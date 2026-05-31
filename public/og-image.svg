@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Link My App">
+  <rect width="1200" height="630" fill="#ffffff"/>
+  <path d="M0 0h1200v630H0z" fill="url(#grid)"/>
+  <defs>
+    <pattern id="grid" width="44" height="44" patternUnits="userSpaceOnUse">
+      <path d="M44 0H0v44" fill="none" stroke="#ededed" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect x="96" y="86" width="1008" height="458" rx="44" fill="#fff" stroke="#e5e5e5"/>
+  <rect x="142" y="132" width="74" height="74" rx="20" fill="#050505"/>
+  <path d="M162 174c9 8 18 8 27-3l10-11c3-3 3-6 0-9s-7-3-9 0l-9 10c-6 7-12 7-19 1v12Z" fill="#fff"/>
+  <path d="M198 164c-9-8-18-8-27 3l-10 11c-3 3-3 6 0 9s7 3 9 0l9-10c6-7 12-7 19-1v-12Z" fill="#fff" opacity=".82"/>
+  <text x="240" y="184" fill="#050505" font-family="Arial, Helvetica, sans-serif" font-size="42" font-weight="800">Link My App</text>
+  <text x="142" y="316" fill="#050505" font-family="Arial, Helvetica, sans-serif" font-size="76" font-weight="900">Link de descarga para apps</text>
+  <text x="142" y="386" fill="#555" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="600">App Store, Google Play, QR y estadísticas en una sola URL.</text>
+  <rect x="142" y="438" width="298" height="62" rx="22" fill="#050505"/>
+  <text x="172" y="479" fill="#fff" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="800">link-my.app</text>
+</svg>

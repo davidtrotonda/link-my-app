@@ -1,0 +1,42 @@
+{
+  "rules": {
+    "users": {
+      "$uid": {
+        ".read": "data.child('public').val() === true || (auth != null && auth.uid === $uid)",
+        ".write": "auth != null && auth.uid === $uid && (!newData.hasChild('plan') || newData.child('plan').val() == data.child('plan').val()) && (!newData.hasChild('planLabel') || newData.child('planLabel').val() == data.child('planLabel').val()) && (!newData.hasChild('proSince') || newData.child('proSince').val() == data.child('proSince').val()) && (!newData.hasChild('stripeCustomerId') || newData.child('stripeCustomerId').val() == data.child('stripeCustomerId').val()) && (!newData.hasChild('stripeLastSessionId') || newData.child('stripeLastSessionId').val() == data.child('stripeLastSessionId').val())",
+        ".validate": "newData.hasChildren(['uid', 'displayName', 'email', 'public']) && newData.child('uid').val() === $uid && newData.child('displayName').isString() && newData.child('email').isString() && newData.child('public').isBoolean()"
+      }
+    },
+    "links": {
+      ".indexOn": ["slug", "ownerId"],
+      ".read": "(auth != null && query.orderByChild == 'ownerId' && query.equalTo == auth.uid) || (query.orderByChild == 'slug' && query.equalTo != null)",
+      "$linkId": {
+        ".read": "data.child('active').val() === true || (auth != null && data.child('ownerId').val() === auth.uid)",
+        ".write": "auth != null && ((!data.exists() && newData.child('ownerId').val() === auth.uid) || (data.exists() && data.child('ownerId').val() === auth.uid && (!newData.exists() || newData.child('ownerId').val() === auth.uid)))",
+        ".validate": "newData.hasChildren(['ownerId', 'title', 'slug', 'iosUrl', 'androidUrl', 'fallbackUrl', 'active', 'createdAt', 'updatedAt']) && newData.child('ownerId').isString() && newData.child('title').isString() && newData.child('slug').isString() && newData.child('iosUrl').isString() && newData.child('androidUrl').isString() && newData.child('fallbackUrl').isString() && newData.child('active').isBoolean()"
+      }
+    },
+    "clickEvents": {
+      ".indexOn": ["ownerId", "ownerLinkKey", "linkId"],
+      ".read": "auth != null && query.orderByChild == 'ownerId' && query.equalTo == auth.uid",
+      "$eventId": {
+        ".read": "auth != null && data.child('ownerId').val() === auth.uid",
+        ".write": "(!data.exists() && newData.hasChildren(['linkId', 'ownerId', 'ownerLinkKey', 'slug', 'destination', 'userAgent', 'createdAt']) && newData.child('linkId').isString() && newData.child('ownerId').isString() && newData.child('ownerLinkKey').isString() && newData.child('slug').isString() && newData.child('userAgent').isString() && (newData.child('destination').val() === 'ios' || newData.child('destination').val() === 'android' || newData.child('destination').val() === 'fallback') && root.child('links').child(newData.child('linkId').val()).child('active').val() === true && root.child('links').child(newData.child('linkId').val()).child('ownerId').val() === newData.child('ownerId').val() && root.child('links').child(newData.child('linkId').val()).child('slug').val() === newData.child('slug').val()) || (auth != null && data.exists() && data.child('ownerId').val() === auth.uid && !newData.exists())"
+      }
+    },
+    "settings": {
+      "prices": {
+        ".read": true,
+        ".write": "auth != null && root.child('admins').child(auth.uid).val() === true"
+      },
+      "promoCodes": {
+        ".read": "auth != null && root.child('admins').child(auth.uid).val() === true",
+        ".write": "auth != null && root.child('admins').child(auth.uid).val() === true"
+      }
+    },
+    "admins": {
+      ".read": false,
+      ".write": false
+    }
+  }
+}

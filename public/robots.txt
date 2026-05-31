@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /login
+Disallow: /admin
+Disallow: /perfil
+
+Sitemap: https://link-my.app/sitemap_index.xml
+Sitemap: https://link-my.app/sitemap.xml

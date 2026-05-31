@@ -1,0 +1,95 @@
+{
+  "hosting": {
+    "public": "dist",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "headers": [
+      {
+        "source": "**",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          },
+          {
+            "key": "Strict-Transport-Security",
+            "value": "max-age=31536000; includeSubDomains; preload"
+          },
+          {
+            "key": "X-Content-Type-Options",
+            "value": "nosniff"
+          },
+          {
+            "key": "Referrer-Policy",
+            "value": "strict-origin-when-cross-origin"
+          },
+          {
+            "key": "Permissions-Policy",
+            "value": "camera=(), microphone=(), geolocation=()"
+          }
+        ]
+      },
+      {
+        "source": "**/*.@(js|css|png|jpg|jpeg|gif|svg|webp|woff|woff2|ttf|eot|ico)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=31536000, immutable"
+          }
+        ]
+      }
+    ],
+    "rewrites": [
+      {
+        "source": "/api/stripe/checkout",
+        "function": {
+          "functionId": "createCheckoutSession",
+          "region": "europe-west1"
+        }
+      },
+      {
+        "source": "/api/stripe/portal",
+        "function": {
+          "functionId": "createPortalSession",
+          "region": "europe-west1"
+        }
+      },
+      {
+        "source": "/api/stripe/webhook",
+        "function": {
+          "functionId": "stripeWebhook",
+          "region": "europe-west1"
+        }
+      },
+      {
+        "source": "/api/stripe/verifyPayment",
+        "function": {
+          "functionId": "verifyPayment",
+          "region": "europe-west1"
+        }
+      },
+      {
+        "source": "/api/stripe/applyPromoCode",
+        "function": {
+          "functionId": "applyPromoCode",
+          "region": "europe-west1"
+        }
+      },
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  },
+  "functions": {
+    "source": "functions",
+    "codebase": "default",
+    "ignore": ["node_modules", ".git", "firebase-debug.log", "firebase-debug.*.log"],
+    "postdeploy": ["node scripts/disable-run-invoker-iam.mjs"]
+  },
+  "database": {
+    "rules": "database.rules.json"
+  },
+  "firestore": {
+    "rules": "firestore.rules"
+  }
+}

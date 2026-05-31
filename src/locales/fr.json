@@ -1,0 +1,331 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "how": "Ce que nous faisons",
+    "faqs": "Faqs",
+    "price": "Tarifs",
+    "login": "Se connecter",
+    "logout": "Déconnexion",
+    "blog": "Blog"
+  },
+  "blogCovers": {
+    "limited": "Limité",
+    "free": "GRATUIT",
+    "closes": "Ferme en 2025",
+    "migration": "Migration en 1 clic",
+    "installs": "+300 Installs",
+    "visits": "Visites",
+    "downloads": "Téléchargements"
+  },
+  "language": {
+    "label": "Langue",
+    "en": "English",
+    "es": "Español",
+    "fr": "Français"
+  },
+  "landing": {
+    "heroTag": "Liens de téléchargement pour apps",
+    "heroTitle": "Un lien pour Google Play et App Store",
+    "heroSubtitle": "Crée un lien qui détecte si le mobile est Android ou iOS et l’envoie vers la bonne boutique pour télécharger l’app",
+    "formTitle": "Crée Smartlink",
+    "freeBadge": "Gratuit",
+    "formButton": "Crée Smartlink",
+    "formLoginButton": "Connecte-toi et crée Smartlink",
+    "draftReady": "Nous avons enregistré les informations saisies sur la page d’accueil. Vérifie-les et crée ton lien de téléchargement.",
+    "appNameLabel": "Nom de l’app",
+    "appNamePlaceholder": "Ex. Mon app",
+    "iosUrlLabel": "Lien de ton app sur App Store",
+    "androidUrlLabel": "Lien de ton app sur Google Play",
+    "fallbackUrlLabel": "Lien alternatif pour les autres appareils",
+    "customUrlLabel": "Écris le nom que tu veux pour ton smart link",
+    "editable": "Personnalisable",
+    "customUrlPlaceholder": "/nom-de-ton-app",
+    "fallbackPlaceholder": "https://tonsite.com/telecharger-app",
+    "previewUrl": "link-my.app/telecharger-app",
+    "generatedUrl": "URL générée :",
+    "qrTitle": "Un QR sera aussi créé avec ton lien",
+    "qrText": "Tu pourras l’utiliser sur des affiches, packagings, comptoirs ou campagnes physiques.",
+    "mockupIosTitle": "Ton app sur App Store",
+    "mockupIosGet": "Obtenir",
+    "mockupIosRating": "496 K AVIS",
+    "mockupDownloads": "TÉLÉCHARGEMENTS",
+    "mockupIosAge": "ÂGE",
+    "mockupIosYears": "ans",
+    "mockupAndroidTitle": "Ton app sur Google Play",
+    "mockupAndroidRating": "Avis",
+    "mockupAndroidInstall": "Installer",
+    "seoTitle": "Un lien pour Google Play et App Store",
+    "seoDesc": "Crée des smart links qui envoient chaque clic vers App Store, Google Play ou une URL alternative selon l’appareil."
+  },
+  "seoContent": {
+    "tag": "Plus de téléchargements d’apps",
+    "title": "Promouvoir les deux stores avec un seul lien",
+    "description": "Crée un lien qui détecte si le mobile est Android ou iOS et l’envoie vers la bonne boutique pour télécharger l’app.",
+    "qrCta": "Voir comment créer ton QR",
+    "blocks": [
+      {
+        "title": "Un lien de téléchargement pour iPhone, Android et ordinateur",
+        "text": "Évite d’afficher deux boutons ou d’expliquer quelle boutique ouvrir. Avec un lien intelligent, chaque clic arrive au bon endroit : App Store, Google Play ou une page alternative."
+      },
+      {
+        "title": "Code QR pour télécharger une app en campagnes physiques",
+        "text": "Transforme affiches, packagings, événements et comptoirs en URL mesurables. Le même smart link peut être imprimé en QR et séparer les clics issus des scans."
+      },
+      {
+        "title": "Statistiques pour savoir quel canal apporte le plus de téléchargements",
+        "text": "Mesure les clics par appareil, source et campagne. Compare Instagram, email, web, QR ou magasin physique et décide où promouvoir ton app."
+      }
+    ]
+  },
+  "simulations": {
+    "title": "Ce que fait Link My App",
+    "description": "Si ton app a un lien pour iPhone et un autre pour Android, un smart link crée une seule URL qui détecte l’appareil et envoie chaque visite vers la bonne boutique.",
+    "step1Title": "Le clic",
+    "step1Text": "L’utilisateur trouve ton lien sur les réseaux, dans un email ou en scannant un QR et appuie dessus.",
+    "step2Title": "Analyse",
+    "step2Text": "En une fraction de seconde, nous reconnaissons le système : iOS, Android ou ordinateur.",
+    "step3Title": "Redirection",
+    "step3Text": "Avec un seul lien, nous redirigeons l’utilisateur vers App Store ou Google Play selon que son mobile est iPhone ou Android."
+  },
+  "pricingComparison": {
+    "title": "Gratuit pour commencer. Pro pour grandir",
+    "freeTitle": "Gratuit",
+    "freeText": "Pour tester Link My App avec une app et obtenir un QR de base.",
+    "freeBadge": "Départ",
+    "firstLink": "Ton premier lien",
+    "proTitle": "Pro à vie",
+    "proText": "Pour créer, mesurer et optimiser tous les liens de tes apps.",
+    "best": "Meilleure option",
+    "paymentLabel": "Paiement unique\nà vie",
+    "unlock": "Débloquer Pro",
+    "freeFeatures": ["1 smart link actif", "1 code QR automatique"],
+    "proFeatures": [
+      "Smart links illimités",
+      "QR illimités pour affiches et campagnes",
+      "Statistiques complètes de clics",
+      "Clics séparés par iPhone, Android et ordinateur",
+      "Campagnes par emplacement : Instagram, web, QR, email ou magasin physique",
+      "Historique complet des clics",
+      "Tableau de bord pour gérer toutes tes apps",
+      "Liens personnalisés et modifiables"
+    ]
+  },
+  "pricingExtras": {
+    "compareTag": "Comparaison complète",
+    "compareTitle": "Ce qu'inclut exactement chaque plan",
+    "colFeature": "Fonction",
+    "compareRows": [
+      { "feature": "Smart links actifs", "free": "1", "pro": "Illimités" },
+      { "feature": "Codes QR", "free": "1 automatique", "pro": "Illimités" },
+      { "feature": "Statistiques de clics", "free": "Basiques", "pro": "Complètes par appareil, source et campagne" },
+      { "feature": "Slugs personnalisés", "free": false, "pro": true },
+      { "feature": "Modifier les destinations sans réimprimer le QR", "free": false, "pro": true },
+      { "feature": "Smart link par canal (Instagram, TikTok, QR…)", "free": false, "pro": true },
+      { "feature": "Historique complet des clics", "free": false, "pro": true },
+      { "feature": "Panel multi-apps", "free": false, "pro": true },
+      { "feature": "Support par email", "free": true, "pro": true }
+    ],
+    "whyTag": "Pourquoi un paiement unique",
+    "whyTitle": "Sans abonnements ni surprises mensuelles",
+    "reasons": [
+      { "title": "Pas d'abonnement mensuel", "text": "Tu paies 9,99 € une fois et ton compte Pro reste actif sans renouvellement ni charges surprises." },
+      { "title": "Prix bloqué à vie", "text": "Si on augmente les prix pour les nouveaux utilisateurs, ton paiement original reste intact." },
+      { "title": "Sans contrat ni engagement", "text": "Aucune durée minimum. C'est un achat, pas un abonnement." }
+    ],
+    "faqTitle": "FAQ sur le prix",
+    "faqs": [
+      { "q": "Est-ce vraiment un paiement unique ?", "a": "Oui. Tu paies 9,99 € une seule fois et ton compte devient Pro à vie. Pas de renouvellement automatique, ni de facturation mensuelle ou annuelle." },
+      { "q": "Y a-t-il une limite de smart links ou QR en Pro ?", "a": "Non. Avec Pro tu crées tous les smart links et QR que tu veux pour différentes apps, campagnes, canaux ou lieux." },
+      { "q": "Que deviennent les liens créés en Gratuit ?", "a": "Ils restent actifs et continuent de fonctionner. Passer à Pro débloque les statistiques avancées, les slugs personnalisés et les liens illimités." },
+      { "q": "Puis-je changer la destination d'un lien sans réimprimer le QR ?", "a": "Oui. Les smart links sont stables : tu peux changer l'URL App Store, Google Play ou alternative quand tu veux et le QR imprimé continue de fonctionner." },
+      { "q": "Quels moyens de paiement acceptez-vous ?", "a": "Tu peux payer par carte, Apple Pay ou Google Pay selon ton appareil. La transaction est traitée de manière sécurisée par notre prestataire de paiement." },
+      { "q": "Puis-je facturer le paiement à mon entreprise ?", "a": "Oui. Après le paiement tu reçois un reçu et on peut émettre une facture avec les données fiscales de ton entreprise sur demande." }
+    ],
+    "ctaTag": "Commence aujourd'hui",
+    "ctaTitle": "Crée ton premier smart link gratuitement",
+    "ctaSubtitle": "Sans carte. Sans engagement. Débloque Pro avec un seul paiement quand tu en as besoin.",
+    "ctaButton": "Créer un compte gratuit"
+  },
+  "landingFaqs": {
+    "title": "Questions fréquentes",
+    "subtitle": "Réponses sur les liens de téléchargement pour apps, les codes QR et les statistiques de clics.",
+    "items": [
+      {
+        "question": "Que fait exactement Link My App ?",
+        "answer": "Link My App crée un lien unique pour ton app. Quand quelqu’un l’ouvre, il détecte iPhone, Android ou un autre appareil et l’envoie automatiquement vers la bonne destination."
+      },
+      {
+        "question": "Puis-je créer plusieurs liens pour la même app ?",
+        "answer": "Oui. Tu peux créer différents liens pour tes campagnes, emplacements ou canaux et savoir d’où viennent les clics."
+      },
+      {
+        "question": "Est-ce qu’il génère aussi un code QR ?",
+        "answer": "Oui. En plus du lien de téléchargement, un QR est créé pour les affiches, packagings, comptoirs, événements ou campagnes physiques."
+      },
+      {
+        "question": "Que se passe-t-il si l’utilisateur ouvre le lien depuis un ordinateur ?",
+        "answer": "Dans ce cas, Link My App utilise le lien alternatif que tu as défini, par exemple une landing de téléchargement, une page d’information ou ton site web."
+      },
+      {
+        "question": "Ai-je besoin de connaissances techniques ?",
+        "answer": "Non. Il suffit de coller le lien App Store, le lien Google Play, d’écrire le nom souhaité et de créer ton lien de téléchargement."
+      }
+    ]
+  },
+  "footer": {
+    "ctaTitle": "Transforme chaque clic en téléchargement",
+    "ctaSubtitle": "Regroupe App Store, Google Play, QR et campagnes dans une seule URL prête à envoyer chaque utilisateur vers la bonne destination.",
+    "btnCreate": "Créer mon lien de téléchargement",
+    "btnAccess": "Accéder au tableau de bord",
+    "brandSubtitle": "Un lien de téléchargement pour envoyer chaque utilisateur vers la bonne boutique.",
+    "cookies": "Cookies",
+    "terms": "Conditions générales",
+    "privacy": "Politique de confidentialité",
+    "blog": "Blog"
+  },
+  "login": {
+    "seoTitle": "Connexion pour créer des liens de téléchargement d’apps",
+    "seoDesc": "Accède à Link My App pour créer des liens de téléchargement, générer des QR codes et consulter les statistiques de clics de tes apps.",
+    "privatePanel": "Tableau privé",
+    "heroTitle": "Crée des liens et mesure les clics",
+    "benefit1": "Crée des liens pour iPhone, Android et web",
+    "benefit2": "Génère un QR automatique pour chaque lien",
+    "benefit3": "Consulte les statistiques de clics et d’appareils",
+    "authTag": "Authentification",
+    "loginTitle": "Accède à ton compte",
+    "registerTitle": "Crée ton compte",
+    "pendingDraft": "Ton lien de téléchargement est prêt. Connecte-toi et il t’attendra dans le tableau de bord.",
+    "googleBtn": "Continuer avec Google",
+    "emailSeparator": "Email",
+    "nameLabel": "Nom",
+    "namePlaceholder": "Ton nom",
+    "emailLabel": "Email",
+    "passwordLabel": "Mot de passe",
+    "passwordPlaceholder": "Minimum 6 caractères",
+    "loginBtn": "Connexion",
+    "registerBtn": "Créer un compte",
+    "switchRegister": "Pas encore de compte ? Inscris-toi gratuitement",
+    "switchLogin": "Tu as déjà un compte ? Connecte-toi"
+  },
+  "cookiesBanner": {
+    "text": "Pour améliorer ton expérience, nous utilisons des cookies. Ils nous aident à mémoriser tes préférences et à rendre la navigation plus rapide et fluide.",
+    "reject": "Refuser",
+    "accept": "Accepter les cookies"
+  },
+  "blog": {
+    "indexTitle": "Augmente les téléchargements de ton app",
+    "indexSubtitle": "Guides pratiques pour promouvoir une app avec un seul lien, mesurer les campagnes et envoyer chaque clic vers la bonne boutique.",
+    "share": "Partager",
+    "readArticle": "Dans cet article",
+    "related": "Articles liés",
+    "moreArticles": "Voir plus d’articles",
+    "updated": "Mis à jour en",
+    "reading": "de lecture",
+    "prevPage": "Précédent",
+    "nextPage": "Suivant"
+  },
+  "dashboard": {
+    "copy": "Copier",
+    "channelsTag": "D'où viendront les téléchargements ?",
+    "channelsSubtitle": "Crée des URLs spécifiques par réseau social pour mesurer chaque canal séparément.",
+    "channelsHint": "Crée un lien par réseau social et mesure quel canal génère le plus de téléchargements (Pro requis).",
+    "channelsHintPro": "Crée un lien par canal pour mesurer chacun séparément.",
+    "channelPreviewPrefix": "Ton lien pour",
+    "channelPreviewSuffix": "aura le suffixe",
+    "channelCreated": "Lien créé pour",
+    "createCtaSubtitle": "Touche pour ouvrir le formulaire et créer ton lien",
+    "open": "Ouvrir",
+    "pause": "Mettre en pause",
+    "activate": "Activer",
+    "delete": "Supprimer",
+    "others": "Autres",
+    "ratePlatforms": "Évalue-nous sur Trustpilot",
+    "leaveSuggestion": "Laisse-nous une suggestion",
+    "suggestionPlaceholder": "Quelque chose fonctionne mal ou tu l’améliorerais...",
+    "sendFeedback": "Envoyer le commentaire",
+    "settingsLanguage": "Langue",
+    "successTitle": "Tu es maintenant PRO",
+    "successText": "Ton compte a été mis à niveau. Tu peux créer tous les liens que tu veux et utiliser les fonctionnalités premium.",
+    "successButton": "Aller à mon tableau de bord",
+    "subtitle": "Tes liens de téléchargement",
+    "title": "Tableau de bord des liens",
+    "statLinks": "Liens",
+    "statActive": "Actifs",
+    "statClicks": "Clics",
+    "statDownloads": "Téléchargements",
+    "loadingLinks": "Chargement des liens...",
+    "noLinksTitle": "Tu n’as pas encore de liens",
+    "noLinksDesc": "Crée le premier depuis le formulaire et il apparaîtra ici avec son URL, son QR et ses statistiques.",
+    "createFirstLink": "Créer mon premier lien",
+    "active": "Actif",
+    "paused": "En pause",
+    "createTitle": "Crée Smartlink",
+    "createButton": "Crée Smartlink",
+    "downloadQR": "Télécharger le QR",
+    "freePlan": "Gratuit",
+    "linksPanelTag": "Tableau des liens",
+    "openSettings": "Ouvrir les paramètres du compte",
+    "userDefault": "Utilisateur",
+    "deleteConfirm": "Tu vas supprimer ton compte, tes liens et tes statistiques. Cette action est irréversible.",
+    "accountDetailsTag": "Détails du compte",
+    "accountTitle": "Compte",
+    "closeSettings": "Fermer les paramètres",
+    "nameLabel": "Nom",
+    "noEmail": "Sans email",
+    "currentPlan": "Plan actuel",
+    "saveChanges": "Enregistrer",
+    "dangerZone": "Zone dangereuse",
+    "deleteWarning": "Si tu supprimes le compte, tes smartlinks, statistiques et données du tableau de bord seront supprimés.",
+    "totalClicks": "Clics totaux",
+    "clicksOnLink": "Clics sur le lien",
+    "downloadsLabel": "Téléchargements",
+    "estimateNotice": "Estimation basée sur des données moyennes de conversion du secteur. Nous analysons l’origine géographique, l’appareil et les schémas temporels de chaque clic pour proposer une projection réaliste du volume d’installations attendues.",
+    "clicksOnQR": "Clics sur le QR",
+    "priceCurrency": "€",
+    "priceValue": "9,99",
+    "price": "9,99€",
+    "unlockProTag": "Débloque Pro",
+    "unlockProTitle": "Crée des liens illimités",
+    "unlockProDesc": "Ton premier lien est déjà créé. Passe à Pro pour créer tous les liens que tu veux pour 9,99€ à vie, mesurer tes campagnes et voir les statistiques en temps réel.",
+    "proFeature1": "Smart links illimités",
+    "proFeature2": "Statistiques en temps réel",
+    "proFeature3": "QR illimités pour campagnes",
+    "proFeature4": "Historique complet des clics",
+    "promoPlaceholder": "Code promo (facultatif)",
+    "unlockProModalTitle": "Passe à Pro",
+    "unlockProModalDesc": "Tu peux créer tous les liens que tu veux pour 9,99€ à vie. QR illimités, statistiques en temps réel et historique complet inclus."
+  },
+  "marketing": {
+    "precio": {
+      "title": "Tarifs des liens de téléchargement pour apps",
+      "description": "Consulte les tarifs de Link My App : commence gratuitement avec 1 lien et débloque les smart links illimités, QR et statistiques avec un paiement unique.",
+      "eyebrow": "",
+      "h1": "",
+      "intro": ""
+    },
+    "faqs": {
+      "title": "Questions fréquentes sur les liens de téléchargement d’apps",
+      "description": "Réponses sur la création de liens de téléchargement pour apps, la génération de QR codes et la mesure des clics vers App Store et Google Play.",
+      "eyebrow": "Faqs",
+      "h1": "Questions fréquentes sur les liens pour télécharger des apps.",
+      "intro": "Tout ce qu’il faut savoir avant de créer une URL unique pour App Store, Google Play, QR et campagnes."
+    },
+    "comoFunciona": {
+      "title": "Comment créer un lien pour App Store et Google Play",
+      "description": "Découvre comment fonctionne un smart link pour apps : il détecte iPhone, Android ou ordinateur et redirige vers App Store, Google Play ou une URL alternative.",
+      "eyebrow": "Fonctionnement",
+      "h1": "Ce que nous faisons chez <br class=\"md:hidden\" /> Link My App",
+      "intro": "Un lien intelligent évite de perdre des utilisateurs : il détecte l’appareil, redirige vers la bonne destination et permet de mesurer les clics par source."
+    }
+  },
+  "notFound": {
+    "title": "Page introuvable",
+    "description": "Cette page Link My App n’existe pas ou le smart link n’est plus disponible.",
+    "heading": "Lien introuvable",
+    "text": "Cette page n’existe pas ou le smart link n’est plus disponible.",
+    "back": "Retour à l’accueil"
+  },
+  "publicProfile": {
+    "noLinks": "Ce profil n’a pas encore de liens actifs."
+  }
+}
