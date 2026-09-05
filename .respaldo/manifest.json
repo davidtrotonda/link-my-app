@@ -1,0 +1,80 @@
+{
+  "path": "/Users/davidtroton/Documents/Codex/2026-08-13/en-link-my-app-tienes-que/work/link-my-app",
+  "project": "link-my-app",
+  "common": "/Users/davidtroton/Documents/Codex/2026-08-13/en-link-my-app-tienes-que/work/link-my-app/.git",
+  "gitdir": "/Users/davidtroton/Documents/Codex/2026-08-13/en-link-my-app-tienes-que/work/link-my-app/.git",
+  "remote": "https://github.com/davidtrotonda/link-my-app.git",
+  "id": "link-my-app-b884e439f6",
+  "head": "e2eb6b9b2534d0bf72e0bd4abfcd8ae980069a71",
+  "capture_mode": "changes",
+  "captured_at": "2026-09-05T16:06:29.718930+02:00",
+  "files": [
+    {
+      "path": "public/sitemap-blog.xml",
+      "bytes": 12562,
+      "sha256": "d3b7ec43c4b1262ef3f82b56e15c6c0d5411ef2cabd1ec75cde15e19d9d38ced",
+      "mode": 420,
+      "git_blob": "b3bc670828b159a56864eee624977643a490ecc0"
+    },
+    {
+      "path": "public/sitemap-en.xml",
+      "bytes": 13166,
+      "sha256": "19a04396236706c347d9d87dbf67a64169adda9dbb227c38fe5246037cf88cc3",
+      "mode": 420,
+      "git_blob": "4f91d003c62b1fe2762dfebe606dade47de0741e"
+    },
+    {
+      "path": "public/sitemap-es.xml",
+      "bytes": 13246,
+      "sha256": "c0535b3c6f9c96722033373457096eff9944416a506c6d6218455f8719629f6a",
+      "mode": 420,
+      "git_blob": "36ccc6f58d77349bb0f39a561c69e192937e71f0"
+    },
+    {
+      "path": "public/sitemap-fr.xml",
+      "bytes": 13284,
+      "sha256": "0c7cfc7649663f376131d3a71787e39c34bcfbc10892f37af7f61a25215d7745",
+      "mode": 420,
+      "git_blob": "2f465336e86104a61343d034c4d34ca907f8f1f4"
+    },
+    {
+      "path": "public/sitemap_index.xml",
+      "bytes": 560,
+      "sha256": "e70599db2d51320a315f210071c4ea6eb2ad50b82bfacecd31d08aefcd00eb7d",
+      "mode": 420,
+      "git_blob": "372259eaa925ed3da93830117e64ae72a23ecc8c"
+    },
+    {
+      "path": "public/tourixy-favicon.png",
+      "bytes": 5276,
+      "sha256": "633bf2d0aa3f6b5485dae152518a0d6f0b37088bb1bad4dfa8a4a8e0ed0e9a6c",
+      "mode": 420,
+      "git_blob": "2c414f21cbd9bea4c81a9fa8603e5b8a0d2cb86e"
+    },
+    {
+      "path": "src/App.jsx",
+      "bytes": 176058,
+      "sha256": "cc7ec3854b1250e2b63e2ddd45e91eb8eeaf042996e42c20eafc2501e03adb11",
+      "mode": 420,
+      "git_blob": "db8b8f0aa87f5029674bca6cfc3074766b4c5fa2"
+    },
+    {
+      "path": "src/TourixyCaseStudy.jsx",
+      "bytes": 26175,
+      "sha256": "80dcd53a45ce789b9f484f44e0033efff41cec91f3f71729dff12410d5f6e17e",
+      "mode": 420,
+      "git_blob": "954b253df871b5de205f6ea10f9988a2cce2e27a"
+    },
+    {
+      "path": "src/lib/i18nRoutes.js",
+      "bytes": 6479,
+      "sha256": "014e9f31b6c24ae002d9c50525f1070c6ab7f2291761c48c45ce897cfae5d362",
+      "mode": 420,
+      "git_blob": "7a2139443038d949590eeeae4fba91102ee616da"
+    }
+  ],
+  "private_files": [],
+  "deleted": [],
+  "omitted": [],
+  "excluded_counts": {}
+}

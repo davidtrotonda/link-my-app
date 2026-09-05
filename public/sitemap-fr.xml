@@ -12,6 +12,16 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://link-my.app/" />
   </url>
   <url>
+    <loc>https://link-my.app/fr/cas-clients/tourixy</loc>
+    <lastmod>2026-08-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/success-stories/tourixy" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://link-my.app/es/casos-de-exito/tourixy" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://link-my.app/fr/cas-clients/tourixy" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://link-my.app/success-stories/tourixy" />
+  </url>
+  <url>
     <loc>https://link-my.app/fr/que-faisons-nous</loc>
     <lastmod>2026-05-25</lastmod>
     <changefreq>monthly</changefreq>

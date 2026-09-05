@@ -141,6 +141,7 @@ const UseCasePage = React.lazy(() => import("./UseCasePage.jsx"));
 const AgenciesPage = React.lazy(() => import("./AgenciesPage.jsx"));
 const HowToHub = React.lazy(() => import("./HowToHub.jsx"));
 const HowToPage = React.lazy(() => import("./HowToPage.jsx"));
+const TourixyCaseStudy = React.lazy(() => import("./TourixyCaseStudy.jsx"));
 
 const AuthContext = createContext({
   user: null,
@@ -1283,6 +1284,12 @@ function SeoContentSection() {
   const blocks = Array.isArray(translatedBlocks)
     ? translatedBlocks.map((b, i) => ({ ...contentBlocks[i], ...b }))
     : contentBlocks;
+  const tourixyCaseLabel =
+    {
+      en: "Success story · Tourixy",
+      es: "Caso de éxito · Tourixy",
+      fr: "Cas client · Tourixy",
+    }[language] || "Success story · Tourixy";
 
   return (
     <section className="relative w-full bg-white px-5 py-20 text-black md:px-8 md:py-24">
@@ -1402,6 +1409,32 @@ function SeoContentSection() {
                 </Link>
               );
             })}
+          </div>
+        </div>
+
+        <div className="mt-6 flex justify-center">
+          <div className="inline-flex items-center rounded-full border border-sky-100 bg-white p-1.5 pr-2 shadow-[0_14px_38px_rgba(14,116,144,0.10)]">
+            <img
+              src="/tourixy-favicon.png"
+              alt=""
+              className="h-10 w-10 rounded-full shadow-sm"
+            />
+            <Link
+              to={localizePath("/success-story/tourixy", language)}
+              className="group ml-2.5 rounded-full px-2 py-2 text-[12px] font-black uppercase tracking-[0.13em] text-black/70 transition hover:text-black"
+            >
+              {tourixyCaseLabel}
+            </Link>
+            <span className="mx-1 h-5 w-px bg-black/10" aria-hidden />
+            <a
+              href="https://tourixy.com"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Tourixy.com"
+              className="grid h-9 w-9 place-items-center rounded-full bg-black text-white transition hover:-translate-y-0.5 hover:bg-sky-700"
+            >
+              <ArrowRight size={15} />
+            </a>
           </div>
         </div>
       </div>
@@ -4399,6 +4432,10 @@ function App() {
               />
               <Route path={getLocalizedRouteSegment("/blog", language)} element={<BlogIndex />} />
               <Route path={`${getLocalizedRouteSegment("/blog", language)}/:slug`} element={<BlogPost />} />
+              <Route
+                path={getLocalizedRouteSegment("/success-story/tourixy", language)}
+                element={<TourixyCaseStudy />}
+              />
               <Route
                 path="como-funciona"
                 element={<MarketingPage pageKey="comoFunciona" />}
