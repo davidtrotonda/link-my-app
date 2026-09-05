@@ -54,6 +54,78 @@ const hubMeta = {
     intro:
       "Guides étape par étape pour utiliser ton smart link dans chaque canal : Instagram, WhatsApp, ton site, codes QR et redirection par appareil.",
   },
+  ja: {
+    title: "アプリダウンロードリンクの作り方ガイド",
+    description:
+      "Instagramプロフィール、WhatsApp、端末別リダイレクト、Webボタン、紙媒体QRでアプリを共有するための実践ガイド。",
+    h1: "アプリをスマートに共有する方法",
+    eyebrow: "使い方ガイド",
+    intro:
+      "Instagram、WhatsApp、Webサイト、QRコード、端末別リダイレクトなど、各チャネルでスマートリンクを使う手順を解説します。",
+  },
+  de: {
+    title: "Anleitungen für App-Download-Links",
+    description:
+      "Praktische Guides für Instagram Bio, WhatsApp, Geräte-Weiterleitung, Website-Button und QR-Codes für App-Downloads.",
+    h1: "So teilst du deine App auf die smarte Art",
+    eyebrow: "Anleitungen",
+    intro:
+      "Schritt-für-Schritt-Guides für deinen Smartlink in jedem Kanal: Instagram, WhatsApp, Website, QR-Codes und automatische Weiterleitung nach Gerät.",
+  },
+  pt: {
+    title: "Guias para links de download de apps",
+    description:
+      "Guias práticos para bio de Instagram, WhatsApp, redirecionamento por dispositivo, botão no site e QR codes para downloads de apps.",
+    h1: "Como partilhar a tua app de forma inteligente",
+    eyebrow: "Guias",
+    intro:
+      "Guias passo a passo para usar o teu smart link em cada canal: Instagram, WhatsApp, site, QR codes e redirecionamento automático por dispositivo.",
+  },
+  it: {
+    title: "Guide per link di download app",
+    description:
+      "Guide pratiche per bio Instagram, WhatsApp, reindirizzamento per dispositivo, pulsante sito e QR code per download app.",
+    h1: "Come condividere la tua app in modo intelligente",
+    eyebrow: "Guide",
+    intro:
+      "Guide passo dopo passo per usare il tuo smart link in ogni canale: Instagram, WhatsApp, sito, QR code e reindirizzamento automatico per dispositivo.",
+  },
+  ko: {
+    title: "앱 다운로드 링크 사용 가이드",
+    description:
+      "Instagram 프로필, WhatsApp, 기기별 리디렉션, 웹사이트 버튼, 오프라인 QR 캠페인에서 앱을 공유하는 실전 가이드.",
+    h1: "앱을 더 스마트하게 공유하는 방법",
+    eyebrow: "가이드",
+    intro:
+      "Instagram, WhatsApp, 웹사이트, QR 코드, 기기별 리디렉션에서 스마트 링크를 쓰는 방법을 단계별로 안내합니다.",
+  },
+  nl: {
+    title: "Gidsen voor app-downloadlinks",
+    description:
+      "Praktische gidsen voor Instagram bio, WhatsApp, doorsturen per apparaat, websiteknop en QR-codes voor app-downloads.",
+    h1: "Hoe je je app slimmer deelt",
+    eyebrow: "Gidsen",
+    intro:
+      "Stap-voor-stap gidsen om je smartlink in elk kanaal te gebruiken: Instagram, WhatsApp, website, QR-codes en automatisch doorsturen per apparaat.",
+  },
+  ar: {
+    title: "أدلة روابط تنزيل التطبيقات",
+    description:
+      "أدلة عملية لـ Instagram bio وWhatsApp والتحويل حسب الجهاز وزر الموقع ورموز QR لتنزيل التطبيقات.",
+    h1: "كيف تشارك تطبيقك بطريقة أذكى",
+    eyebrow: "الأدلة",
+    intro:
+      "أدلة خطوة بخطوة لاستخدام الرابط الذكي في كل قناة: Instagram وWhatsApp والموقع ورموز QR والتحويل التلقائي حسب الجهاز.",
+  },
+  hi: {
+    title: "App download links के लिए how-to guides",
+    description:
+      "Instagram bio, WhatsApp, device redirect, website button और app download QR codes के लिए practical guides.",
+    h1: "अपनी app को smart तरीके से कैसे share करें",
+    eyebrow: "Guides",
+    intro:
+      "हर channel में smart link इस्तेमाल करने के लिए step-by-step guides: Instagram, WhatsApp, website, QR codes और device-based redirects.",
+  },
 };
 
 export default function HowToHub() {

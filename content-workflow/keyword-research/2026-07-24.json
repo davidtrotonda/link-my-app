@@ -1,0 +1,750 @@
+{
+  "queriedAt": "2026-07-24T11:07:56+02:00",
+  "timezone": "Europe/Madrid",
+  "googleAds": {
+    "customerId": "4440561793",
+    "languageId": "1003",
+    "locationIds": [
+      "2724"
+    ],
+    "network": "GOOGLE_SEARCH",
+    "currency": "EUR",
+    "source": "Google Ads Keyword Planner"
+  },
+  "seeds": [
+    {
+      "family": "Enlaces de descarga y tiendas",
+      "keywords": [
+        "enlace de descarga app",
+        "un solo enlace app store google play",
+        "smart link para apps",
+        "enlace universal app",
+        "link de descarga aplicación"
+      ]
+    },
+    {
+      "family": "Promoción, adquisición y conversión",
+      "keywords": [
+        "cómo promocionar una app móvil",
+        "marketing de aplicaciones móviles",
+        "conseguir descargas app",
+        "campaña instalación de aplicaciones",
+        "publicidad para apps"
+      ]
+    },
+    {
+      "family": "QR, medición, atribución e influencers",
+      "keywords": [
+        "qr para descargar app",
+        "medir descargas de una app",
+        "atribución app móvil",
+        "tracking descargas app",
+        "marketing influencers aplicaciones",
+        "anuncios para descargar app"
+      ]
+    },
+    {
+      "family": "ASO y descubrimiento en las tiendas",
+      "keywords": [
+        "aso app",
+        "app store optimization",
+        "optimización app store",
+        "posicionamiento de aplicaciones",
+        "palabras clave app store",
+        "optimizar ficha google play",
+        "seo para apps",
+        "aso marketing"
+      ]
+    }
+  ],
+  "monthlyVolumeLabels": [
+    "2025-07",
+    "2025-08",
+    "2025-09",
+    "2025-10",
+    "2025-11",
+    "2025-12",
+    "2026-01",
+    "2026-02",
+    "2026-03",
+    "2026-04",
+    "2026-05",
+    "2026-06"
+  ],
+  "trendMethod": "La tendencia compara visualmente los tres últimos meses disponibles con los tres primeros. Para la keyword seleccionada se conserva además el cálculo porcentual exacto.",
+  "candidates": [
+    {
+      "keyword": "app store optimization",
+      "family": "ASO",
+      "avgMonthlySearches": 170,
+      "competition": "MEDIUM",
+      "competitionIndex": 51,
+      "lowTopOfPageBid": 2.581024,
+      "highTopOfPageBid": 13.659073,
+      "monthlySearchVolumes": [210, 170, 210, 320, 170, 90, 140, 140, 390, 90, 110, 70],
+      "trend": "down",
+      "decision": "selected"
+    },
+    {
+      "keyword": "aso app",
+      "family": "ASO",
+      "avgMonthlySearches": 170,
+      "competition": "MEDIUM",
+      "competitionIndex": 51,
+      "lowTopOfPageBid": 2.581024,
+      "highTopOfPageBid": 13.659073,
+      "monthlySearchVolumes": [210, 170, 210, 320, 170, 90, 140, 140, 390, 90, 110, 70],
+      "trend": "down",
+      "decision": "consolidated variant"
+    },
+    {
+      "keyword": "aso marketing",
+      "family": "ASO",
+      "avgMonthlySearches": 70,
+      "competition": "LOW",
+      "competitionIndex": 19,
+      "lowTopOfPageBid": 1.042984,
+      "highTopOfPageBid": 12.308099,
+      "monthlySearchVolumes": [70, 50, 170, 110, 90, 40, 70, 50, 110, 30, 30, 30],
+      "trend": "down",
+      "decision": "secondary"
+    },
+    {
+      "keyword": "google play aso",
+      "family": "ASO",
+      "avgMonthlySearches": 40,
+      "competition": "LOW",
+      "competitionIndex": 27,
+      "lowTopOfPageBid": 2.801156,
+      "highTopOfPageBid": 7.380761,
+      "monthlySearchVolumes": [30, 30, 70, 70, 50, 20, 30, 20, 90, 10, 20, 10],
+      "trend": "down",
+      "decision": "secondary"
+    },
+    {
+      "keyword": "aso seo",
+      "family": "ASO",
+      "avgMonthlySearches": 30,
+      "competition": "LOW",
+      "competitionIndex": 13,
+      "lowTopOfPageBid": 0,
+      "highTopOfPageBid": 0,
+      "monthlySearchVolumes": [40, 30, 40, 40, 30, 20, 20, 20, 70, 30, 20, 10],
+      "trend": "down",
+      "decision": "secondary"
+    },
+    {
+      "keyword": "aso aplicaciones",
+      "family": "ASO",
+      "avgMonthlySearches": 20,
+      "competition": "LOW",
+      "competitionIndex": 29,
+      "lowTopOfPageBid": 0,
+      "highTopOfPageBid": 0,
+      "monthlySearchVolumes": [10, 10, 20, 30, 20, 10, 20, 10, 40, 10, 10, 10],
+      "trend": "flat",
+      "decision": "secondary"
+    },
+    {
+      "keyword": "seo para aplicaciones",
+      "family": "ASO",
+      "avgMonthlySearches": 20,
+      "competition": "UNSPECIFIED",
+      "competitionIndex": 0,
+      "lowTopOfPageBid": 0,
+      "highTopOfPageBid": 0,
+      "monthlySearchVolumes": [10, 10, 30, 30, 30, 20, 10, 10, 40, 10, 10, 0],
+      "trend": "down",
+      "decision": "secondary"
+    },
+    {
+      "keyword": "seo para apps",
+      "family": "ASO",
+      "avgMonthlySearches": 20,
+      "competition": "UNSPECIFIED",
+      "competitionIndex": 0,
+      "lowTopOfPageBid": 0,
+      "highTopOfPageBid": 0,
+      "monthlySearchVolumes": [20, 10, 30, 40, 40, 10, 20, 10, 50, 10, 10, 0],
+      "trend": "down",
+      "decision": "secondary"
+    },
+    {
+      "keyword": "aso iphone",
+      "family": "ASO",
+      "avgMonthlySearches": 10,
+      "competition": "UNSPECIFIED",
+      "competitionIndex": 0,
+      "lowTopOfPageBid": 0,
+      "highTopOfPageBid": 0,
+      "monthlySearchVolumes": [10, 10, 30, 30, 20, 10, 10, 10, 30, 10, 10, 0],
+      "trend": "down",
+      "decision": "rejected"
+    },
+    {
+      "keyword": "aso para apps",
+      "family": "ASO",
+      "avgMonthlySearches": 10,
+      "competition": "UNSPECIFIED",
+      "competitionIndex": 0,
+      "lowTopOfPageBid": 0,
+      "highTopOfPageBid": 0,
+      "monthlySearchVolumes": [0, 0, 0, 10, 0, 0, 0, 0, 10, 0, 10, 0],
+      "trend": "up from zero",
+      "decision": "rejected"
+    },
+    {
+      "keyword": "google play seo",
+      "family": "ASO",
+      "avgMonthlySearches": 10,
+      "competition": "LOW",
+      "competitionIndex": 29,
+      "lowTopOfPageBid": 0,
+      "highTopOfPageBid": 0,
+      "monthlySearchVolumes": [10, 10, 0, 0, 10, 10, 10, 10, 20, 10, 10, 10],
+      "trend": "flat",
+      "decision": "secondary"
+    },
+    {
+      "keyword": "posicionamiento app store",
+      "family": "ASO",
+      "avgMonthlySearches": 10,
+      "competition": "UNSPECIFIED",
+      "competitionIndex": 0,
+      "lowTopOfPageBid": 0,
+      "highTopOfPageBid": 0,
+      "monthlySearchVolumes": [10, 0, 0, 0, 10, 0, 0, 0, 0, 10, 0, 0],
+      "trend": "flat",
+      "decision": "rejected"
+    },
+    {
+      "keyword": "posicionamiento de aplicaciones",
+      "family": "ASO",
+      "avgMonthlySearches": 10,
+      "competition": "UNSPECIFIED",
+      "competitionIndex": 0,
+      "lowTopOfPageBid": 0,
+      "highTopOfPageBid": 0,
+      "monthlySearchVolumes": [0, 0, 10, 10, 10, 0, 10, 10, 10, 10, 10, 0],
+      "trend": "up",
+      "decision": "rejected"
+    },
+    {
+      "keyword": "posicionar app en google play",
+      "family": "ASO",
+      "avgMonthlySearches": 10,
+      "competition": "UNSPECIFIED",
+      "competitionIndex": 0,
+      "lowTopOfPageBid": 0,
+      "highTopOfPageBid": 0,
+      "monthlySearchVolumes": [10, 10, 10, 10, 0, 0, 10, 0, 10, 0, 10, 0],
+      "trend": "down",
+      "decision": "rejected"
+    },
+    {
+      "keyword": "seo google play store",
+      "family": "ASO",
+      "avgMonthlySearches": 10,
+      "competition": "LOW",
+      "competitionIndex": 7,
+      "lowTopOfPageBid": 0,
+      "highTopOfPageBid": 0,
+      "monthlySearchVolumes": [10, 0, 10, 0, 0, 0, 0, 10, 10, 10, 10, 10],
+      "trend": "up",
+      "decision": "secondary"
+    },
+    {
+      "keyword": "seo para aplicaciones moviles",
+      "family": "ASO",
+      "avgMonthlySearches": 10,
+      "competition": "LOW",
+      "competitionIndex": 0,
+      "lowTopOfPageBid": 0,
+      "highTopOfPageBid": 0,
+      "monthlySearchVolumes": [10, 10, 0, 0, 0, 10, 10, 10, 0, 10, 10, 10],
+      "trend": "up",
+      "decision": "secondary"
+    },
+    {
+      "keyword": "seo play store",
+      "family": "ASO",
+      "avgMonthlySearches": 10,
+      "competition": "UNSPECIFIED",
+      "competitionIndex": 0,
+      "lowTopOfPageBid": 0,
+      "highTopOfPageBid": 0,
+      "monthlySearchVolumes": [10, 0, 10, 10, 10, 10, 10, 10, 10, 10, 10, 0],
+      "trend": "flat",
+      "decision": "secondary"
+    },
+    {
+      "keyword": "servicio app store optimization",
+      "family": "ASO",
+      "avgMonthlySearches": 10,
+      "competition": "LOW",
+      "competitionIndex": 0,
+      "lowTopOfPageBid": 0,
+      "highTopOfPageBid": 0,
+      "monthlySearchVolumes": [10, 10, 30, 30, 20, 10, 10, 10, 30, 10, 10, 10],
+      "trend": "down",
+      "decision": "rejected"
+    },
+    {
+      "keyword": "pasos para posicionar una app en play store",
+      "family": "ASO",
+      "avgMonthlySearches": 10,
+      "competition": "UNSPECIFIED",
+      "competitionIndex": 0,
+      "lowTopOfPageBid": 0,
+      "highTopOfPageBid": 0,
+      "monthlySearchVolumes": [0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0],
+      "trend": "flat at zero",
+      "decision": "rejected"
+    },
+    {
+      "keyword": "promocionar una app",
+      "family": "Promoción",
+      "avgMonthlySearches": 20,
+      "competition": "MEDIUM",
+      "competitionIndex": 60,
+      "lowTopOfPageBid": 1.811831,
+      "highTopOfPageBid": 38.344728,
+      "monthlySearchVolumes": [10, 20, 20, 30, 30, 10, 20, 20, 70, 10, 10, 10],
+      "trend": "down",
+      "decision": "rejected for cannibalization"
+    },
+    {
+      "keyword": "como promocionar una app",
+      "family": "Promoción",
+      "avgMonthlySearches": 20,
+      "competition": "MEDIUM",
+      "competitionIndex": 64,
+      "lowTopOfPageBid": 1.345099,
+      "highTopOfPageBid": 12.156995,
+      "monthlySearchVolumes": [20, 10, 30, 40, 30, 10, 20, 10, 40, 10, 10, 10],
+      "trend": "down",
+      "decision": "rejected for cannibalization"
+    },
+    {
+      "keyword": "estrategias de marketing para una app",
+      "family": "Promoción",
+      "avgMonthlySearches": 10,
+      "competition": "UNSPECIFIED",
+      "competitionIndex": 0,
+      "lowTopOfPageBid": 0,
+      "highTopOfPageBid": 0,
+      "monthlySearchVolumes": [0, 10, 0, 10, 0, 0, 10, 0, 10, 0, 0, 0],
+      "trend": "down",
+      "decision": "rejected"
+    },
+    {
+      "keyword": "marketing aplicaciones",
+      "family": "Promoción",
+      "avgMonthlySearches": 10,
+      "competition": "UNSPECIFIED",
+      "competitionIndex": 0,
+      "lowTopOfPageBid": 0,
+      "highTopOfPageBid": 0,
+      "monthlySearchVolumes": [10, 10, 10, 10, 0, 0, 0, 10, 20, 10, 10, 0],
+      "trend": "down",
+      "decision": "rejected"
+    },
+    {
+      "keyword": "marketing de aplicaciones",
+      "family": "Promoción",
+      "avgMonthlySearches": 10,
+      "competition": "UNSPECIFIED",
+      "competitionIndex": 0,
+      "lowTopOfPageBid": 0,
+      "highTopOfPageBid": 0,
+      "monthlySearchVolumes": [10, 0, 10, 10, 10, 10, 10, 10, 10, 0, 10, 0],
+      "trend": "down",
+      "decision": "rejected"
+    },
+    {
+      "keyword": "marketing de apps",
+      "family": "Promoción",
+      "avgMonthlySearches": 10,
+      "competition": "MEDIUM",
+      "competitionIndex": 52,
+      "lowTopOfPageBid": 1.565296,
+      "highTopOfPageBid": 5.349171,
+      "monthlySearchVolumes": [10, 10, 20, 10, 10, 10, 10, 10, 30, 10, 10, 10],
+      "trend": "flat",
+      "decision": "rejected"
+    },
+    {
+      "keyword": "marketing digital para apps",
+      "family": "Promoción",
+      "avgMonthlySearches": 10,
+      "competition": "UNSPECIFIED",
+      "competitionIndex": 0,
+      "lowTopOfPageBid": 0,
+      "highTopOfPageBid": 0,
+      "monthlySearchVolumes": [10, 10, 0, 0, 0, 0, 10, 10, 10, 0, 0, 0],
+      "trend": "down",
+      "decision": "rejected"
+    },
+    {
+      "keyword": "marketing para aplicaciones moviles",
+      "family": "Promoción",
+      "avgMonthlySearches": 10,
+      "competition": "UNSPECIFIED",
+      "competitionIndex": 0,
+      "lowTopOfPageBid": 0,
+      "highTopOfPageBid": 0,
+      "monthlySearchVolumes": [10, 10, 10, 10, 10, 10, 10, 0, 10, 10, 10, 0],
+      "trend": "down",
+      "decision": "rejected"
+    },
+    {
+      "keyword": "marketing para apps",
+      "family": "Promoción",
+      "avgMonthlySearches": 10,
+      "competition": "HIGH",
+      "competitionIndex": 81,
+      "lowTopOfPageBid": 2.224661,
+      "highTopOfPageBid": 7.688361,
+      "monthlySearchVolumes": [10, 10, 10, 20, 10, 10, 10, 10, 30, 10, 10, 10],
+      "trend": "flat",
+      "decision": "rejected"
+    },
+    {
+      "keyword": "campaña de aplicaciones google ads",
+      "family": "Promoción",
+      "avgMonthlySearches": 10,
+      "competition": "LOW",
+      "competitionIndex": 14,
+      "lowTopOfPageBid": 0,
+      "highTopOfPageBid": 0,
+      "monthlySearchVolumes": [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
+      "trend": "flat",
+      "decision": "rejected for overlap"
+    },
+    {
+      "keyword": "campañas de aplicaciones google ads",
+      "family": "Promoción",
+      "avgMonthlySearches": 10,
+      "competition": "LOW",
+      "competitionIndex": 14,
+      "lowTopOfPageBid": 0,
+      "highTopOfPageBid": 0,
+      "monthlySearchVolumes": [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
+      "trend": "flat",
+      "decision": "rejected for overlap"
+    },
+    {
+      "keyword": "publicidad app",
+      "family": "Promoción",
+      "avgMonthlySearches": 20,
+      "competition": "LOW",
+      "competitionIndex": 17,
+      "lowTopOfPageBid": 0,
+      "highTopOfPageBid": 0,
+      "monthlySearchVolumes": [20, 10, 20, 20, 20, 10, 10, 20, 20, 20, 20, 10],
+      "trend": "flat",
+      "decision": "rejected as ambiguous"
+    },
+    {
+      "keyword": "publicidad de app",
+      "family": "Promoción",
+      "avgMonthlySearches": 20,
+      "competition": "MEDIUM",
+      "competitionIndex": 43,
+      "lowTopOfPageBid": 0,
+      "highTopOfPageBid": 0,
+      "monthlySearchVolumes": [20, 10, 30, 40, 30, 10, 10, 20, 40, 10, 10, 10],
+      "trend": "down",
+      "decision": "rejected as ambiguous"
+    },
+    {
+      "keyword": "publicidad para apps",
+      "family": "Promoción",
+      "avgMonthlySearches": 10,
+      "competition": "MEDIUM",
+      "competitionIndex": 49,
+      "lowTopOfPageBid": 0,
+      "highTopOfPageBid": 0,
+      "monthlySearchVolumes": [10, 10, 10, 0, 10, 0, 0, 10, 10, 10, 10, 10],
+      "trend": "flat",
+      "decision": "rejected as ambiguous"
+    },
+    {
+      "keyword": "publicidad para una app",
+      "family": "Promoción",
+      "avgMonthlySearches": 10,
+      "competition": "UNSPECIFIED",
+      "competitionIndex": 0,
+      "lowTopOfPageBid": 0,
+      "highTopOfPageBid": 0,
+      "monthlySearchVolumes": [10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      "trend": "down",
+      "decision": "rejected"
+    },
+    {
+      "keyword": "conseguir descargas app",
+      "family": "Promoción",
+      "avgMonthlySearches": 10,
+      "competition": "UNSPECIFIED",
+      "competitionIndex": 0,
+      "lowTopOfPageBid": 0,
+      "highTopOfPageBid": 0,
+      "monthlySearchVolumes": [10, 0, 0, 0, 10, 10, 0, 0, 0, 0, 0, 0],
+      "trend": "flat at zero",
+      "decision": "rejected for cannibalization"
+    },
+    {
+      "keyword": "smart link app",
+      "family": "Enlaces",
+      "avgMonthlySearches": 10,
+      "competition": "UNSPECIFIED",
+      "competitionIndex": 0,
+      "lowTopOfPageBid": 0,
+      "highTopOfPageBid": 0,
+      "monthlySearchVolumes": [10, 0, 10, 10, 10, 10, 10, 10, 0, 0, 0, 0],
+      "trend": "down",
+      "decision": "rejected for cannibalization"
+    },
+    {
+      "keyword": "app smart link",
+      "family": "Enlaces",
+      "avgMonthlySearches": 10,
+      "competition": "LOW",
+      "competitionIndex": 0,
+      "lowTopOfPageBid": 0,
+      "highTopOfPageBid": 0,
+      "monthlySearchVolumes": [0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 10, 10],
+      "trend": "up",
+      "decision": "rejected for cannibalization"
+    },
+    {
+      "keyword": "codigo qr para descargar app",
+      "family": "QR y medición",
+      "avgMonthlySearches": 10,
+      "competition": "UNSPECIFIED",
+      "competitionIndex": 0,
+      "lowTopOfPageBid": 0,
+      "highTopOfPageBid": 0,
+      "monthlySearchVolumes": [0, 0, 10, 10, 10, 0, 0, 10, 0, 10, 0, 0],
+      "trend": "flat",
+      "decision": "rejected for cannibalization"
+    },
+    {
+      "keyword": "escanear codigo qr para descargar app",
+      "family": "QR y medición",
+      "avgMonthlySearches": 10,
+      "competition": "UNSPECIFIED",
+      "competitionIndex": 0,
+      "lowTopOfPageBid": 0,
+      "highTopOfPageBid": 0,
+      "monthlySearchVolumes": [10, 10, 0, 0, 10, 0, 10, 0, 0, 0, 10, 0],
+      "trend": "down",
+      "decision": "rejected as end-user intent"
+    },
+    {
+      "keyword": "qr para descargar app",
+      "family": "QR y medición",
+      "avgMonthlySearches": 10,
+      "competition": "HIGH",
+      "competitionIndex": 68,
+      "lowTopOfPageBid": 0.355362,
+      "highTopOfPageBid": 0.816627,
+      "monthlySearchVolumes": [10, 10, 10, 10, 10, 0, 10, 10, 10, 10, 10, 10],
+      "trend": "flat",
+      "decision": "rejected for cannibalization"
+    },
+    {
+      "keyword": "mobile app analytics",
+      "family": "QR y medición",
+      "avgMonthlySearches": 10,
+      "competition": "LOW",
+      "competitionIndex": 29,
+      "lowTopOfPageBid": 0,
+      "highTopOfPageBid": 0,
+      "monthlySearchVolumes": [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 0, 10],
+      "trend": "down",
+      "decision": "rejected for overlap"
+    },
+    {
+      "keyword": "google analytics para app",
+      "family": "QR y medición",
+      "avgMonthlySearches": 10,
+      "competition": "LOW",
+      "competitionIndex": 0,
+      "lowTopOfPageBid": 0,
+      "highTopOfPageBid": 0,
+      "monthlySearchVolumes": [10, 10, 10, 0, 0, 10, 10, 10, 0, 0, 10, 10],
+      "trend": "down",
+      "decision": "rejected as off-product"
+    },
+    {
+      "keyword": "optimización app store",
+      "family": "ASO",
+      "avgMonthlySearches": 0,
+      "competition": "UNSPECIFIED",
+      "competitionIndex": 0,
+      "lowTopOfPageBid": 0,
+      "highTopOfPageBid": 0,
+      "monthlySearchVolumes": [],
+      "trend": "no data",
+      "decision": "rejected"
+    },
+    {
+      "keyword": "optimizar ficha app store",
+      "family": "ASO",
+      "avgMonthlySearches": 0,
+      "competition": "UNSPECIFIED",
+      "competitionIndex": 0,
+      "lowTopOfPageBid": 0,
+      "highTopOfPageBid": 0,
+      "monthlySearchVolumes": [],
+      "trend": "no data",
+      "decision": "rejected"
+    },
+    {
+      "keyword": "optimizar ficha google play",
+      "family": "ASO",
+      "avgMonthlySearches": 0,
+      "competition": "UNSPECIFIED",
+      "competitionIndex": 0,
+      "lowTopOfPageBid": 0,
+      "highTopOfPageBid": 0,
+      "monthlySearchVolumes": [],
+      "trend": "no data",
+      "decision": "rejected"
+    },
+    {
+      "keyword": "palabras clave app store",
+      "family": "ASO",
+      "avgMonthlySearches": 0,
+      "competition": "UNSPECIFIED",
+      "competitionIndex": 0,
+      "lowTopOfPageBid": 0,
+      "highTopOfPageBid": 0,
+      "monthlySearchVolumes": [],
+      "trend": "no data",
+      "decision": "rejected"
+    },
+    {
+      "keyword": "aumentar descargas app",
+      "family": "Promoción",
+      "avgMonthlySearches": 0,
+      "competition": "UNSPECIFIED",
+      "competitionIndex": 0,
+      "lowTopOfPageBid": 0,
+      "highTopOfPageBid": 0,
+      "monthlySearchVolumes": [],
+      "trend": "no data",
+      "decision": "rejected"
+    },
+    {
+      "keyword": "campaña de instalación de aplicaciones",
+      "family": "Promoción",
+      "avgMonthlySearches": 0,
+      "competition": "UNSPECIFIED",
+      "competitionIndex": 0,
+      "lowTopOfPageBid": 0,
+      "highTopOfPageBid": 0,
+      "monthlySearchVolumes": [],
+      "trend": "no data",
+      "decision": "rejected"
+    },
+    {
+      "keyword": "campañas de descarga de apps",
+      "family": "Promoción",
+      "avgMonthlySearches": 0,
+      "competition": "UNSPECIFIED",
+      "competitionIndex": 0,
+      "lowTopOfPageBid": 0,
+      "highTopOfPageBid": 0,
+      "monthlySearchVolumes": [],
+      "trend": "no data",
+      "decision": "rejected"
+    },
+    {
+      "keyword": "enlace de descarga app",
+      "family": "Enlaces",
+      "avgMonthlySearches": 0,
+      "competition": "UNSPECIFIED",
+      "competitionIndex": 0,
+      "lowTopOfPageBid": 0,
+      "highTopOfPageBid": 0,
+      "monthlySearchVolumes": [],
+      "trend": "no data",
+      "decision": "rejected for cannibalization"
+    }
+  ],
+  "selected": {
+    "keyword": "app store optimization",
+    "avgMonthlySearches": 170,
+    "competition": "MEDIUM",
+    "competitionIndex": 51,
+    "lowTopOfPageBid": 2.581024,
+    "highTopOfPageBid": 13.659073,
+    "monthlySearchVolumes": [210, 170, 210, 320, 170, 90, 140, 140, 390, 90, 110, 70],
+    "trendLast3VsFirst3Percent": -54.24,
+    "reason": "Es la consulta con mayor demanda real, intención informativa y comercial clara, pujas que confirman valor y un hueco editorial no cubierto. Se elige pese a la tendencia reciente negativa porque supera a las alternativas en demanda y diferenciación, y permite explicar cómo ASO, adquisición y enlaces de descarga trabajan juntos sin prometer resultados."
+  },
+  "rejected": [
+    {
+      "keyword": "aso app",
+      "reason": "Comparte exactamente la misma serie e intención; se consolida como variante secundaria."
+    },
+    {
+      "keyword": "aso marketing",
+      "reason": "Buena oportunidad, pero menor demanda y una tendencia reciente más débil."
+    },
+    {
+      "keyword": "google play aso",
+      "reason": "Solo cubre una tienda; se integra como sección del artículo general."
+    },
+    {
+      "keyword": "promocionar una app",
+      "reason": "Canibaliza la guía para ecommerce y el playbook de lanzamiento SaaS."
+    },
+    {
+      "keyword": "como promocionar una app",
+      "reason": "Misma canibalización y menor diferenciación editorial."
+    },
+    {
+      "keyword": "campaña de aplicaciones google ads",
+      "reason": "Solapa el artículo sobre Google Ads y la tienda equivocada."
+    },
+    {
+      "keyword": "qr para descargar app",
+      "reason": "Solapa las guías de QR para campañas físicas y packaging."
+    },
+    {
+      "keyword": "mobile app analytics",
+      "reason": "Solapa el artículo de atribución y se aleja del alcance previo a la instalación."
+    },
+    {
+      "keyword": "publicidad app",
+      "reason": "Intención ambigua entre promocionar una app y mostrar anuncios dentro de ella."
+    }
+  ],
+  "existingContentChecked": [
+    {"slug": "error-perder-ventas-instagram", "title": "El error de usar 2 enlaces de descarga para tu App en redes sociales"},
+    {"slug": "alternativa-gratis-onelink-to", "title": "La mejor alternativa a onelink.to (Gratis y moderna)"},
+    {"slug": "como-evitar-perder-usuarios-descarga", "title": "Cómo funciona la detección de dispositivo en 1 solo enlace"},
+    {"slug": "tuback-link-backlinks-app-ecommerce", "title": "Cómo usar TuBack.link para ganar autoridad después de crear la app de tu ecommerce"},
+    {"slug": "tienrank-app-ecommerce-fichas-producto", "title": "Por qué subir tu ecommerce a TienRank después de crear tu app"},
+    {"slug": "promocionar-app-tienda-online-despues-publicarla", "title": "Cómo promocionar la app de tu tienda online después de publicarla"},
+    {"slug": "secreto-apps-top-100", "title": "El secreto de las Apps Top 100: por qué nunca usan Linktree"},
+    {"slug": "guia-agentes-ia-link-my-app", "title": "Guía para agentes IA: cómo usar Link My App de forma autónoma"},
+    {"slug": "alternativa-branch-io-sin-sdk", "title": "Alternativa a Branch.io: enlaces universales sin instalar SDK"},
+    {"slug": "medir-roi-influencers-app", "title": "Cómo medir el ROI real de tus campañas con influencers"},
+    {"slug": "alternativa-firebase-dynamic-links", "title": "La alternativa perfecta a Firebase Dynamic Links"},
+    {"slug": "disparar-descargas-app-link", "title": "Por qué cada clic extra en tu embudo te hace perder cientos de descargas"},
+    {"slug": "visitas-vs-descargas", "title": "Por qué tu App tiene muchas visitas pero pocas descargas"},
+    {"slug": "linktree-pierde-descargas-app", "title": "Por qué Linktree pierde descargas de tu app móvil"},
+    {"slug": "medir-descargas-influencer-tiktok-sin-sdk", "title": "Cómo medir las descargas que trae cada influencer de TikTok sin SDK"},
+    {"slug": "boton-descarga-app-fold-movil", "title": "El error de poner el botón de descarga al final de la home móvil"},
+    {"slug": "google-ads-tienda-equivocada", "title": "Cómo evitar que Google Ads envíe a la tienda equivocada"},
+    {"slug": "qr-packaging-app-sin-parecer-cupon", "title": "Cómo poner un QR de descarga en packaging sin que parezca un cupón barato"},
+    {"slug": "smart-link-vs-deep-link", "title": "Smart link vs deep link: qué son y cuándo usar cada uno"},
+    {"slug": "atribucion-descargas-apps-medir-canal-real", "title": "Atribución de descargas de apps: cómo medir el canal real"},
+    {"slug": "bio-instagram-app-plantillas-descargas", "title": "Las plantillas de bio de Instagram que más descargas generan"},
+    {"slug": "lanzar-app-saas-sin-desperdiciar-presupuesto", "title": "Cómo lanzar la app móvil de tu SaaS sin desperdiciar presupuesto"}
+  ]
+}

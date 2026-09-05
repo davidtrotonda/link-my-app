@@ -220,10 +220,10 @@ export default function AgenciesPage() {
                 {t("agencies.ctaPrimary", "Crear cuenta de agencia")} <ArrowRight size={16} />
               </Link>
               <Link
-                to={localizePath("/pricing", language)}
+                to={localizePath("/login", language)}
                 className="inline-flex items-center justify-center gap-2 rounded-full border border-black/12 bg-white px-6 py-3 text-sm font-black tracking-[-0.01em] text-black transition hover:-translate-y-0.5 hover:border-black/25"
               >
-                {t("agencies.ctaSecondary", "Ver precio Pro")}
+                {t("agencies.ctaSecondary", "Crear cuenta gratis")}
               </Link>
             </div>
           </div>

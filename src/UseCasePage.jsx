@@ -8,6 +8,7 @@ import {
   Dumbbell,
   Sparkles,
   Building2,
+  Megaphone,
   Check,
   ChevronDown,
   QrCode,
@@ -19,7 +20,7 @@ import {
 import { SEO, LegalNavbar } from "./App.jsx";
 import { FinalFooter as LandingFinalFooter, animationStyles } from "./LandingVisuals.jsx";
 import { localizePath, normalizeLanguage } from "./lib/i18nRoutes.js";
-import { niches, useCaseHubRoutes, nichePath, getNicheBySlug } from "./lib/useCases.js";
+import { niches, visibleNiches, useCaseHubRoutes, nichePath, getNicheBySlug } from "./lib/useCases.js";
 
 const brandName = "Link My App";
 const siteUrl = "https://link-my.app";
@@ -31,6 +32,7 @@ const iconByName = {
   Dumbbell,
   Sparkles,
   Building2,
+  Megaphone,
 };
 
 export default function UseCasePage() {
@@ -46,7 +48,7 @@ export default function UseCasePage() {
   const canonical = `${siteUrl}${language === "en" ? "" : `/${language}`}${hubPath}/${content.slug}`;
 
   const relatedNiches = useMemo(
-    () => niches.filter((n) => n.id !== niche.id).slice(0, 4),
+    () => visibleNiches.filter((n) => n.id !== niche.id).slice(0, 4),
     [niche.id],
   );
 

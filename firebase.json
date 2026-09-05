@@ -1,6 +1,7 @@
 {
   "hosting": {
     "public": "dist",
+    "cleanUrls": true,
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "headers": [
       {
@@ -71,6 +72,20 @@
         "source": "/api/stripe/applyPromoCode",
         "function": {
           "functionId": "applyPromoCode",
+          "region": "europe-west1"
+        }
+      },
+      {
+        "source": "/api/admin/prepare-account",
+        "function": {
+          "functionId": "prepareUserAccount",
+          "region": "europe-west1"
+        }
+      },
+      {
+        "source": "/api/admin/consume-prepared-account",
+        "function": {
+          "functionId": "consumePreparedAccount",
           "region": "europe-west1"
         }
       },

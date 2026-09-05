@@ -1,0 +1,25 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "https://link-my-app-smart-redirect-v2.ancient-wave-c097.workers.dev/"
+    },
+    {
+      "source": "/:path*",
+      "destination": "https://link-my-app-smart-redirect-v2.ancient-wave-c097.workers.dev/:path*"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Link-My-App-Frontdoor",
+          "value": "vercel"
+        }
+      ]
+    }
+  ]
+}

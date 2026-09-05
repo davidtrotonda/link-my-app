@@ -10,6 +10,8 @@ const services = [
   "stripewebhook",
   "applypromocode",
   "verifypayment",
+  "prepareuseraccount",
+  "consumepreparedaccount",
 ];
 const configPath = path.join(
   os.homedir(),

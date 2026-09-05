@@ -1,16 +1,77 @@
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
+const localizedContentModules = [
+  "/src/lib/deContent.js",
+  "/src/lib/itContent.js",
+  "/src/lib/jaContent.js",
+  "/src/lib/koContent.js",
+  "/src/lib/nlContent.js",
+  "/src/lib/arContent.js",
+  "/src/lib/hiContent.js",
+  "/src/lib/ptContent.js",
+];
+
+function manualChunks(id) {
+  const moduleId = id.replaceAll("\\", "/");
+
+  if (moduleId.includes("/node_modules/")) {
+    if (
+      moduleId.includes("/node_modules/react/") ||
+      moduleId.includes("/node_modules/react-dom/") ||
+      moduleId.includes("/node_modules/react-router-dom/")
+    ) {
+      return "react";
+    }
+
+    if (moduleId.includes("/node_modules/firebase/")) {
+      return "firebase";
+    }
+
+    if (moduleId.includes("/node_modules/lucide-react/")) {
+      return "icons";
+    }
+
+    if (
+      moduleId.includes("/node_modules/i18next/") ||
+      moduleId.includes("/node_modules/i18next-browser-languagedetector/") ||
+      moduleId.includes("/node_modules/react-i18next/")
+    ) {
+      return "i18n";
+    }
+  }
+
+  if (moduleId.endsWith("/src/LandingVisuals.jsx")) {
+    return "landing-visuals";
+  }
+
+  if (
+    moduleId.endsWith("/src/lib/legalPages.js") ||
+    localizedContentModules.some((contentModule) => moduleId.endsWith(contentModule))
+  ) {
+    return "localized-content";
+  }
+
+  if (
+    moduleId.includes("/src/lib/blogOverrides") ||
+    moduleId.endsWith("/src/MoreBlogs.jsx") ||
+    moduleId.endsWith("/src/MoreBlogs2.jsx") ||
+    moduleId.endsWith("/src/MoreBlogs3.jsx") ||
+    moduleId.endsWith("/src/TuBackBlogPost.jsx") ||
+    moduleId.endsWith("/src/TienRankBlogPost.jsx")
+  ) {
+    return "blog-content";
+  }
+
+  return undefined;
+}
+
 export default defineConfig({
   plugins: [react()],
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          react: ["react", "react-dom", "react-router-dom"],
-          firebase: ["firebase/app", "firebase/auth", "firebase/database"],
-          icons: ["lucide-react"],
-        },
+        manualChunks,
       },
     },
   },

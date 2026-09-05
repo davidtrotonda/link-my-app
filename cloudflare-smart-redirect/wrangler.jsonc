@@ -1,0 +1,49 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "link-my-app-smart-redirect-v2",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-08-25",
+  "compatibility_flags": ["nodejs_compat"],
+  "account_id": "96b45f7d9bb157c93abc3ed178072cf8",
+  "workers_dev": true,
+  "preview_urls": true,
+  "routes": [],
+  "assets": {
+    "directory": "../dist",
+    "binding": "ASSETS",
+    "html_handling": "drop-trailing-slash"
+  },
+  "kv_namespaces": [
+    {
+      "binding": "LINKS_KV",
+      "id": "7b172eed5f34478dbc66f5973f7dc633"
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "ANALYTICS_DB",
+      "database_name": "link-my-app-edge-analytics-db",
+      "database_id": "381b050d-9268-45fd-839c-f0e727d16280",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "vars": {
+    "APP_ORIGIN": "https://link-my.app",
+    "FIREBASE_DATABASE_URL": "https://skeilink-default-rtdb.europe-west1.firebasedatabase.app",
+    "FIREBASE_HOSTING_ORIGIN": "https://skeilink.web.app",
+    "EDGE_CACHE_TTL_SECONDS": "60",
+    "EDGE_MISSING_TTL_SECONDS": "60",
+    "REDIRECT_INTERSTITIAL_DELAY_MS": "1100",
+    "LEGACY_CLICK_FALLBACK": "true"
+  },
+  "observability": {
+    "enabled": true,
+    "logs": {
+      "head_sampling_rate": 0.1
+    },
+    "traces": {
+      "enabled": true,
+      "head_sampling_rate": 0.01
+    }
+  }
+}

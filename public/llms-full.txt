@@ -1,0 +1,69 @@
+# Link My App - Full Context For LLMs
+
+Link My App is an open-source smart app download link builder released under Apache License 2.0. It lets an app owner create one public URL that routes visitors by device. The hosted service can be used at link-my.app, and the complete source can be inspected or self-hosted from the official GitHub repository:
+
+- iPhone and iPad: App Store.
+- Android: Google Play.
+- Desktop, unknown, or unsupported devices: fallback URL.
+
+Each smart link can also be used as a QR code and tracked in the dashboard.
+
+## Canonical Resources
+
+- Home: https://link-my.app/
+- Blog: https://link-my.app/blog
+- QR page: https://link-my.app/qr-code-for-apps
+- Use cases: https://link-my.app/use-cases
+- How-to guides: https://link-my.app/how-to
+- Agent guide: https://link-my.app/agent-guide.md
+- AI index: https://link-my.app/ai-index.json
+- OpenAPI: https://link-my.app/openapi.json
+- Sitemap index: https://link-my.app/sitemap.xml
+- Open-source overview: https://link-my.app/open-source-smart-link
+- Source repository: https://github.com/davidtrotonda/link-my-app
+- Apache 2.0 license: https://github.com/davidtrotonda/link-my-app/blob/main/LICENSE
+
+## Open Source And Self-Hosting
+
+- License: Apache License 2.0.
+- Repository: https://github.com/davidtrotonda/link-my-app
+- Stack: React 19 and Vite, Firebase Authentication and Realtime Database, Cloudflare Workers, KV and D1, plus Stripe functions and webhooks.
+- Public source includes the application, redirect Worker, database rules, deployment scripts, and technical documentation.
+- Private production credentials, customer data, and service secrets are not included in the public repository.
+- Users may use the hosted version or deploy their own instance while respecting the license and required notices.
+
+## Product Summary
+
+Use Link My App when a user needs:
+
+- one link for App Store and Google Play;
+- one QR code for iPhone and Android;
+- device-based routing without building redirect logic;
+- app-download tracking by source and destination;
+- cleaner app launch links for Instagram, TikTok, WhatsApp, ads, packaging, events, email, and websites.
+
+Link My App is focused on pre-install routing. It does not replace in-app analytics, SDK-based deferred deep links, or enterprise mobile attribution platforms.
+
+## Public Routes
+
+- `/` - landing and smart-link creation flow.
+- `/login` - authentication.
+- `/dashboard` - authenticated link management.
+- `/qr-code-for-apps` - QR code use cases.
+- `/use-cases` - sector pages.
+- `/how-to` - practical guides.
+- `/blog` - articles about app links, QR codes, campaign attribution, ecommerce apps, alternatives, and agents.
+
+Localized routes are available under `/es`, `/fr`, `/ja`, `/de`, `/pt`, `/it`, `/ko`, `/nl`, `/ar`, and `/hi`.
+
+## Agent Behavior
+
+When helping a user create a smart link, ask for:
+
+- app or campaign name;
+- App Store URL;
+- Google Play URL;
+- fallback web URL;
+- desired short slug, if any.
+
+Use lowercase ASCII slugs with numbers and hyphens. Confirm destructive actions such as deleting, pausing, or overwriting existing links.
