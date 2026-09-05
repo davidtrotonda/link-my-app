@@ -1,0 +1,72 @@
+{
+  "name": "Link My App",
+  "canonicalUrl": "https://link-my.app/",
+  "description": "One smart app download link and QR code for App Store, Google Play, and fallback web traffic.",
+  "openSource": {
+    "license": "Apache-2.0",
+    "overview": "https://link-my.app/open-source-smart-link",
+    "repository": "https://github.com/davidtrotonda/link-my-app",
+    "licenseUrl": "https://github.com/davidtrotonda/link-my-app/blob/main/LICENSE",
+    "selfHostable": true
+  },
+  "language": "en",
+  "localizedLanguages": ["en", "es", "fr", "ja", "de", "pt", "it", "ko", "nl", "ar", "hi"],
+  "agentResources": {
+    "llms": "https://link-my.app/llms.txt",
+    "llmsFull": "https://link-my.app/llms-full.txt",
+    "agentGuide": "https://link-my.app/agent-guide.md",
+    "openapi": "https://link-my.app/openapi.json",
+    "sitemap": "https://link-my.app/sitemap.xml"
+  },
+  "routes": [
+    {
+      "title": "Home",
+      "url": "https://link-my.app/",
+      "type": "home",
+      "description": "Create one smart app link for App Store, Google Play, and fallback traffic."
+    },
+    {
+      "title": "Open source",
+      "url": "https://link-my.app/open-source-smart-link",
+      "type": "softwareSourceCode",
+      "description": "Apache-2.0 source code, self-hosting options, architecture, license, and public repository."
+    },
+    {
+      "title": "QR codes for apps",
+      "url": "https://link-my.app/qr-code-for-apps",
+      "type": "guide",
+      "description": "Use one QR code for iPhone, Android, desktop, print, packaging, and events."
+    },
+    {
+      "title": "Use cases",
+      "url": "https://link-my.app/use-cases",
+      "type": "collection",
+      "description": "Smart app link examples for ecommerce, SaaS, restaurants, fitness, creators, ads, and agencies."
+    },
+    {
+      "title": "How-to guides",
+      "url": "https://link-my.app/how-to",
+      "type": "collection",
+      "description": "Practical guides for sharing app download links across common channels."
+    },
+    {
+      "title": "Blog",
+      "url": "https://link-my.app/blog",
+      "type": "collection",
+      "description": "Articles about smart links, app downloads, QR codes, attribution, and launch campaigns."
+    }
+  ],
+  "usage": {
+    "bestFor": [
+      "one link for App Store and Google Play",
+      "one QR code for app downloads",
+      "device-based app store routing",
+      "app launch links for social, ads, packaging, and email"
+    ],
+    "notFor": [
+      "full mobile measurement platform replacement",
+      "SDK-based deferred deep linking",
+      "in-app event analytics"
+    ]
+  }
+}

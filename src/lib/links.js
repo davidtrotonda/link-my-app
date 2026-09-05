@@ -29,15 +29,44 @@ export function slugFromInput(value) {
 
 export function normalizeUrl(value) {
   const trimmed = value.trim();
-  if (!trimmed) return "";
-  if (trimmed.startsWith("https://") || trimmed.startsWith("http://")) {
-    return trimmed;
+  if (!trimmed || /\s/.test(trimmed)) return "";
+
+  const valueWithProtocol = /^https?:\/\//i.test(trimmed)
+    ? trimmed
+    : `https://${trimmed}`;
+
+  try {
+    const parsedUrl = new URL(valueWithProtocol);
+    if (!["http:", "https:"].includes(parsedUrl.protocol) || !parsedUrl.hostname) {
+      return "";
+    }
+    return parsedUrl.toString();
+  } catch {
+    return "";
   }
-  return `https://${trimmed}`;
 }
 
 export function publicLinkForSlug(baseUrl, slug) {
   return `${baseUrl.replace(/\/$/, "")}/${slug}`;
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+export function buildWebsiteLinkHtml(url, anchorText) {
+  const parsedUrl = new URL(url);
+
+  if (!["http:", "https:"].includes(parsedUrl.protocol)) {
+    throw new Error("Website links must use HTTP or HTTPS.");
+  }
+
+  return `<a href="${escapeHtml(parsedUrl.toString())}">${escapeHtml(anchorText)}</a>`;
 }
 
 export function profileLinkForUser(baseUrl, uid) {

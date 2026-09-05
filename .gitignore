@@ -3,5 +3,7 @@ dist
 .env
 .DS_Store
 .firebase
+.wrangler
 firebase-debug.log
+database-debug.log
 firestore-debug.log

@@ -26,7 +26,8 @@ Created by [David Trotonda](https://github.com/davidtrotonda).
 - Tailwind CSS
 - Firebase Authentication
 - Firebase Realtime Database
-- Firebase Hosting
+- Cloudflare Workers Static Assets, KV and D1
+- Firebase Hosting as rollback origin
 - Firebase Functions v2
 - Stripe
 - i18next
@@ -74,18 +75,27 @@ firebase functions:secrets:set STRIPE_WEBHOOK_SECRET_LEGACY
 
 ## Deploy
 
-Login and select your Firebase project first:
+Login to Firebase and Cloudflare first:
 
 ```bash
 npx firebase login
 npx firebase use --add
+npx wrangler login
 ```
 
-Deploy hosting, database rules and functions:
+Deploy database rules and the Cloudflare frontend/edge Worker:
 
 ```bash
 npm run deploy
 ```
+
+Firebase Functions are deployed separately when their code changes:
+
+```bash
+npm run deploy:functions
+```
+
+See [docs/CLOUDFLARE_DEPLOYMENT.md](docs/CLOUDFLARE_DEPLOYMENT.md) for architecture, DNS cutover and rollback.
 
 If you use the helper script to make Cloud Run invokers public, set your project id:
 

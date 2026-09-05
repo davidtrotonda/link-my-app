@@ -1,0 +1,55 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Link My App Public Agent Surface",
+    "version": "0.1.0",
+    "description": "Public, read-only documentation surface for Link My App agents. Authenticated dashboard operations happen through the website UI."
+  },
+  "servers": [
+    {
+      "url": "https://link-my.app"
+    }
+  ],
+  "paths": {
+    "/llms.txt": {
+      "get": {
+        "summary": "Compact LLM entry point",
+        "responses": {
+          "200": {
+            "description": "Markdown/plain text LLM overview"
+          }
+        }
+      }
+    },
+    "/llms-full.txt": {
+      "get": {
+        "summary": "Full LLM context",
+        "responses": {
+          "200": {
+            "description": "Extended Markdown/plain text context"
+          }
+        }
+      }
+    },
+    "/agent-guide.md": {
+      "get": {
+        "summary": "Agent operating guide",
+        "responses": {
+          "200": {
+            "description": "Markdown guide for AI agents"
+          }
+        }
+      }
+    },
+    "/ai-index.json": {
+      "get": {
+        "summary": "Structured AI index",
+        "responses": {
+          "200": {
+            "description": "JSON index for crawlers and agents"
+          }
+        }
+      }
+    }
+  }
+}

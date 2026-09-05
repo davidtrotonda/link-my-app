@@ -2,10 +2,27 @@
 // Cada guía tiene contenido único por idioma y un slug distinto en cada uno
 // para evitar canibalización SEO con la landing principal y entre guías.
 
+import { germanHowTos } from "./deContent.js";
+import { italianHowTos } from "./itContent.js";
+import { japaneseHowTos } from "./jaContent.js";
+import { koreanHowTos } from "./koContent.js";
+import { dutchHowTos } from "./nlContent.js";
+import { arabicHowTos } from "./arContent.js";
+import { hindiHowTos } from "./hiContent.js";
+import { portugueseHowTos } from "./ptContent.js";
+
 export const howToHubRoutes = {
   en: "/how-to",
   es: "/como",
   fr: "/comment",
+  ja: "/how-to",
+  de: "/anleitungen",
+  pt: "/guias",
+  it: "/guide",
+  ko: "/how-to",
+  nl: "/gidsen",
+  ar: "/how-to",
+  hi: "/how-to",
 };
 
 export function howToPath(howToId, language = "en") {
@@ -547,3 +564,30 @@ export const howTos = [
     },
   },
 ];
+
+howTos.forEach((howTo) => {
+  if (japaneseHowTos[howTo.id]) {
+    howTo.ja = japaneseHowTos[howTo.id];
+  }
+  if (germanHowTos[howTo.id]) {
+    howTo.de = germanHowTos[howTo.id];
+  }
+  if (portugueseHowTos[howTo.id]) {
+    howTo.pt = portugueseHowTos[howTo.id];
+  }
+  if (italianHowTos[howTo.id]) {
+    howTo.it = italianHowTos[howTo.id];
+  }
+  if (koreanHowTos[howTo.id]) {
+    howTo.ko = koreanHowTos[howTo.id];
+  }
+  if (dutchHowTos[howTo.id]) {
+    howTo.nl = dutchHowTos[howTo.id];
+  }
+  if (arabicHowTos[howTo.id]) {
+    howTo.ar = arabicHowTos[howTo.id];
+  }
+  if (hindiHowTos[howTo.id]) {
+    howTo.hi = hindiHowTos[howTo.id];
+  }
+});

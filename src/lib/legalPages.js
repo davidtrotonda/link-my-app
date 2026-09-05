@@ -1,4 +1,12 @@
 import { ShieldCheck, Cookie, FileText } from "lucide-react";
+import { germanLegalPages } from "./deContent.js";
+import { italianLegalPages } from "./itContent.js";
+import { japaneseLegalPages } from "./jaContent.js";
+import { koreanLegalPages } from "./koContent.js";
+import { dutchLegalPages } from "./nlContent.js";
+import { arabicLegalPages } from "./arContent.js";
+import { hindiLegalPages } from "./hiContent.js";
+import { portugueseLegalPages } from "./ptContent.js";
 
 export const legalPagesEs = {
   privacy: {
@@ -485,6 +493,102 @@ export const legalTabsFr = [
   { key: "cookies", label: "Politique relative aux Cookies", icon: Cookie },
   { key: "terms", label: "Conditions Générales", icon: FileText },
 ];
+
+export const legalTabsJa = [
+  { key: "privacy", label: "プライバシーポリシー", icon: ShieldCheck },
+  { key: "cookies", label: "Cookieポリシー", icon: Cookie },
+  { key: "terms", label: "利用規約", icon: FileText },
+];
+
+export const legalTabsDe = [
+  { key: "privacy", label: "Datenschutzerklärung", icon: ShieldCheck },
+  { key: "cookies", label: "Cookie-Richtlinie", icon: Cookie },
+  { key: "terms", label: "Allgemeine Geschäftsbedingungen", icon: FileText },
+];
+
+export const legalTabsPt = [
+  { key: "privacy", label: "Política de Privacidade", icon: ShieldCheck },
+  { key: "cookies", label: "Política de Cookies", icon: Cookie },
+  { key: "terms", label: "Termos e Condições", icon: FileText },
+];
+
+export const legalTabsIt = [
+  { key: "privacy", label: "Informativa sulla Privacy", icon: ShieldCheck },
+  { key: "cookies", label: "Cookie Policy", icon: Cookie },
+  { key: "terms", label: "Termini e Condizioni", icon: FileText },
+];
+
+export const legalTabsKo = [
+  { key: "privacy", label: "개인정보 처리방침", icon: ShieldCheck },
+  { key: "cookies", label: "쿠키 정책", icon: Cookie },
+  { key: "terms", label: "이용약관", icon: FileText },
+];
+
+export const legalTabsNl = [
+  { key: "privacy", label: "Privacybeleid", icon: ShieldCheck },
+  { key: "cookies", label: "Cookiebeleid", icon: Cookie },
+  { key: "terms", label: "Algemene voorwaarden", icon: FileText },
+];
+
+export const legalTabsAr = [
+  { key: "privacy", label: "سياسة الخصوصية", icon: ShieldCheck },
+  { key: "cookies", label: "سياسة الكوكيز", icon: Cookie },
+  { key: "terms", label: "الشروط والأحكام", icon: FileText },
+];
+
+export const legalTabsHi = [
+  { key: "privacy", label: "गोपनीयता नीति", icon: ShieldCheck },
+  { key: "cookies", label: "कुकी नीति", icon: Cookie },
+  { key: "terms", label: "नियम और शर्तें", icon: FileText },
+];
+
+export const legalPagesJa = {
+  privacy: { ...japaneseLegalPages.privacy, icon: ShieldCheck },
+  cookies: { ...japaneseLegalPages.cookies, icon: Cookie },
+  terms: { ...japaneseLegalPages.terms, icon: FileText },
+};
+
+export const legalPagesDe = {
+  privacy: { ...germanLegalPages.privacy, icon: ShieldCheck },
+  cookies: { ...germanLegalPages.cookies, icon: Cookie },
+  terms: { ...germanLegalPages.terms, icon: FileText },
+};
+
+export const legalPagesPt = {
+  privacy: { ...portugueseLegalPages.privacy, icon: ShieldCheck },
+  cookies: { ...portugueseLegalPages.cookies, icon: Cookie },
+  terms: { ...portugueseLegalPages.terms, icon: FileText },
+};
+
+export const legalPagesIt = {
+  privacy: { ...italianLegalPages.privacy, icon: ShieldCheck },
+  cookies: { ...italianLegalPages.cookies, icon: Cookie },
+  terms: { ...italianLegalPages.terms, icon: FileText },
+};
+
+export const legalPagesKo = {
+  privacy: { ...koreanLegalPages.privacy, icon: ShieldCheck },
+  cookies: { ...koreanLegalPages.cookies, icon: Cookie },
+  terms: { ...koreanLegalPages.terms, icon: FileText },
+};
+
+export const legalPagesNl = {
+  privacy: { ...dutchLegalPages.privacy, icon: ShieldCheck },
+  cookies: { ...dutchLegalPages.cookies, icon: Cookie },
+  terms: { ...dutchLegalPages.terms, icon: FileText },
+};
+
+export const legalPagesAr = {
+  privacy: { ...arabicLegalPages.privacy, icon: ShieldCheck },
+  cookies: { ...arabicLegalPages.cookies, icon: Cookie },
+  terms: { ...arabicLegalPages.terms, icon: FileText },
+};
+
+export const legalPagesHi = {
+  privacy: { ...hindiLegalPages.privacy, icon: ShieldCheck },
+  cookies: { ...hindiLegalPages.cookies, icon: Cookie },
+  terms: { ...hindiLegalPages.terms, icon: FileText },
+};
 
 export const legalPagesFr = {
   privacy: {

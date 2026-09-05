@@ -1,22 +1,37 @@
 #!/usr/bin/env node
 /**
- * Regenerates public/sitemap-blog.xml so every monthly redeploy bumps the
- * freshness signal for Google. Each post gets a deterministic random day
- * within the current month, never in the future — same algorithm as
- * src/lib/blogDates.js so frontend and sitemap stay in sync.
- *
- * Runs automatically before `vite build` (see package.json `prebuild`).
+ * Regenerates every public sitemap from the route/catalog source of truth.
+ * This keeps Google/Bing away from legacy URLs and makes new SEO pages
+ * discoverable as soon as they are added to the app catalogs.
  */
 
 import { writeFileSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  defaultLanguage,
+  localizePath,
+  supportedLanguages,
+} from "../src/lib/i18nRoutes.js";
+import { niches, nichePath } from "../src/lib/useCases.js";
+import { howTos, howToPath } from "../src/lib/howTos.js";
+import { blogSeoPosts } from "../src/lib/blogSeoMeta.js";
+const { loadStaticSeoData } = await import("./load-blog-static-data.mjs");
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, "..");
 const publicDir = join(repoRoot, "public");
+const siteUrl = "https://link-my.app";
+const { blog: blogStaticData } = await loadStaticSeoData();
+const availableBlogSlugsByLanguage = Object.fromEntries(
+  Object.entries(blogStaticData).map(([language, posts]) => [
+    language,
+    new Set(posts.map((post) => post.slug)),
+  ]),
+);
 
 const now = new Date();
+const todayISO = now.toISOString().slice(0, 10);
 const year = now.getUTCFullYear();
 const month = String(now.getUTCMonth() + 1).padStart(2, "0");
 const monthKey = `${year}-${now.getUTCMonth()}`;
@@ -25,7 +40,7 @@ const maxDay = Math.min(28, Math.max(1, todayDay));
 
 function hashString(str) {
   let hash = 0;
-  for (let i = 0; i < str.length; i++) {
+  for (let i = 0; i < str.length; i += 1) {
     hash = (hash << 5) - hash + str.charCodeAt(i);
     hash |= 0;
   }
@@ -42,73 +57,143 @@ function isoForSlug(slug) {
   return `${year}-${month}-${day}`;
 }
 
-const blogSlugs = [
-  "error-perder-ventas-instagram",
-  "como-evitar-perder-usuarios-descarga",
-  "disparar-descargas-app-link",
-  "alternativa-gratis-onelink-to",
-  "alternativa-branch-io-sin-sdk",
-  "alternativa-firebase-dynamic-links",
-  "medir-roi-influencers-app",
-  "secreto-apps-top-100",
-  "visitas-vs-descargas",
-  // AI Agent guide (page 1, middle position)
-  "guia-agentes-ia-link-my-app",
-  // Page 2 — 5 long-tail + 4 head/medium
-  "linktree-pierde-descargas-app",
-  "medir-descargas-influencer-tiktok-sin-sdk",
-  "boton-descarga-app-fold-movil",
-  "google-ads-tienda-equivocada",
-  "qr-packaging-app-sin-parecer-cupon",
-  "smart-link-vs-deep-link",
-  "atribucion-descargas-apps-medir-canal-real",
-  "bio-instagram-app-plantillas-descargas",
-  "lanzar-app-saas-sin-desperdiciar-presupuesto",
-];
+function languagePrefix(language) {
+  return language === defaultLanguage ? "" : `/${language}`;
+}
 
-// For the sitemap index we use the most recent date across all blog entries
-const indexLastmod = blogSlugs
-  .map(isoForSlug)
-  .sort()
-  .pop();
+function withSiteUrl(path) {
+  if (path === "/") return `${siteUrl}/`;
+  return `${siteUrl}${path}`;
+}
 
-const sitemapIndexUrls = [
-  { loc: "https://link-my.app/sitemap-en.xml", lastmod: indexLastmod },
-  { loc: "https://link-my.app/sitemap-es.xml", lastmod: indexLastmod },
-  { loc: "https://link-my.app/sitemap-fr.xml", lastmod: indexLastmod },
-  { loc: "https://link-my.app/sitemap-blog.xml", lastmod: indexLastmod },
-];
+function escapeXml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+}
 
-function buildBlogSitemap() {
-  const urls = blogSlugs
-    .map((slug) => {
-      const lastmod = isoForSlug(slug);
-      return `  <url>
-    <loc>https://link-my.app/blog/${slug}</loc>
-    <lastmod>${lastmod}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/blog/${slug}" />
-    <xhtml:link rel="alternate" hreflang="es" href="https://link-my.app/es/blog/${slug}" />
-    <xhtml:link rel="alternate" hreflang="fr" href="https://link-my.app/fr/blog/${slug}" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://link-my.app/blog/${slug}" />
+function xmlAlternates(entry) {
+  const languages = entry.getLanguages?.() || supportedLanguages;
+  const defaultAlternateLanguage = languages.includes(defaultLanguage)
+    ? defaultLanguage
+    : languages.includes("es")
+      ? "es"
+      : languages[0];
+  return [
+    ...languages.map(
+      (language) =>
+        `    <xhtml:link rel="alternate" hreflang="${language}" href="${escapeXml(withSiteUrl(entry.getPath(language)))}" />`,
+    ),
+    `    <xhtml:link rel="alternate" hreflang="x-default" href="${escapeXml(withSiteUrl(entry.getPath(defaultAlternateLanguage)))}" />`,
+  ].join("\n");
+}
+
+function xmlUrl(entry, language) {
+  const loc = withSiteUrl(entry.getPath(language));
+  return `  <url>
+    <loc>${escapeXml(loc)}</loc>
+    <lastmod>${entry.lastmod}</lastmod>
+    <changefreq>${entry.changefreq}</changefreq>
+    <priority>${entry.priority}</priority>
+${xmlAlternates(entry)}
   </url>`;
-    })
-    .join("\n");
+}
 
+function xmlUrlset(urls) {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
-${urls}
+${urls.join("\n")}
 </urlset>
 `;
+}
+
+function localizedDynamicPath(pathByLanguage, language) {
+  return `${languagePrefix(language)}${pathByLanguage(language)}`;
+}
+
+const staticPageEntries = [
+  { id: "home", path: "/", changefreq: "weekly", priority: "1.0" },
+  { id: "open-source", path: "/open-source", changefreq: "monthly", priority: "0.9" },
+  { id: "what-we-do", path: "/what-we-do", changefreq: "monthly", priority: "0.8" },
+  { id: "pricing", path: "/pricing", changefreq: "monthly", priority: "0.8" },
+  { id: "qr-codes", path: "/qr-codes", changefreq: "monthly", priority: "0.85" },
+  { id: "use-cases", path: "/use-cases", changefreq: "weekly", priority: "0.85" },
+  { id: "tourixy-success-story", path: "/success-story/tourixy", changefreq: "monthly", priority: "0.85" },
+  { id: "how-to", path: "/how-to", changefreq: "weekly", priority: "0.85" },
+  { id: "faqs", path: "/faqs", changefreq: "monthly", priority: "0.7" },
+  { id: "blog", path: "/blog", changefreq: "weekly", priority: "0.75" },
+  { id: "privacy", path: "/privacy", changefreq: "yearly", priority: "0.35" },
+  { id: "cookies", path: "/cookies", changefreq: "yearly", priority: "0.35" },
+  { id: "terms", path: "/terms", changefreq: "yearly", priority: "0.35" },
+].map((entry) => ({
+  ...entry,
+  lastmod: todayISO,
+  getPath: (language) => localizePath(entry.path, language),
+}));
+
+const useCaseEntries = niches.map((niche) => ({
+  id: `use-case-${niche.id}`,
+  lastmod: todayISO,
+  changefreq: "monthly",
+  priority: niche.id === "agencies" ? "0.82" : "0.76",
+  getPath: (language) => localizedDynamicPath((lang) => nichePath(niche.id, lang), language),
+}));
+
+const howToEntries = howTos.map((howTo) => ({
+  id: `how-to-${howTo.id}`,
+  lastmod: todayISO,
+  changefreq: "monthly",
+  priority: "0.72",
+  getPath: (language) => localizedDynamicPath((lang) => howToPath(howTo.id, lang), language),
+}));
+
+const pageEntries = [...staticPageEntries, ...useCaseEntries, ...howToEntries];
+
+const blogEntries = blogSeoPosts.map((post) => ({
+  id: `blog-${post.slug}`,
+  lastmod: post.publishedAt || isoForSlug(post.slug),
+  changefreq: "monthly",
+  priority: "0.62",
+  getPath: (language) => localizePath(`/blog/${post.slug}`, language),
+  getLanguages: () => supportedLanguages.filter((language) =>
+    availableBlogSlugsByLanguage[language]?.has(post.slug)),
+}));
+
+const sitemapIndexUrls = [
+  { loc: `${siteUrl}/sitemap-en.xml`, lastmod: todayISO },
+  { loc: `${siteUrl}/sitemap-es.xml`, lastmod: todayISO },
+  { loc: `${siteUrl}/sitemap-fr.xml`, lastmod: todayISO },
+  { loc: `${siteUrl}/sitemap-ja.xml`, lastmod: todayISO },
+  { loc: `${siteUrl}/sitemap-de.xml`, lastmod: todayISO },
+  { loc: `${siteUrl}/sitemap-pt.xml`, lastmod: todayISO },
+  { loc: `${siteUrl}/sitemap-it.xml`, lastmod: todayISO },
+  { loc: `${siteUrl}/sitemap-ko.xml`, lastmod: todayISO },
+  { loc: `${siteUrl}/sitemap-nl.xml`, lastmod: todayISO },
+  { loc: `${siteUrl}/sitemap-ar.xml`, lastmod: todayISO },
+  { loc: `${siteUrl}/sitemap-hi.xml`, lastmod: todayISO },
+  { loc: `${siteUrl}/sitemap-blog.xml`, lastmod: todayISO },
+];
+
+function buildLanguageSitemap(language) {
+  return xmlUrlset(pageEntries.map((entry) => xmlUrl(entry, language)));
+}
+
+function buildBlogSitemap() {
+  const urls = blogEntries.flatMap((entry) =>
+    entry.getLanguages().map((language) => xmlUrl(entry, language)),
+  );
+  return xmlUrlset(urls);
 }
 
 function buildSitemapIndex() {
   const items = sitemapIndexUrls
     .map(
       (entry) => `  <sitemap>
-    <loc>${entry.loc}</loc>
+    <loc>${escapeXml(entry.loc)}</loc>
     <lastmod>${entry.lastmod}</lastmod>
   </sitemap>`,
     )
@@ -123,13 +208,26 @@ ${items}
 
 mkdirSync(publicDir, { recursive: true });
 
-const blogSitemapPath = join(publicDir, "sitemap-blog.xml");
-writeFileSync(blogSitemapPath, buildBlogSitemap(), "utf8");
-
-const indexPath = join(publicDir, "sitemap_index.xml");
-writeFileSync(indexPath, buildSitemapIndex(), "utf8");
-
-console.log(`[sitemap] regenerated (month ${year}-${month}, maxDay ${maxDay})`);
-blogSlugs.forEach((slug) => {
-  console.log(`  ${isoForSlug(slug)}  ${slug}`);
+supportedLanguages.forEach((language) => {
+  writeFileSync(
+    join(publicDir, `sitemap-${language}.xml`),
+    buildLanguageSitemap(language),
+    "utf8",
+  );
 });
+
+writeFileSync(join(publicDir, "sitemap-blog.xml"), buildBlogSitemap(), "utf8");
+
+const sitemapIndex = buildSitemapIndex();
+writeFileSync(join(publicDir, "sitemap_index.xml"), sitemapIndex, "utf8");
+writeFileSync(join(publicDir, "sitemap.xml"), sitemapIndex, "utf8");
+
+// Vite's SSR loader can leave a file-watcher handle open on macOS/iCloud
+// workspaces even after server.close(). All generated files are written sync.
+for (const handle of process._getActiveHandles()) {
+  if (handle?.constructor?.name === "Server" && typeof handle.close === "function") {
+    handle.closeAllConnections?.();
+    handle.close();
+  }
+  handle.unref?.();
+}
