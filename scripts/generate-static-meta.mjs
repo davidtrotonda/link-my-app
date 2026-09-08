@@ -478,8 +478,8 @@ function htmlFor(entry, language) {
   return html
     .replace(/<html\b[^>]*>/, `<html lang="${language}" dir="${direction}">`)
     .replace(
-      /(\s*<meta name="googlebot" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1" \/>\n)/,
-      `$1${seo}\n`,
+      /(\s*<meta name="googlebot" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1" \/>)/,
+      `$1\n${seo}`,
     )
     .replace(
       '<div id="root"></div>',
