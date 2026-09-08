@@ -1,0 +1,454 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://link-my.app/it</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://link-my.app/es" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://link-my.app/fr" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://link-my.app/ja" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://link-my.app/de" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://link-my.app/pt" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://link-my.app/it" />
+    <xhtml:link rel="alternate" hreflang="ko" href="https://link-my.app/ko" />
+    <xhtml:link rel="alternate" hreflang="nl" href="https://link-my.app/nl" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://link-my.app/ar" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://link-my.app/hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://link-my.app/" />
+  </url>
+  <url>
+    <loc>https://link-my.app/it/open-source</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/open-source-smart-link" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://link-my.app/es/codigo-abierto" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://link-my.app/fr/open-source" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://link-my.app/ja/open-source" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://link-my.app/de/open-source-smartlink" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://link-my.app/pt/codigo-aberto" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://link-my.app/it/open-source" />
+    <xhtml:link rel="alternate" hreflang="ko" href="https://link-my.app/ko/open-source" />
+    <xhtml:link rel="alternate" hreflang="nl" href="https://link-my.app/nl/open-source" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://link-my.app/ar/open-source" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://link-my.app/hi/open-source" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://link-my.app/open-source-smart-link" />
+  </url>
+  <url>
+    <loc>https://link-my.app/it/link-download-app</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/what-we-do" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://link-my.app/es/que-hacemos" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://link-my.app/fr/que-faisons-nous" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://link-my.app/ja/app-download-link" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://link-my.app/de/app-download-link" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://link-my.app/pt/link-download-app" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://link-my.app/it/link-download-app" />
+    <xhtml:link rel="alternate" hreflang="ko" href="https://link-my.app/ko/app-download-link" />
+    <xhtml:link rel="alternate" hreflang="nl" href="https://link-my.app/nl/app-downloadlink" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://link-my.app/ar/app-download-link" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://link-my.app/hi/app-download-link" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://link-my.app/what-we-do" />
+  </url>
+  <url>
+    <loc>https://link-my.app/it/gratis</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/pricing" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://link-my.app/es/precio" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://link-my.app/fr/tarifs" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://link-my.app/ja/free" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://link-my.app/de/kostenlos" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://link-my.app/pt/gratis" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://link-my.app/it/gratis" />
+    <xhtml:link rel="alternate" hreflang="ko" href="https://link-my.app/ko/free" />
+    <xhtml:link rel="alternate" hreflang="nl" href="https://link-my.app/nl/gratis" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://link-my.app/ar/free" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://link-my.app/hi/free" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://link-my.app/pricing" />
+  </url>
+  <url>
+    <loc>https://link-my.app/it/qr-code-app</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/qr-code-for-apps" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://link-my.app/es/codigo-qr-app" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://link-my.app/fr/code-qr-app" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://link-my.app/ja/app-qr-code" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://link-my.app/de/app-qr-code" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://link-my.app/pt/qr-code-app" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://link-my.app/it/qr-code-app" />
+    <xhtml:link rel="alternate" hreflang="ko" href="https://link-my.app/ko/app-qr-code" />
+    <xhtml:link rel="alternate" hreflang="nl" href="https://link-my.app/nl/app-qr-code" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://link-my.app/ar/app-qr-code" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://link-my.app/hi/app-qr-code" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://link-my.app/qr-code-for-apps" />
+  </url>
+  <url>
+    <loc>https://link-my.app/it/casi-uso</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/use-cases" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://link-my.app/es/casos-de-uso" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://link-my.app/fr/cas-d-usage" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://link-my.app/ja/use-cases" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://link-my.app/de/anwendungsfaelle" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://link-my.app/pt/casos-de-uso" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://link-my.app/it/casi-uso" />
+    <xhtml:link rel="alternate" hreflang="ko" href="https://link-my.app/ko/use-cases" />
+    <xhtml:link rel="alternate" hreflang="nl" href="https://link-my.app/nl/toepassingen" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://link-my.app/ar/use-cases" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://link-my.app/hi/use-cases" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://link-my.app/use-cases" />
+  </url>
+  <url>
+    <loc>https://link-my.app/it/casi-di-successo/tourixy</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/success-stories/tourixy" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://link-my.app/es/casos-de-exito/tourixy" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://link-my.app/fr/cas-clients/tourixy" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://link-my.app/ja/success-stories/tourixy" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://link-my.app/de/erfolgsgeschichten/tourixy" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://link-my.app/pt/casos-de-sucesso/tourixy" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://link-my.app/it/casi-di-successo/tourixy" />
+    <xhtml:link rel="alternate" hreflang="ko" href="https://link-my.app/ko/success-stories/tourixy" />
+    <xhtml:link rel="alternate" hreflang="nl" href="https://link-my.app/nl/succesverhalen/tourixy" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://link-my.app/ar/success-stories/tourixy" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://link-my.app/hi/success-stories/tourixy" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://link-my.app/success-stories/tourixy" />
+  </url>
+  <url>
+    <loc>https://link-my.app/it/guide</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/how-to" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://link-my.app/es/como" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://link-my.app/fr/comment" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://link-my.app/ja/how-to" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://link-my.app/de/anleitungen" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://link-my.app/pt/guias" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://link-my.app/it/guide" />
+    <xhtml:link rel="alternate" hreflang="ko" href="https://link-my.app/ko/how-to" />
+    <xhtml:link rel="alternate" hreflang="nl" href="https://link-my.app/nl/gidsen" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://link-my.app/ar/how-to" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://link-my.app/hi/how-to" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://link-my.app/how-to" />
+  </url>
+  <url>
+    <loc>https://link-my.app/it/faq</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/faqs" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://link-my.app/es/faqs" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://link-my.app/fr/faq" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://link-my.app/ja/faq" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://link-my.app/de/faq" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://link-my.app/pt/faq" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://link-my.app/it/faq" />
+    <xhtml:link rel="alternate" hreflang="ko" href="https://link-my.app/ko/faq" />
+    <xhtml:link rel="alternate" hreflang="nl" href="https://link-my.app/nl/faq" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://link-my.app/ar/faq" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://link-my.app/hi/faq" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://link-my.app/faqs" />
+  </url>
+  <url>
+    <loc>https://link-my.app/it/blog</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.75</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/blog" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://link-my.app/es/blog" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://link-my.app/fr/blog" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://link-my.app/ja/blog" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://link-my.app/de/blog" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://link-my.app/pt/blog" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://link-my.app/it/blog" />
+    <xhtml:link rel="alternate" hreflang="ko" href="https://link-my.app/ko/blog" />
+    <xhtml:link rel="alternate" hreflang="nl" href="https://link-my.app/nl/blog" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://link-my.app/ar/blog" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://link-my.app/hi/blog" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://link-my.app/blog" />
+  </url>
+  <url>
+    <loc>https://link-my.app/it/privacy</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.35</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/privacy" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://link-my.app/es/privacidad" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://link-my.app/fr/confidentialite" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://link-my.app/ja/privacy" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://link-my.app/de/datenschutz" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://link-my.app/pt/privacidade" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://link-my.app/it/privacy" />
+    <xhtml:link rel="alternate" hreflang="ko" href="https://link-my.app/ko/privacy" />
+    <xhtml:link rel="alternate" hreflang="nl" href="https://link-my.app/nl/privacy" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://link-my.app/ar/privacy" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://link-my.app/hi/privacy" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://link-my.app/privacy" />
+  </url>
+  <url>
+    <loc>https://link-my.app/it/cookies</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.35</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/cookies" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://link-my.app/es/cookies" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://link-my.app/fr/cookies" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://link-my.app/ja/cookies" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://link-my.app/de/cookies" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://link-my.app/pt/cookies" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://link-my.app/it/cookies" />
+    <xhtml:link rel="alternate" hreflang="ko" href="https://link-my.app/ko/cookies" />
+    <xhtml:link rel="alternate" hreflang="nl" href="https://link-my.app/nl/cookies" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://link-my.app/ar/cookies" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://link-my.app/hi/cookies" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://link-my.app/cookies" />
+  </url>
+  <url>
+    <loc>https://link-my.app/it/termini</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.35</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/terms" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://link-my.app/es/terminos" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://link-my.app/fr/conditions" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://link-my.app/ja/terms" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://link-my.app/de/agb" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://link-my.app/pt/termos" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://link-my.app/it/termini" />
+    <xhtml:link rel="alternate" hreflang="ko" href="https://link-my.app/ko/terms" />
+    <xhtml:link rel="alternate" hreflang="nl" href="https://link-my.app/nl/voorwaarden" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://link-my.app/ar/terms" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://link-my.app/hi/terms" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://link-my.app/terms" />
+  </url>
+  <url>
+    <loc>https://link-my.app/it/casi-uso/annunci-app</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.76</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/use-cases/app-install-ads" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://link-my.app/es/casos-de-uso/anuncios-app" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://link-my.app/fr/cas-d-usage/publicites-app" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://link-my.app/ja/use-cases/app-install-ads" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://link-my.app/de/anwendungsfaelle/app-install-ads" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://link-my.app/pt/casos-de-uso/anuncios-app" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://link-my.app/it/casi-uso/annunci-app" />
+    <xhtml:link rel="alternate" hreflang="ko" href="https://link-my.app/ko/use-cases/app-install-ads" />
+    <xhtml:link rel="alternate" hreflang="nl" href="https://link-my.app/nl/toepassingen/app-install-ads" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://link-my.app/ar/use-cases/app-install-ads" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://link-my.app/hi/use-cases/app-install-ads" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://link-my.app/use-cases/app-install-ads" />
+  </url>
+  <url>
+    <loc>https://link-my.app/it/casi-uso/link-download-app-ecommerce</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.76</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/use-cases/ecommerce-apps" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://link-my.app/es/casos-de-uso/apps-ecommerce" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://link-my.app/fr/cas-d-usage/apps-ecommerce" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://link-my.app/ja/use-cases/ecommerce-app-download-link" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://link-my.app/de/anwendungsfaelle/ecommerce-app-download-link" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://link-my.app/pt/casos-de-uso/link-download-app-ecommerce" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://link-my.app/it/casi-uso/link-download-app-ecommerce" />
+    <xhtml:link rel="alternate" hreflang="ko" href="https://link-my.app/ko/use-cases/ecommerce-app-download-link" />
+    <xhtml:link rel="alternate" hreflang="nl" href="https://link-my.app/nl/toepassingen/ecommerce-app-downloadlink" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://link-my.app/ar/use-cases/ecommerce-app-download-link" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://link-my.app/hi/use-cases/ecommerce-app-download-link" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://link-my.app/use-cases/ecommerce-apps" />
+  </url>
+  <url>
+    <loc>https://link-my.app/it/casi-uso/link-download-app-saas</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.76</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/use-cases/saas-apps" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://link-my.app/es/casos-de-uso/apps-saas" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://link-my.app/fr/cas-d-usage/apps-saas" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://link-my.app/ja/use-cases/saas-app-download-link" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://link-my.app/de/anwendungsfaelle/saas-app-download-link" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://link-my.app/pt/casos-de-uso/link-download-app-saas" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://link-my.app/it/casi-uso/link-download-app-saas" />
+    <xhtml:link rel="alternate" hreflang="ko" href="https://link-my.app/ko/use-cases/saas-app-download-link" />
+    <xhtml:link rel="alternate" hreflang="nl" href="https://link-my.app/nl/toepassingen/saas-app-downloadlink" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://link-my.app/ar/use-cases/saas-app-download-link" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://link-my.app/hi/use-cases/saas-app-download-link" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://link-my.app/use-cases/saas-apps" />
+  </url>
+  <url>
+    <loc>https://link-my.app/it/casi-uso/qr-code-app-ristorante</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.76</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/use-cases/restaurant-apps" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://link-my.app/es/casos-de-uso/apps-restaurantes" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://link-my.app/fr/cas-d-usage/apps-restauration" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://link-my.app/ja/use-cases/restaurant-app-download-link" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://link-my.app/de/anwendungsfaelle/restaurant-app-download-link" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://link-my.app/pt/casos-de-uso/qr-code-app-restaurante" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://link-my.app/it/casi-uso/qr-code-app-ristorante" />
+    <xhtml:link rel="alternate" hreflang="ko" href="https://link-my.app/ko/use-cases/restaurant-app-qr-code" />
+    <xhtml:link rel="alternate" hreflang="nl" href="https://link-my.app/nl/toepassingen/restaurant-app-qr-code" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://link-my.app/ar/use-cases/restaurant-app-qr-code" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://link-my.app/hi/use-cases/restaurant-app-qr-code" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://link-my.app/use-cases/restaurant-apps" />
+  </url>
+  <url>
+    <loc>https://link-my.app/it/casi-uso/link-download-app-fitness</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.76</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/use-cases/fitness-apps" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://link-my.app/es/casos-de-uso/apps-fitness" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://link-my.app/fr/cas-d-usage/apps-fitness" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://link-my.app/ja/use-cases/fitness-app-download-link" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://link-my.app/de/anwendungsfaelle/fitness-app-download-link" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://link-my.app/pt/casos-de-uso/link-download-app-fitness" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://link-my.app/it/casi-uso/link-download-app-fitness" />
+    <xhtml:link rel="alternate" hreflang="ko" href="https://link-my.app/ko/use-cases/fitness-app-download-link" />
+    <xhtml:link rel="alternate" hreflang="nl" href="https://link-my.app/nl/toepassingen/fitness-app-downloadlink" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://link-my.app/ar/use-cases/fitness-app-download-link" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://link-my.app/hi/use-cases/fitness-app-download-link" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://link-my.app/use-cases/fitness-apps" />
+  </url>
+  <url>
+    <loc>https://link-my.app/it/casi-uso/link-download-app-creator</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.76</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/use-cases/creator-apps" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://link-my.app/es/casos-de-uso/apps-creadores" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://link-my.app/fr/cas-d-usage/apps-createurs" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://link-my.app/ja/use-cases/creator-app-download-link" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://link-my.app/de/anwendungsfaelle/creator-app-download-link" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://link-my.app/pt/casos-de-uso/link-download-app-criadores" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://link-my.app/it/casi-uso/link-download-app-creator" />
+    <xhtml:link rel="alternate" hreflang="ko" href="https://link-my.app/ko/use-cases/creator-app-download-link" />
+    <xhtml:link rel="alternate" hreflang="nl" href="https://link-my.app/nl/toepassingen/creator-app-downloadlink" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://link-my.app/ar/use-cases/creator-app-download-link" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://link-my.app/hi/use-cases/creator-app-download-link" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://link-my.app/use-cases/creator-apps" />
+  </url>
+  <url>
+    <loc>https://link-my.app/it/casi-uso/per-agenzie</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/use-cases/for-agencies" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://link-my.app/es/casos-de-uso/para-agencias" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://link-my.app/fr/cas-d-usage/pour-agences" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://link-my.app/ja/use-cases/for-agencies" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://link-my.app/de/anwendungsfaelle/fuer-agenturen" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://link-my.app/pt/casos-de-uso/para-agencias" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://link-my.app/it/casi-uso/per-agenzie" />
+    <xhtml:link rel="alternate" hreflang="ko" href="https://link-my.app/ko/use-cases/for-agencies" />
+    <xhtml:link rel="alternate" hreflang="nl" href="https://link-my.app/nl/toepassingen/voor-agencies" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://link-my.app/ar/use-cases/for-agencies" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://link-my.app/hi/use-cases/for-agencies" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://link-my.app/use-cases/for-agencies" />
+  </url>
+  <url>
+    <loc>https://link-my.app/it/guide/condividere-app-instagram</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.72</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/how-to/share-your-app-on-instagram" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://link-my.app/es/como/compartir-app-instagram" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://link-my.app/fr/comment/partager-app-instagram" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://link-my.app/ja/how-to/instagram-app-link" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://link-my.app/de/anleitungen/app-auf-instagram-teilen" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://link-my.app/pt/guias/partilhar-app-instagram" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://link-my.app/it/guide/condividere-app-instagram" />
+    <xhtml:link rel="alternate" hreflang="ko" href="https://link-my.app/ko/how-to/share-app-instagram" />
+    <xhtml:link rel="alternate" hreflang="nl" href="https://link-my.app/nl/gidsen/app-delen-instagram" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://link-my.app/ar/how-to/share-app-instagram" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://link-my.app/hi/how-to/share-app-instagram" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://link-my.app/how-to/share-your-app-on-instagram" />
+  </url>
+  <url>
+    <loc>https://link-my.app/it/guide/link-download-app-whatsapp</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.72</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/how-to/app-download-link-whatsapp" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://link-my.app/es/como/enlace-descarga-app-whatsapp" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://link-my.app/fr/comment/lien-telechargement-app-whatsapp" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://link-my.app/ja/how-to/whatsapp-app-download-link" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://link-my.app/de/anleitungen/app-download-link-whatsapp" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://link-my.app/pt/guias/link-download-app-whatsapp" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://link-my.app/it/guide/link-download-app-whatsapp" />
+    <xhtml:link rel="alternate" hreflang="ko" href="https://link-my.app/ko/how-to/app-download-link-whatsapp" />
+    <xhtml:link rel="alternate" hreflang="nl" href="https://link-my.app/nl/gidsen/app-downloadlink-whatsapp" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://link-my.app/ar/how-to/app-download-link-whatsapp" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://link-my.app/hi/how-to/app-download-link-whatsapp" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://link-my.app/how-to/app-download-link-whatsapp" />
+  </url>
+  <url>
+    <loc>https://link-my.app/it/guide/reindirizzare-app-store-google-play</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.72</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/how-to/redirect-users-app-store-google-play" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://link-my.app/es/como/redirigir-usuarios-app-store-google-play" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://link-my.app/fr/comment/rediriger-utilisateurs-app-store-google-play" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://link-my.app/ja/how-to/redirect-app-store-google-play" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://link-my.app/de/anleitungen/app-store-google-play-weiterleitung" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://link-my.app/pt/guias/redirecionar-app-store-google-play" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://link-my.app/it/guide/reindirizzare-app-store-google-play" />
+    <xhtml:link rel="alternate" hreflang="ko" href="https://link-my.app/ko/how-to/app-store-google-play-redirect" />
+    <xhtml:link rel="alternate" hreflang="nl" href="https://link-my.app/nl/gidsen/app-store-google-play-doorsturen" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://link-my.app/ar/how-to/app-store-google-play-redirect" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://link-my.app/hi/how-to/app-store-google-play-redirect" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://link-my.app/how-to/redirect-users-app-store-google-play" />
+  </url>
+  <url>
+    <loc>https://link-my.app/it/guide/pulsante-download-app-sito</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.72</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/how-to/app-download-button-website" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://link-my.app/es/como/boton-descarga-app-web" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://link-my.app/fr/comment/bouton-telechargement-app-site" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://link-my.app/ja/how-to/website-app-download-button" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://link-my.app/de/anleitungen/app-download-button-website" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://link-my.app/pt/guias/botao-download-app-site" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://link-my.app/it/guide/pulsante-download-app-sito" />
+    <xhtml:link rel="alternate" hreflang="ko" href="https://link-my.app/ko/how-to/app-download-button-website" />
+    <xhtml:link rel="alternate" hreflang="nl" href="https://link-my.app/nl/gidsen/app-downloadknop-website" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://link-my.app/ar/how-to/app-download-button-website" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://link-my.app/hi/how-to/app-download-button-website" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://link-my.app/how-to/app-download-button-website" />
+  </url>
+  <url>
+    <loc>https://link-my.app/it/guide/qr-code-download-app</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.72</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/how-to/use-qr-physical-campaigns" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://link-my.app/es/como/usar-qr-campanas-fisicas" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://link-my.app/fr/comment/utiliser-qr-campagnes-physiques" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://link-my.app/ja/how-to/qr-code-app-download" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://link-my.app/de/anleitungen/qr-code-app-download" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://link-my.app/pt/guias/qr-code-download-app" />
+    <xhtml:link rel="alternate" hreflang="it" href="https://link-my.app/it/guide/qr-code-download-app" />
+    <xhtml:link rel="alternate" hreflang="ko" href="https://link-my.app/ko/how-to/qr-code-app-download" />
+    <xhtml:link rel="alternate" hreflang="nl" href="https://link-my.app/nl/gidsen/qr-code-app-download" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://link-my.app/ar/how-to/qr-code-app-download" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://link-my.app/hi/how-to/qr-code-app-download" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://link-my.app/how-to/use-qr-physical-campaigns" />
+  </url>
+</urlset>

@@ -210,7 +210,7 @@ export const agentGuideBlogPost = {
 
       <h2 className="text-[22px] font-bold mt-12 mb-4 tracking-tight scroll-mt-32">6. Atribución por canal (Instagram, TikTok, etc.)</h2>
       <p>
-        Para distinguir de qué red social vienen las descargas, un usuario Pro puede crear <strong>un smart link por canal</strong> con un sufijo en el slug. Los sufijos definidos son:
+        Para distinguir de qué red social vienen las descargas, cualquier usuario puede crear <strong>un smart link por canal</strong> con un sufijo en el slug. Los sufijos definidos son:
       </p>
       <div className="overflow-x-auto my-4">
         <table className="w-full text-sm border border-black/10 rounded-xl">
@@ -237,7 +237,7 @@ export const agentGuideBlogPost = {
         El sistema reconoce automáticamente estos sufijos y muestra el icono de la red social correspondiente en el panel. Para campañas específicas se puede añadir un sufijo extra: <Code>marina-fitness-ig-bf2026</Code> (Black Friday 2026).
       </p>
       <Callout type="warn">
-        Importante: la creación de smart links por canal solo está disponible en el plan <strong>Pro</strong>. Si un usuario en Gratis intenta crear más de un link activo, el sistema bloquea la operación y muestra el modal de upgrade.
+        Importante: la creación de smart links por canal está disponible gratis. No hay modal de upgrade ni límite de un único link activo.
       </Callout>
 
       <h2 className="text-[22px] font-bold mt-12 mb-4 tracking-tight scroll-mt-32">7. Generación del QR</h2>
@@ -254,23 +254,23 @@ export const agentGuideBlogPost = {
         Tamaño recomendado para impresión: mínimo 220×220 px en pantalla, 3×3 cm o más en físico. Para packaging premium, usar 4×4 cm con padding visual.
       </p>
 
-      <h2 className="text-[22px] font-bold mt-12 mb-4 tracking-tight scroll-mt-32">8. Pro vs Gratis: límites técnicos</h2>
+      <h2 className="text-[22px] font-bold mt-12 mb-4 tracking-tight scroll-mt-32">8. Plan gratis: funciones incluidas</h2>
       <div className="overflow-x-auto my-4">
         <table className="w-full text-sm border border-black/10 rounded-xl">
           <thead className="bg-slate-50 text-left">
             <tr>
-              <th className="p-3 font-bold">Límite</th>
-              <th className="p-3 font-bold">Gratis</th>
-              <th className="p-3 font-bold">Pro</th>
+              <th className="p-3 font-bold">Función</th>
+              <th className="p-3 font-bold">Incluido gratis</th>
+              <th className="p-3 font-bold">Notas</th>
             </tr>
           </thead>
           <tbody>
-            <tr className="border-t border-black/5"><td className="p-3">Smart links activos</td><td className="p-3">1</td><td className="p-3">Ilimitados</td></tr>
-            <tr className="border-t border-black/5"><td className="p-3">QR generados</td><td className="p-3">1 automático</td><td className="p-3">Ilimitados</td></tr>
-            <tr className="border-t border-black/5"><td className="p-3">Slug personalizado</td><td className="p-3">No</td><td className="p-3">Sí</td></tr>
-            <tr className="border-t border-black/5"><td className="p-3">Estadísticas por canal</td><td className="p-3">No</td><td className="p-3">Sí</td></tr>
-            <tr className="border-t border-black/5"><td className="p-3">Editar destinos sin reimprimir QR</td><td className="p-3">No</td><td className="p-3">Sí</td></tr>
-            <tr className="border-t border-black/5"><td className="p-3">Precio</td><td className="p-3">0 €</td><td className="p-3">9,99 € pago único</td></tr>
+            <tr className="border-t border-black/5"><td className="p-3">Smart links activos</td><td className="p-3">Sí</td><td className="p-3">Ilimitados</td></tr>
+            <tr className="border-t border-black/5"><td className="p-3">QR generados</td><td className="p-3">Sí</td><td className="p-3">Ilimitados</td></tr>
+            <tr className="border-t border-black/5"><td className="p-3">Slug personalizado</td><td className="p-3">Sí</td><td className="p-3">Editable</td></tr>
+            <tr className="border-t border-black/5"><td className="p-3">Estadísticas por canal</td><td className="p-3">Sí</td><td className="p-3">Incluye QR, redes y fuentes</td></tr>
+            <tr className="border-t border-black/5"><td className="p-3">Editar destinos sin reimprimir QR</td><td className="p-3">Sí</td><td className="p-3">El QR mantiene la misma URL</td></tr>
+            <tr className="border-t border-black/5"><td className="p-3">Precio</td><td className="p-3">0 €</td><td className="p-3">Sin pago ni suscripción</td></tr>
           </tbody>
         </table>
       </div>
@@ -281,7 +281,6 @@ export const agentGuideBlogPost = {
         <li><Code>https://link-my.app/</Code> – home pública.</li>
         <li><Code>https://link-my.app/login</Code> – inicio de sesión y registro.</li>
         <li><Code>https://link-my.app/dashboard</Code> – panel del usuario autenticado (privado).</li>
-        <li><Code>https://link-my.app/pricing</Code> – página de precio (EN). En ES: <Code>/es/precio</Code>. En FR: <Code>/fr/tarifs</Code>.</li>
         <li><Code>https://link-my.app/qr-code-for-apps</Code> – landing dedicada al QR. ES: <Code>/es/codigo-qr-app</Code>. FR: <Code>/fr/code-qr-app</Code>.</li>
         <li><Code>https://link-my.app/use-cases</Code> – hub de casos de uso.</li>
         <li><Code>https://link-my.app/how-to</Code> – guías paso a paso.</li>
@@ -294,9 +293,9 @@ export const agentGuideBlogPost = {
         Link My App está disponible en 3 idiomas con slugs traducidos por idioma:
       </p>
       <ul className="ml-5 list-disc space-y-1">
-        <li><strong>Inglés</strong> (por defecto, sin prefijo): <Code>/</Code>, <Code>/pricing</Code>, <Code>/qr-code-for-apps</Code>, <Code>/blog</Code>, <Code>/login</Code>...</li>
-        <li><strong>Español</strong>: <Code>/es</Code>, <Code>/es/precio</Code>, <Code>/es/codigo-qr-app</Code>, <Code>/es/blog</Code>, <Code>/es/iniciar-sesion</Code>...</li>
-        <li><strong>Francés</strong>: <Code>/fr</Code>, <Code>/fr/tarifs</Code>, <Code>/fr/code-qr-app</Code>, <Code>/fr/blog</Code>, <Code>/fr/connexion</Code>...</li>
+        <li><strong>Inglés</strong> (por defecto, sin prefijo): <Code>/</Code>, <Code>/qr-code-for-apps</Code>, <Code>/blog</Code>, <Code>/login</Code>...</li>
+        <li><strong>Español</strong>: <Code>/es</Code>, <Code>/es/codigo-qr-app</Code>, <Code>/es/blog</Code>, <Code>/es/iniciar-sesion</Code>...</li>
+        <li><strong>Francés</strong>: <Code>/fr</Code>, <Code>/fr/code-qr-app</Code>, <Code>/fr/blog</Code>, <Code>/fr/connexion</Code>...</li>
       </ul>
       <p>
         Un agente debe detectar el idioma del usuario y usar los slugs apropiados al enlazar la documentación. Si no está claro, asumir inglés por defecto.
@@ -341,7 +340,7 @@ export const agentGuideBlogPost = {
       <h2 className="text-[22px] font-bold mt-12 mb-4 tracking-tight scroll-mt-32">14. Errores comunes y cómo resolverlos</h2>
       <ul className="ml-5 list-disc space-y-2">
         <li><strong>"Slug ya en uso"</strong> → sugerir variante con sufijo de canal o año.</li>
-        <li><strong>"Límite alcanzado en Gratis"</strong> → ofrecer el upgrade a Pro o sugerir desactivar un link existente.</li>
+        <li><strong>"Slug ya en uso al crear por canal"</strong> → sugerir variante con sufijo de campaña o año.</li>
         <li><strong>"URL inválida"</strong> → verificar que tiene <Code>https://</Code> y el dominio correcto (apps.apple.com / play.google.com).</li>
         <li><strong>"QR no escanea desde distancia"</strong> → recomendar mínimo 3×3 cm impreso y contraste negro sobre blanco.</li>
         <li><strong>"Los clics no suben"</strong> → verificar que el smart link es el que se comparte realmente y no una URL antigua.</li>

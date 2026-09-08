@@ -47,10 +47,3 @@ a {
   color: inherit;
   text-decoration: none;
 }
-
-@supports (content-visibility: auto) {
-  main > section:not(#inicio) {
-    content-visibility: auto;
-    contain-intrinsic-size: 1px 900px;
-  }
-}

@@ -4,53 +4,85 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#ffffff" />
-    <meta name="robots" content="index,follow" />
+    <meta data-base-seo="true" name="robots" content="index,follow" />
     <meta name="googlebot" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1" />
-    <meta name="author" content="David Trotonda" />
-    <meta name="publisher" content="David Trotonda" />
+    <meta data-base-seo="true" name="author" content="David Trotonda" />
+    <meta data-base-seo="true" name="publisher" content="David Trotonda" />
     <meta
+      data-base-seo="true"
       name="keywords"
       content="app download link, smart link for apps, App Store Google Play link, QR code for apps, app link analytics, link descarga app, enlaces inteligentes apps"
     />
     <meta
+      data-base-seo="true"
       name="description"
       content="One link detects iPhone, Android or desktop and sends every click to Google Play, App Store or your website."
     />
-    <link rel="canonical" href="https://link-my.app/" />
-    <link rel="alternate" hreflang="en" href="https://link-my.app/" />
-    <link rel="alternate" hreflang="es" href="https://link-my.app/es" />
-    <link rel="alternate" hreflang="fr" href="https://link-my.app/fr" />
-    <link rel="alternate" hreflang="x-default" href="https://link-my.app/" />
+    <link data-base-seo="true" rel="canonical" href="https://link-my.app/" />
+    <link data-base-seo="true" rel="alternate" hreflang="en" href="https://link-my.app/" />
+    <link data-base-seo="true" rel="alternate" hreflang="es" href="https://link-my.app/es" />
+    <link data-base-seo="true" rel="alternate" hreflang="fr" href="https://link-my.app/fr" />
+    <link data-base-seo="true" rel="alternate" hreflang="ja" href="https://link-my.app/ja" />
+    <link data-base-seo="true" rel="alternate" hreflang="de" href="https://link-my.app/de" />
+    <link data-base-seo="true" rel="alternate" hreflang="pt" href="https://link-my.app/pt" />
+    <link data-base-seo="true" rel="alternate" hreflang="it" href="https://link-my.app/it" />
+    <link data-base-seo="true" rel="alternate" hreflang="ko" href="https://link-my.app/ko" />
+    <link data-base-seo="true" rel="alternate" hreflang="nl" href="https://link-my.app/nl" />
+    <link data-base-seo="true" rel="alternate" hreflang="ar" href="https://link-my.app/ar" />
+    <link data-base-seo="true" rel="alternate" hreflang="hi" href="https://link-my.app/hi" />
+    <link data-base-seo="true" rel="alternate" hreflang="x-default" href="https://link-my.app/" />
     <link rel="icon" href="/favicon.ico" sizes="48x48" />
     <link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96" />
     <link rel="icon" href="/favicon-192.png" type="image/png" sizes="192x192" />
     <link rel="icon" href="/favicon-512.png" type="image/png" sizes="512x512" />
     <link rel="shortcut icon" href="/favicon.ico" />
     <link rel="manifest" href="/site.webmanifest" />
+    <link rel="llms-txt" type="text/markdown" href="/llms.txt" />
+    <link rel="help" type="text/markdown" href="/agents.md" title="Agent guide for Link My App" />
     <link rel="apple-touch-icon" sizes="192x192" href="/favicon-192.png" />
     <link rel="apple-touch-icon" sizes="512x512" href="/favicon-512.png" />
     <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
     <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin />
+    <link rel="preconnect" href="https://www.googletagmanager.com" />
     <link rel="preconnect" href="https://www.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://identitytoolkit.googleapis.com" />
     <link rel="preconnect" href="https://api.qrserver.com" />
-    <meta property="og:locale" content="en_US" />
-    <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="Link My App" />
-    <meta property="og:title" content="Link My App | One link for Google Play and App Store" />
+    <script>
+      (function () {
+        var firstSegment = window.location.pathname.split("/").filter(Boolean)[0];
+        var language = ["en", "es", "fr", "ja", "de", "pt", "it", "ko", "nl", "ar", "hi"].indexOf(firstSegment) >= 0 ? firstSegment : "en";
+        document.documentElement.lang = language;
+        document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
+      })();
+    </script>
+    <meta data-base-seo="true" property="og:locale" content="en_US" />
+    <meta data-base-seo="true" property="og:type" content="website" />
+    <meta data-base-seo="true" property="og:site_name" content="Link My App" />
+    <meta data-base-seo="true" property="og:title" content="Link My App | One link for Google Play and App Store" />
     <meta
+      data-base-seo="true"
       property="og:description"
       content="One link detects iPhone, Android or desktop and sends every click to Google Play, App Store or your website."
     />
-    <meta property="og:url" content="https://link-my.app/" />
-    <meta property="og:image" content="https://link-my.app/og-image.svg" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Link My App | One link for Google Play and App Store" />
+    <meta data-base-seo="true" property="og:url" content="https://link-my.app/" />
+    <meta data-base-seo="true" property="og:image" content="https://link-my.app/og-image.svg" />
+    <meta data-base-seo="true" name="twitter:card" content="summary_large_image" />
+    <meta data-base-seo="true" name="twitter:title" content="Link My App | One link for Google Play and App Store" />
     <meta
+      data-base-seo="true"
       name="twitter:description"
       content="One link detects iPhone, Android or desktop and sends every click to Google Play, App Store or your website."
     />
-    <meta name="twitter:image" content="https://link-my.app/og-image.svg" />
+    <meta data-base-seo="true" name="twitter:image" content="https://link-my.app/og-image.svg" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=%VITE_FIREBASE_MEASUREMENT_ID%"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "%VITE_FIREBASE_MEASUREMENT_ID%");
+    </script>
     <script type="application/ld+json" id="base-schema">
       {
         "@context": "https://schema.org",
@@ -69,20 +101,36 @@
           },
           {
             "@type": "SoftwareApplication",
+            "@id": "https://link-my.app/#software",
             "name": "Link My App",
             "applicationCategory": "BusinessApplication",
             "operatingSystem": "Web",
             "url": "https://link-my.app/",
+            "isAccessibleForFree": true,
+            "license": "https://github.com/davidtrotonda/link-my-app/blob/main/LICENSE",
+            "sameAs": ["https://github.com/davidtrotonda/link-my-app"],
             "offers": {
               "@type": "Offer",
-              "price": "9.99",
+              "price": "0",
               "priceCurrency": "EUR"
+            }
+          },
+          {
+            "@type": "SoftwareSourceCode",
+            "@id": "https://link-my.app/#source-code",
+            "name": "Link My App source code",
+            "codeRepository": "https://github.com/davidtrotonda/link-my-app",
+            "license": "https://github.com/davidtrotonda/link-my-app/blob/main/LICENSE",
+            "programmingLanguage": ["JavaScript", "JSX", "HTML", "CSS"],
+            "runtimePlatform": ["React", "Firebase", "Cloudflare Workers"],
+            "targetProduct": {
+              "@id": "https://link-my.app/#software"
             }
           }
         ]
       }
     </script>
-    <title>Link My App | One link for Google Play and App Store</title>
+    <title data-base-seo="true">Link My App | One link for Google Play and App Store</title>
   </head>
   <body>
     <div id="root"></div>

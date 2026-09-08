@@ -2,6 +2,7 @@ import {
   default as React,
   createContext,
   Suspense,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -31,6 +32,7 @@ import {
   serverTimestamp,
   equalTo,
   get,
+  limitToLast,
   onValue,
   orderByChild,
   push,
@@ -47,6 +49,9 @@ import {
   Building2,
   Check,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Code2,
   Cookie,
   Copy,
   Download,
@@ -60,11 +65,13 @@ import {
   Loader2,
   LogOut,
   Mail,
+  Megaphone,
   Menu,
   MessageSquare,
   MousePointer2,
   Plus,
   QrCode,
+  Search,
   Settings,
   ShieldCheck,
   Smartphone,
@@ -74,7 +81,6 @@ import {
   User,
   Utensils,
   X,
-  Lock,
   Sparkles,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -89,6 +95,11 @@ import {
   stripePortalUrl,
   applyPromoCodeUrl,
   verifyPaymentUrl,
+  adminPrepareAccountUrl,
+  consumePreparedAccountUrl,
+  edgeAccountStatsDeleteUrl,
+  edgeLinkSyncUrl,
+  edgeStatsUrl,
 } from "./firebase.js";
 import { LanguageWrapper } from "./LanguageWrapper.jsx";
 import {
@@ -96,12 +107,12 @@ import {
   FinalFooter as LandingFinalFooter,
   ModernSimulationsSection as LandingSimulationsSection,
   PricingComparisonSection as LandingPricingSection,
-  PricingPageExtras as LandingPricingExtras,
   PremiumNavbar as LandingNavbar,
   SmartLinkFlow as LandingSmartLinkFlow,
   faqs as landingFaqs,
 } from "./LandingVisuals.jsx";
 import {
+  buildWebsiteLinkHtml,
   detectDestination,
   normalizeUrl,
   publicLinkForSlug,
@@ -118,15 +129,8 @@ import {
   supportedLanguages,
   switchLanguagePath,
 } from "./lib/i18nRoutes.js";
-import {
-  legalPagesEn,
-  legalPagesEs,
-  legalPagesFr,
-  legalTabsEn,
-  legalTabsEs,
-  legalTabsFr,
-} from "./lib/legalPages.js";
-import { niches as useCaseNiches, nichePath } from "./lib/useCases.js";
+import { visibleUseCaseTeasers as useCaseNiches, teaserNichePath as nichePath } from "./lib/useCaseTeasers.js";
+import { getOpenSourceContent, openSourceLinks } from "./lib/openSourceContent.js";
 import { socialGlyphs } from "./components/SocialIcons.jsx";
 
 const BlogIndex = React.lazy(() =>
@@ -141,6 +145,7 @@ const UseCasePage = React.lazy(() => import("./UseCasePage.jsx"));
 const AgenciesPage = React.lazy(() => import("./AgenciesPage.jsx"));
 const HowToHub = React.lazy(() => import("./HowToHub.jsx"));
 const HowToPage = React.lazy(() => import("./HowToPage.jsx"));
+const TourixyCaseStudy = React.lazy(() => import("./TourixyCaseStudy.jsx"));
 
 const AuthContext = createContext({
   user: null,
@@ -156,11 +161,34 @@ const emptyLinkForm = {
   customUrl: "",
 };
 
+const destinationUrlFields = ["iosUrl", "androidUrl", "fallbackUrl"];
+
+function normalizeLinkDestinationUrls(form) {
+  return destinationUrlFields.reduce(
+    (normalizedForm, field) => ({
+      ...normalizedForm,
+      [field]: normalizeUrl(form[field] || ""),
+    }),
+    { ...form }
+  );
+}
+
 const linkDraftStorageKey = "link-my-app.pendingLinkDraft";
 const brandName = "Link My App";
 const siteUrl = "https://link-my.app";
-const brandLogoUrl = `${siteUrl}/logo-link-my-app.png`;
+const brandLogoUrl = `${siteUrl}/favicon-512.png`;
 const adminEmail = import.meta.env.VITE_ADMIN_EMAIL || "";
+const configuredAdminEmails = [
+  adminEmail,
+  ...(import.meta.env.VITE_ADMIN_EMAILS || "").split(/[,\s]+/),
+];
+const adminEmails = Array.from(
+  new Set(
+    ["info@skeilapps.com", "davidtroton@gmail.com", ...configuredAdminEmails]
+      .map((email) => email.trim().toLowerCase())
+      .filter(Boolean)
+  )
+);
 const feedbackEndpoint = import.meta.env.VITE_FEEDBACK_ENDPOINT || "";
 const defaultSeoDescription =
   "Un solo enlace detecta iPhone, Android u ordenador y lleva cada clic a Google Play, App Store o tu web.";
@@ -188,26 +216,130 @@ const emptyStats = {
   days: [],
 };
 
-function formatAuthError(error) {
+function normalizeEmail(value = "") {
+  return value.trim().toLowerCase();
+}
+
+function isValidEmailAddress(value = "") {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizeEmail(value));
+}
+
+function isAdminUser(user) {
+  return Boolean(user?.email && adminEmails.includes(normalizeEmail(user.email)));
+}
+
+function formatTimestamp(value) {
+  if (!value) return "Sin fecha";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Sin fecha";
+  return date.toLocaleDateString("es-ES", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+function getCurrentPageLanguage() {
+  if (typeof window === "undefined") return defaultLanguage;
+
+  const pathLanguage = getLanguageFromPath(window.location.pathname);
+  const documentLanguage =
+    typeof document !== "undefined" ? document.documentElement.lang : "";
+  const browserLanguage =
+    typeof navigator !== "undefined" ? navigator.language : "";
+
+  return normalizeLanguage(
+    pathLanguage || documentLanguage || browserLanguage || defaultLanguage
+  );
+}
+
+function getFirebaseAuthLanguage(language) {
+  const normalizedLanguage = normalizeLanguage(language);
+  return normalizedLanguage === "pt" ? "pt-PT" : normalizedLanguage;
+}
+
+function getRegistrationLanguageCode(profile) {
+  const code = String(profile?.registrationLanguage || "")
+    .trim()
+    .toLowerCase()
+    .split("-")[0];
+
+  if (code === "ca" || code === "val") return "es";
+  return supportedLanguages.includes(code) ? code : "";
+}
+
+function formatRegistrationLanguage(profile, includeCode = false) {
+  const code = getRegistrationLanguageCode(profile);
+  if (!code) return "Desconocido";
+
+  const label =
+    languageOptions.find((language) => language.code === code)?.label ||
+    code.toUpperCase();
+  return includeCode ? `${label} (${code})` : label;
+}
+
+function formatExportDate(value) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toISOString().slice(0, 10);
+}
+
+function formatAuthError(error, t) {
   const code = error?.code || "";
 
   if (code === "auth/unauthorized-domain") {
-    return "Este dominio todavía no está autorizado en Firebase. Añade link-my.app en Authentication > Settings > Authorized domains.";
+    return t("messages.authUnavailable");
   }
   if (code === "auth/email-already-in-use") {
-    return "Ese email ya tiene cuenta. Prueba a iniciar sesión.";
+    return t("messages.authEmailInUse");
   }
-  if (code === "auth/invalid-credential" || code === "auth/wrong-password") {
-    return "El email o la contraseña no son correctos.";
+  if (
+    code === "auth/invalid-credential" ||
+    code === "auth/wrong-password" ||
+    code === "auth/user-not-found"
+  ) {
+    return t("messages.authInvalidCredentials");
   }
   if (code === "auth/weak-password") {
-    return "La contraseña debe tener al menos 6 caracteres.";
+    return t("messages.authWeakPassword");
   }
   if (code === "auth/popup-closed-by-user") {
-    return "Has cerrado la ventana de Google antes de terminar.";
+    return t("messages.authPopupClosed");
+  }
+  if (code === "auth/too-many-requests") {
+    return t("messages.authTooManyRequests");
+  }
+  if (code === "auth/network-request-failed") {
+    return t("messages.authNetwork");
   }
 
-  return error?.message || "Ha ocurrido un error. Inténtalo de nuevo.";
+  return t("messages.authGeneric");
+}
+
+function createLinkError(code) {
+  const error = new Error(code);
+  error.code = code;
+  return error;
+}
+
+function formatLinkError(error, t) {
+  if (error?.code === "link/title-required") {
+    return t("messages.appNameRequired");
+  }
+  if (error?.code === "link/slug-invalid") {
+    return t("messages.slugInvalid");
+  }
+  if (error?.code === "link/destinations-invalid") {
+    return t("landing.urlInvalidError");
+  }
+  if (error?.code === "link/slug-in-use") {
+    return t("messages.slugInUse");
+  }
+  if (error?.code === "link/service-unavailable") {
+    return t("messages.serviceUnavailableText");
+  }
+  return t("messages.createLinkError");
 }
 
 async function startStripeCheckout(user, currency = "eur") {
@@ -324,6 +456,7 @@ export function SEO({
 }) {
   const { i18n } = useTranslation();
   const language = normalizeLanguage(i18n.language);
+  const direction = language === "ar" ? "rtl" : "ltr";
   const canonical = `${siteUrl}${localizePath(path, language)}`;
   const fullTitle = title.includes(brandName) ? title : `${title} | ${brandName}`;
   const alternates = supportedLanguages.map((lang) => ({
@@ -332,16 +465,23 @@ export function SEO({
   }));
   const xDefaultHref = `${siteUrl}${localizePath(path, defaultLanguage)}`;
 
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    document.querySelectorAll("[data-base-seo='true']").forEach((node) => {
+      node.remove();
+    });
+  }, [canonical, fullTitle]);
+
   return (
     <Helmet>
-      <html lang={language} />
+      <html lang={language} dir={direction} />
       <title>{fullTitle}</title>
       <meta name="description" content={description} />
       <meta name="keywords" content={keywords} />
       <meta name="robots" content={robots} />
       <meta name="author" content="David Trotonda" />
       <meta name="publisher" content="David Trotonda" />
-      <meta property="og:locale" content={{ en: "en_US", es: "es_ES", fr: "fr_FR" }[language] || "en_US"} />
+      <meta property="og:locale" content={{ en: "en_US", es: "es_ES", fr: "fr_FR", ja: "ja_JP", de: "de_DE", pt: "pt_PT", it: "it_IT", ko: "ko_KR", nl: "nl_NL", ar: "ar_AR", hi: "hi_IN" }[language] || "en_US"} />
       <meta property="og:type" content="website" />
       <meta property="og:site_name" content={brandName} />
       <meta property="og:title" content={fullTitle} />
@@ -430,6 +570,179 @@ function getLastSevenDays() {
   });
 }
 
+function eventsToDailyStats(events) {
+  const rows = new Map();
+
+  events.forEach((event) => {
+    const createdAt = Number(event.createdAt || 0);
+    if (!event.linkId || !event.ownerId || !createdAt) return;
+    const day = new Date(createdAt).toISOString().slice(0, 10);
+    const destination = ["ios", "android", "fallback"].includes(event.destination)
+      ? event.destination
+      : "fallback";
+    const source = event.source === "qr" ? "qr" : "written";
+    const key = `${event.linkId}|${day}|${destination}|${source}`;
+    const current = rows.get(key) || {
+      ownerId: event.ownerId,
+      linkId: event.linkId,
+      slug: event.slug || "",
+      day,
+      destination,
+      source,
+      clicks: 0,
+      lastClickAt: 0,
+    };
+    current.clicks += 1;
+    current.lastClickAt = Math.max(current.lastClickAt, createdAt);
+    rows.set(key, current);
+  });
+
+  return Array.from(rows.values());
+}
+
+function mergeDailyStats(...groups) {
+  const rows = new Map();
+
+  groups.flat().forEach((row) => {
+    if (!row?.linkId || !row?.day) return;
+    const destination = ["ios", "android", "fallback"].includes(row.destination)
+      ? row.destination
+      : "fallback";
+    const source = row.source === "qr" ? "qr" : "written";
+    const key = `${row.linkId}|${row.day}|${destination}|${source}`;
+    const current = rows.get(key) || {
+      ownerId: row.ownerId || "",
+      linkId: row.linkId,
+      slug: row.slug || "",
+      day: row.day,
+      destination,
+      source,
+      clicks: 0,
+      lastClickAt: 0,
+    };
+    current.clicks += Math.max(0, Number(row.clicks || 0));
+    current.lastClickAt = Math.max(
+      current.lastClickAt,
+      Number(row.lastClickAt || 0)
+    );
+    rows.set(key, current);
+  });
+
+  return Array.from(rows.values());
+}
+
+function buildStatsForLinks(links, dailyRows) {
+  const nextCounts = Object.fromEntries(
+    links.map((item) => [item.id, { ...emptyStats, days: getLastSevenDays() }])
+  );
+
+  dailyRows.forEach((row) => {
+    if (!nextCounts[row.linkId]) return;
+    const destination = row.destination || "fallback";
+    const source = row.source || "written";
+    const clicks = Math.max(0, Number(row.clicks || 0));
+    const dayStats = nextCounts[row.linkId].days.find(
+      (day) => day.key === row.day
+    );
+
+    nextCounts[row.linkId].total += clicks;
+    if (destination in nextCounts[row.linkId]) {
+      nextCounts[row.linkId][destination] += clicks;
+    }
+    if (source === "qr") {
+      nextCounts[row.linkId].qr += clicks;
+      if (destination === "ios") nextCounts[row.linkId].qr_ios += clicks;
+      else if (destination === "android") nextCounts[row.linkId].qr_android += clicks;
+      else nextCounts[row.linkId].qr_fallback += clicks;
+    } else {
+      nextCounts[row.linkId].written += clicks;
+      if (destination === "ios") nextCounts[row.linkId].written_ios += clicks;
+      else if (destination === "android") nextCounts[row.linkId].written_android += clicks;
+      else nextCounts[row.linkId].written_fallback += clicks;
+    }
+    if (dayStats && destination in dayStats) {
+      dayStats[destination] += clicks;
+    }
+  });
+
+  Object.values(nextCounts).forEach((stats) => {
+    stats.estimatedInstalls = estimateDownloads(stats);
+    stats.days = stats.days.map((day) => ({
+      ...day,
+      estimatedInstalls: estimateDownloads(day),
+    }));
+  });
+
+  return nextCounts;
+}
+
+function adminDateInputValue(date = new Date()) {
+  return date.toISOString().slice(0, 10);
+}
+
+function shiftAdminCalendarDate(value, offset) {
+  const parts = String(value || "").split("-").map(Number);
+  if (parts.length !== 3 || parts.some((part) => !Number.isInteger(part))) return "";
+
+  const date = new Date(Date.UTC(parts[0], parts[1] - 1, parts[2]));
+  if (Number.isNaN(date.getTime())) return "";
+  date.setUTCDate(date.getUTCDate() + offset);
+  return date.toISOString().slice(0, 10);
+}
+
+function adminEventDateKey(timestamp) {
+  if (!timestamp) return "";
+  const date = new Date(timestamp);
+  return Number.isNaN(date.getTime()) ? "" : adminDateInputValue(date);
+}
+
+function buildAdminVisitRows(links, dailyRows, usersById, fromDate, toDate) {
+  if (!fromDate || !toDate || fromDate > toDate) return [];
+
+  const linksById = new Map(links.map((link) => [link.id, link]));
+  const rowsByLink = new Map();
+
+  dailyRows.forEach((event) => {
+    const eventDate = event.day || adminEventDateKey(event.lastClickAt);
+    if (!eventDate) return;
+
+    const link = linksById.get(event.linkId);
+    const linkId = event.linkId || `missing-${event.slug || event.id}`;
+    const ownerId = link?.ownerId || event.ownerId || "";
+    const user = usersById[ownerId] || {};
+    const current = rowsByLink.get(linkId) || {
+      linkId,
+      ownerId,
+      userName: user.displayName || "Usuario sin nombre",
+      userEmail: user.email || event.ownerEmail || "Sin email",
+      title: link?.title || event.title || "Link eliminado",
+      slug: link?.slug || event.slug || linkId,
+      periodVisits: 0,
+      totalVisits: 0,
+      lastVisit: "",
+    };
+
+    const clicks = Math.max(0, Number(event.clicks || 0));
+    current.totalVisits += clicks;
+    if (!current.lastVisit || eventDate > current.lastVisit) {
+      current.lastVisit = eventDate;
+    }
+    if (eventDate >= fromDate && eventDate <= toDate) {
+      current.periodVisits += clicks;
+    }
+    rowsByLink.set(linkId, current);
+  });
+
+  return Array.from(rowsByLink.values())
+    .filter((row) => row.periodVisits > 0)
+    .sort(
+      (a, b) =>
+        b.periodVisits - a.periodVisits ||
+        b.totalVisits - a.totalVisits ||
+        a.userEmail.localeCompare(b.userEmail)
+    );
+}
+
 function sanitizeLinkDraft(value) {
   return {
     title: typeof value?.title === "string" ? value.title : "",
@@ -438,6 +751,133 @@ function sanitizeLinkDraft(value) {
     fallbackUrl: typeof value?.fallbackUrl === "string" ? value.fallbackUrl : "",
     customUrl: typeof value?.customUrl === "string" ? value.customUrl : "",
   };
+}
+
+function publicProfileData(profile = {}) {
+  return {
+    uid: String(profile.uid || ""),
+    displayName: String(profile.displayName || "Usuario").slice(0, 120),
+    bio: String(profile.bio || "").slice(0, 500),
+    photoURL: String(profile.photoURL || "").slice(0, 2048),
+    public: profile.public !== false,
+    updatedAt: profile.updatedAt || serverTimestamp(),
+  };
+}
+
+function publicLinkData(link = {}) {
+  return {
+    ownerId: String(link.ownerId || ""),
+    title: String(link.title || "").slice(0, 160),
+    slug: String(link.slug || ""),
+    iosUrl: String(link.iosUrl || ""),
+    androidUrl: String(link.androidUrl || ""),
+    fallbackUrl: String(link.fallbackUrl || ""),
+    active: Boolean(link.active),
+    createdAt: link.createdAt || serverTimestamp(),
+    updatedAt: link.updatedAt || serverTimestamp(),
+    ...(link.channel ? { channel: String(link.channel).slice(0, 40) } : {}),
+    ...(link.parentLinkId ? { parentLinkId: String(link.parentLinkId).slice(0, 160) } : {}),
+  };
+}
+
+async function fetchEdgeStats(user, { admin = false } = {}) {
+  if (!user || !edgeStatsUrl) return null;
+
+  try {
+    const token = await user.getIdToken();
+    const url = new URL(edgeStatsUrl);
+    if (admin) url.searchParams.set("scope", "admin");
+    else url.searchParams.set("ownerId", user.uid);
+
+    const response = await fetch(url, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!response.ok || !response.headers.get("content-type")?.includes("application/json")) {
+      return null;
+    }
+    const data = await response.json();
+    if (!Array.isArray(data.rows)) return null;
+    return {
+      rows: data.rows,
+      legacyMigrated: data.legacyMigrated === true,
+    };
+  } catch {
+    return null;
+  }
+}
+
+async function syncLinkAtEdge(
+  user,
+  linkId,
+  { previousSlug = "", action = "sync", purgeStats = false } = {}
+) {
+  if (!user || !linkId || !edgeLinkSyncUrl) return false;
+
+  try {
+    const token = await user.getIdToken();
+    const response = await fetch(edgeLinkSyncUrl, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ linkId, previousSlug, action, purgeStats }),
+    });
+    if (!response.ok || !response.headers.get("content-type")?.includes("application/json")) {
+      return false;
+    }
+    const data = await response.json();
+    return data.success === true;
+  } catch {
+    return false;
+  }
+}
+
+async function deleteAccountStatsAtEdge(user) {
+  if (!user || !edgeAccountStatsDeleteUrl) return false;
+
+  try {
+    const token = await user.getIdToken();
+    const response = await fetch(edgeAccountStatsDeleteUrl, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ ownerId: user.uid }),
+    });
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
+async function getWithLegacyFallback(primaryLocation, legacyLocation) {
+  let primarySnapshot = null;
+
+  try {
+    primarySnapshot = await get(primaryLocation);
+    if (primarySnapshot.exists()) return primarySnapshot;
+  } catch {
+    // During the migration, the public collection may not exist under the old rules yet.
+  }
+
+  try {
+    return await get(legacyLocation);
+  } catch {
+    return primarySnapshot;
+  }
+}
+
+async function writePrivateAndPublicLink(linkRef, link) {
+  const linkId = linkRef.key;
+  if (!linkId) throw new Error("No se pudo crear el identificador del link.");
+
+  await update(ref(db), {
+    [`links/${linkId}`]: link,
+    [`publicLinks/${linkId}`]: link.active ? publicLinkData(link) : null,
+  });
+  await syncLinkAtEdge(auth?.currentUser, linkId);
 }
 
 function hasLinkDraftData(draft) {
@@ -489,30 +929,78 @@ function useToast() {
   return [message, show];
 }
 
+async function consumePreparedAccount(user) {
+  if (!user || !consumePreparedAccountUrl) return null;
+
+  try {
+    const token = await user.getIdToken();
+    const response = await fetch(consumePreparedAccountUrl, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({}),
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(data.error || "No se pudo aplicar la cuenta preparada.");
+    }
+    return data;
+  } catch (error) {
+    console.warn("Prepared account sync skipped", error);
+    return null;
+  }
+}
+
 async function ensureUserProfile(user) {
   if (!db || !user) return;
 
   const userRef = ref(db, `users/${user.uid}`);
   const snapshot = await get(userRef);
+  const existingProfile = snapshot.exists() ? snapshot.val() : {};
   const profileData = {
     uid: user.uid,
-    displayName: user.displayName || user.email?.split("@")[0] || "Usuario",
     email: user.email || "",
+    emailNormalized: normalizeEmail(user.email || ""),
     photoURL: user.photoURL || "",
-    public: true,
     updatedAt: serverTimestamp(),
   };
 
   if (snapshot.exists()) {
-    await update(userRef, profileData);
+    const nextProfile = {
+      ...profileData,
+      displayName:
+        existingProfile.displayName ||
+        user.displayName ||
+        user.email?.split("@")[0] ||
+        "Usuario",
+      public:
+        typeof existingProfile.public === "boolean"
+          ? existingProfile.public
+          : true,
+    };
+    await update(ref(db), {
+      [`users/${user.uid}`]: { ...existingProfile, ...nextProfile },
+      [`publicProfiles/${user.uid}`]: publicProfileData({ ...existingProfile, ...nextProfile }),
+    });
+    await consumePreparedAccount(user);
     return;
   }
 
-  await set(userRef, {
+  const newProfile = {
     ...profileData,
+    displayName: user.displayName || user.email?.split("@")[0] || "Usuario",
+    public: true,
     bio: "Mis smart links de Link My App.",
+    registrationLanguage: getCurrentPageLanguage(),
     createdAt: serverTimestamp(),
+  };
+  await update(ref(db), {
+    [`users/${user.uid}`]: newProfile,
+    [`publicProfiles/${user.uid}`]: publicProfileData(newProfile),
   });
+  await consumePreparedAccount(user);
 }
 
 // Available channels for the "create one link per source" pro feature.
@@ -528,6 +1016,26 @@ export const LINK_CHANNELS = [
   { id: "whatsapp", label: "WhatsApp", suffix: "wa", color: "#25D366" },
 ];
 
+async function findAvailableSlug(baseSlug, maxAttempts = 31) {
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    const suffix = attempt === 1 ? "" : `-${attempt}`;
+    const trimmedBase = baseSlug
+      .slice(0, Math.max(1, 80 - suffix.length))
+      .replace(/-+$/, "");
+    const candidate = `${trimmedBase}${suffix}`;
+    const existing = await get(
+      query(ref(db, "publicLinks"), orderByChild("slug"), equalTo(candidate))
+    );
+    const taken =
+      existing.exists() &&
+      Object.values(existing.val()).some((link) => link.active === true);
+
+    if (!taken) return candidate;
+  }
+
+  throw createLinkError("link/slug-in-use");
+}
+
 /**
  * Clones an existing smart link with a new slug suffixed by the channel id.
  * Used by the "track per channel" pro-gated feature in the dashboard.
@@ -539,28 +1047,10 @@ async function createChannelLink(item, channel, user) {
   }
 
   const baseSlug = (item.slug || "").replace(/[-]+$/, "");
-  let candidate = `${baseSlug}-${channel.suffix}`;
-  let tries = 0;
-
-  // Find an unused slug, append -2, -3, ... if collisions
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
-    const existing = await get(
-      query(ref(db, "links"), orderByChild("slug"), equalTo(candidate))
-    );
-    const taken =
-      existing.exists() &&
-      Object.values(existing.val()).some((link) => link.active === true);
-    if (!taken) break;
-    tries += 1;
-    candidate = `${baseSlug}-${channel.suffix}-${tries + 1}`;
-    if (tries > 30) {
-      throw new Error("No se pudo generar un slug único para el canal.");
-    }
-  }
+  const candidate = await findAvailableSlug(`${baseSlug}-${channel.suffix}`);
 
   const linkRef = push(ref(db, "links"));
-  await set(linkRef, {
+  await writePrivateAndPublicLink(linkRef, {
     ownerId: user.uid,
     ownerEmail: user.email || "",
     title: `${item.title} – ${channel.label}`,
@@ -581,46 +1071,24 @@ async function createChannelLink(item, channel, user) {
 
 async function createSmartLink(form, user, options = {}) {
   if (!firebaseReady || !db || !user) {
-    throw new Error("Firebase no está configurado todavía.");
+    throw createLinkError("link/service-unavailable");
   }
 
   const title = form.title.trim();
-  const slug = slugFromInput(form.customUrl || title);
+  const requestedSlug = slugFromInput(form.customUrl || title);
   const iosUrl = normalizeUrl(form.iosUrl);
   const androidUrl = normalizeUrl(form.androidUrl);
   const fallbackUrl = normalizeUrl(form.fallbackUrl);
 
-  if (!title) throw new Error("Añade el nombre de la app.");
-  if (!slug || slug.length < 2) throw new Error("Elige una URL corta válida.");
+  if (!title) throw createLinkError("link/title-required");
+  if (!requestedSlug || requestedSlug.length < 2) {
+    throw createLinkError("link/slug-invalid");
+  }
   if (!iosUrl || !androidUrl || !fallbackUrl) {
-    throw new Error("Completa App Store, Google Play y enlace alternativo.");
+    throw createLinkError("link/destinations-invalid");
   }
 
-  const profileSnap = await get(ref(db, `users/${user.uid}`));
-  const isPro = profileSnap.exists() && profileSnap.val().plan === "pro";
-
-  if (!isPro) {
-    const userLinks = await get(
-      query(ref(db, "links"), orderByChild("ownerId"), equalTo(user.uid))
-    );
-    if (userLinks.exists()) {
-      const activeLinksCount = Object.values(userLinks.val()).filter(l => l.active).length;
-      if (activeLinksCount >= 1) {
-        throw new Error("Límite alcanzado. Pásate a Pro para crear links ilimitados.");
-      }
-    }
-  }
-
-  const existing = await get(
-    query(ref(db, "links"), orderByChild("slug"), equalTo(slug))
-  );
-
-  if (
-    existing.exists() &&
-    Object.values(existing.val()).some((link) => link.active === true)
-  ) {
-    throw new Error("Esa URL corta ya está en uso. Prueba otra.");
-  }
+  const slug = await findAvailableSlug(requestedSlug);
 
   const linkRef = push(ref(db, "links"));
   const payload = {
@@ -641,7 +1109,63 @@ async function createSmartLink(form, user, options = {}) {
   if (options.channel) {
     payload.channel = options.channel;
   }
-  await set(linkRef, payload);
+  await writePrivateAndPublicLink(linkRef, payload);
+
+  return slug;
+}
+
+async function createPendingSmartLink(user) {
+  const draft = readLinkDraft();
+  if (!hasLinkDraftData(draft)) return null;
+
+  try {
+    const slug = await createSmartLink(draft, user);
+    clearLinkDraft();
+    return slug;
+  } catch (error) {
+    // Keep the draft so an invalid URL or a slug collision can be corrected
+    // from the dashboard without losing what the user entered before login.
+    console.warn("Pending smart link could not be created automatically", error);
+    return null;
+  }
+}
+
+async function createSmartLinkForAccount(form, owner, adminUser) {
+  if (!firebaseReady || !db || !owner?.uid) {
+    throw new Error("Selecciona una cuenta válida.");
+  }
+
+  const title = form.title.trim();
+  const requestedSlug = slugFromInput(form.customUrl || title);
+  const iosUrl = normalizeUrl(form.iosUrl);
+  const androidUrl = normalizeUrl(form.androidUrl);
+  const fallbackUrl = normalizeUrl(form.fallbackUrl);
+
+  if (!title) throw new Error("Añade el nombre de la app.");
+  if (!requestedSlug || requestedSlug.length < 2) {
+    throw new Error("Elige una URL corta válida.");
+  }
+  if (!iosUrl || !androidUrl || !fallbackUrl) {
+    throw new Error("Completa App Store, Google Play y enlace alternativo.");
+  }
+
+  const slug = await findAvailableSlug(requestedSlug);
+
+  const linkRef = push(ref(db, "links"));
+  await writePrivateAndPublicLink(linkRef, {
+    ownerId: owner.uid,
+    ownerEmail: owner.email || "",
+    title,
+    slug,
+    customUrl: form.customUrl || "",
+    iosUrl,
+    androidUrl,
+    fallbackUrl,
+    active: true,
+    createdByAdminEmail: adminUser?.email || "",
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
 
   return slug;
 }
@@ -691,6 +1215,7 @@ function AuthProvider({ children }) {
 }
 
 function FirebaseSetupNotice({ compact = false }) {
+  const { t } = useTranslation();
   if (firebaseReady) return null;
 
   return (
@@ -702,11 +1227,9 @@ function FirebaseSetupNotice({ compact = false }) {
       <div className="flex items-start gap-3">
         <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0" />
         <div>
-          <p className="font-black">Falta conectar Firebase</p>
+          <p className="font-black">{t("messages.serviceUnavailableTitle")}</p>
           <p className="mt-1 leading-6 opacity-75">
-            Duplica <span className="font-bold">.env.example</span> como{" "}
-            <span className="font-bold">.env</span> y pega las claves de tu app
-            web de Firebase.
+            {t("messages.serviceUnavailableText")}
           </p>
         </div>
       </div>
@@ -724,7 +1247,6 @@ function PremiumNavbar() {
     { label: t("nav.home"), href: localizePath("/", language) },
     { label: t("nav.how"), href: localizePath("/what-we-do", language) },
     { label: t("nav.faqs"), href: localizePath("/faqs", language) },
-    { label: t("nav.price"), href: localizePath("/pricing", language) },
   ];
 
   return (
@@ -734,7 +1256,7 @@ function PremiumNavbar() {
           to={localizePath("/", language)}
           className="flex shrink-0 items-center gap-2 transition hover:opacity-80"
         >
-          <img src="/logo-link-my-app.png" alt="Link My App" className="h-9 w-9 object-contain shadow-[0_12px_26px_rgba(0,0,0,0.18)]" />
+          <img src="/logo-link-my-app.avif" alt="Link My App" className="h-9 w-9 object-contain shadow-[0_12px_26px_rgba(0,0,0,0.18)]" />
           <span className="text-[18px] font-black tracking-tight text-black md:text-[22px]">
             Link My App
           </span>
@@ -764,7 +1286,7 @@ function PremiumNavbar() {
             type="button"
             onClick={() => setOpen(!open)}
             className="grid h-10 w-10 place-items-center rounded-2xl bg-transparent text-black lg:hidden"
-            aria-label="Abrir menú"
+            aria-label={t("messages.openMenu")}
           >
             {open ? (
               <X size={25} strokeWidth={2.4} />
@@ -801,7 +1323,7 @@ function SmartLinkFlow() {
   return (
     <section
       className="relative w-full overflow-hidden rounded-[30px] border border-black/10 bg-white p-6 shadow-[0_22px_70px_rgba(0,0,0,0.07)]"
-      aria-label="Smart link hacia App Store, web y Google Play"
+      aria-label={t("messages.smartLinkVisualLabel")}
     >
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.05)_1px,transparent_1.5px)] bg-[size:22px_22px] opacity-60" />
       <div className="relative mx-auto flex max-w-[720px] flex-col items-center gap-7 py-4">
@@ -856,7 +1378,7 @@ function StorePreview({ label, tone }) {
  * Optional channel selector shown inside the create-link form once the user
  * already has at least one link. Selecting a channel appends its suffix to
  * the slug (e.g. "mi-app-ig") so each social network gets its own trackable URL.
- * Free users see locked icons that trigger the upgrade modal on click.
+ * The channel suffix creates a separate trackable URL for each social network.
  */
 function ChannelSelector({ selected, onSelect, isPro }) {
   const { t } = useTranslation();
@@ -869,11 +1391,6 @@ function ChannelSelector({ selected, onSelect, isPro }) {
             "Crea URLs específicas por red social para medir cada canal por separado.",
           )}
         </p>
-        {!isPro && (
-          <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-black px-2 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-white">
-            <Lock size={10} /> Pro
-          </span>
-        )}
       </div>
 
       <div className="mt-3 grid grid-cols-4 gap-2">
@@ -891,9 +1408,7 @@ function ChannelSelector({ selected, onSelect, isPro }) {
               className={`group relative flex items-center justify-center rounded-2xl border p-2.5 transition ${
                 isSelected
                   ? "border-black bg-black shadow-[0_10px_25px_rgba(0,0,0,0.18)]"
-                  : isPro
-                    ? "border-black/10 bg-white hover:-translate-y-0.5 hover:border-black/30"
-                    : "border-black/10 bg-white/70 hover:border-black/25"
+                  : "border-black/10 bg-white hover:-translate-y-0.5 hover:border-black/30"
               }`}
             >
               {Glyph && (
@@ -902,9 +1417,6 @@ function ChannelSelector({ selected, onSelect, isPro }) {
                   height={20}
                   style={{ color: isSelected ? "#fff" : channel.color }}
                 />
-              )}
-              {!isPro && !isSelected && (
-                <Lock size={10} className="absolute right-1.5 top-1.5 text-black/40" />
               )}
             </button>
           );
@@ -932,7 +1444,6 @@ function LinkCreateForm({
   onDisabledSubmit,
   hasExistingLinks = false,
   isPro = false,
-  onChannelLocked,
 }) {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
@@ -944,19 +1455,18 @@ function LinkCreateForm({
   const [selectedChannel, setSelectedChannel] = useState(null);
   const submitButtonRef = React.useRef(null);
 
-  const baseSlug = slugFromInput(form.customUrl || form.title) || "mi-app";
+  const baseSlug =
+    slugFromInput(form.customUrl || form.title) ||
+    slugFromInput(t("landing.defaultSlug", "mi-app"));
   const effectiveSlug = selectedChannel ? `${baseSlug}-${selectedChannel.suffix}` : baseSlug;
   const previewUrl = publicLinkForSlug(publicBaseUrl, effectiveSlug);
 
   function updateField(field, value) {
+    setError("");
     setForm((current) => ({ ...current, [field]: value }));
   }
 
   function handleChannelClick(channel) {
-    if (!isPro) {
-      onChannelLocked?.(channel);
-      return;
-    }
     setSelectedChannel((current) => {
       const next = current?.id === channel.id ? null : channel;
       // When a channel becomes selected, smoothly scroll to the submit button
@@ -977,8 +1487,48 @@ function LinkCreateForm({
     event.preventDefault();
     setError("");
 
+    if (!form.title.trim()) {
+      setError(t("messages.appNameRequired"));
+      return;
+    }
+
+    const requestedSlug = slugFromInput(form.customUrl || form.title);
+    if (!requestedSlug || requestedSlug.length < 2) {
+      setError(t("messages.slugInvalid"));
+      return;
+    }
+
+    const missingDestination = destinationUrlFields.some(
+      (field) => !String(form[field] || "").trim()
+    );
+    if (missingDestination) {
+      setError(
+        t(
+          "landing.urlRequiredError",
+          "Completa las direcciones de App Store, Google Play y web alternativa."
+        )
+      );
+      return;
+    }
+
+    const normalizedForm = normalizeLinkDestinationUrls(form);
+    const invalidDestination = destinationUrlFields.some(
+      (field) => !normalizedForm[field]
+    );
+    if (invalidDestination) {
+      setError(
+        t(
+          "landing.urlInvalidError",
+          "Introduce una dirección web válida. Puedes escribirla sin https://."
+        )
+      );
+      return;
+    }
+
+    setForm(normalizedForm);
+
     if (!user) {
-      saveLinkDraft(form);
+      saveLinkDraft(normalizedForm);
       navigate(localizePath("/login?linkDraft=1", i18n.language));
       return;
     }
@@ -990,12 +1540,12 @@ function LinkCreateForm({
 
     setSaving(true);
     try {
-      // If a channel is selected (Pro only) we force the slug suffix by
-      // passing the channel-suffixed slug as customUrl, and tag the link
+      // If a channel is selected we force the slug suffix by passing the
+      // channel-suffixed slug as customUrl, and tag the link
       // with the channel id so its brand icon shows up next to the actions.
       const formForSubmit = selectedChannel
-        ? { ...form, customUrl: effectiveSlug }
-        : form;
+        ? { ...normalizedForm, customUrl: effectiveSlug }
+        : normalizedForm;
       const slug = await createSmartLink(formForSubmit, user, {
         channel: selectedChannel?.id,
       });
@@ -1005,14 +1555,19 @@ function LinkCreateForm({
       setDraftReady(false);
       onCreated?.(slug);
     } catch (nextError) {
-      setError(nextError.message);
+      setError(formatLinkError(nextError, t));
     } finally {
       setSaving(false);
     }
   }
 
   return (
-    <form className="space-y-4" onSubmit={handleSubmit}>
+    <form
+      className="space-y-4"
+      onSubmit={handleSubmit}
+      toolname="create_smart_link"
+      tooldescription="Creates a Link My App smart link that routes iPhone users to App Store, Android users to Google Play, and desktop users to a fallback URL."
+    >
       <FirebaseSetupNotice compact />
 
       {draftReady && (
@@ -1023,30 +1578,47 @@ function LinkCreateForm({
 
       <InputField
         label={t("landing.appNameLabel")}
+        name="app_name"
         value={form.title}
         onChange={(value) => updateField("title", value)}
         placeholder={t("landing.appNamePlaceholder")}
+        toolParamDescription="Public name of the app or campaign for this smart link."
       />
 
       <InputField
         label={t("landing.iosUrlLabel")}
+        name="ios_url"
         value={form.iosUrl}
         onChange={(value) => updateField("iosUrl", value)}
-        placeholder="https://apps.apple.com/..."
+        placeholder={t("landing.iosUrlPlaceholder", "https://apps.apple.com/...")}
+        urlField
+        autoComplete="url"
+        toolParamDescription="Full App Store URL for iPhone and iPad visitors."
       />
 
       <InputField
         label={t("landing.androidUrlLabel")}
+        name="android_url"
         value={form.androidUrl}
         onChange={(value) => updateField("androidUrl", value)}
-        placeholder="https://play.google.com/store/apps/details?id=..."
+        placeholder={t(
+          "landing.androidUrlPlaceholder",
+          "https://play.google.com/store/apps/details?id=..."
+        )}
+        urlField
+        autoComplete="url"
+        toolParamDescription="Full Google Play URL for Android visitors."
       />
 
       <InputField
         label={t("landing.fallbackUrlLabel")}
+        name="fallback_url"
         value={form.fallbackUrl}
         onChange={(value) => updateField("fallbackUrl", value)}
         placeholder={t("landing.fallbackPlaceholder", "https://tuweb.com/descargar-app")}
+        urlField
+        autoComplete="url"
+        toolParamDescription="Fallback web URL for desktop, unknown devices, or unavailable stores."
       />
 
       <label className="block">
@@ -1060,9 +1632,12 @@ function LinkCreateForm({
         </div>
 
         <input
+          name="custom_slug"
           value={form.customUrl}
           onChange={(event) => updateField("customUrl", event.target.value)}
           placeholder={t("landing.customUrlPlaceholder")}
+          autoComplete="off"
+          toolparamdescription="Optional short slug for the public smart link URL."
           className="h-12 w-full rounded-2xl border border-black/12 bg-[#f8f8f6] px-4 text-sm font-semibold outline-none transition placeholder:text-black/28 focus:border-black/35 focus:bg-white"
         />
 
@@ -1120,15 +1695,99 @@ function LinkCreateForm({
   );
 }
 
-function InputField({ label, value, onChange, placeholder, type = "text" }) {
+function DashboardCreateHelp() {
+  const { t } = useTranslation();
+  const fallbackSteps = [
+    "Pon el nombre de tu app para reconocerla dentro del panel.",
+    "Pega el enlace de App Store: se usará cuando alguien abra el link desde iPhone o iPad.",
+    "Pega el enlace de Google Play: se usará cuando alguien abra el link desde Android.",
+    "Añade un enlace alternativo para ordenador, tablets no detectadas u otros dispositivos.",
+    "Elige el nombre corto del enlace y compártelo; el QR se generará automáticamente.",
+    "Cuando compartas el enlace o el QR, Android abrirá Google Play, iPhone abrirá App Store y cualquier otro dispositivo abrirá el enlace alternativo.",
+  ];
+  const translatedSteps = t("dashboard.createHelpSteps", { returnObjects: true });
+  const steps = Array.isArray(translatedSteps) ? translatedSteps : fallbackSteps;
+
+  return (
+    <details className="group mb-5 rounded-[24px] border border-black/8 bg-[#fafaf8] p-4">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 [&::-webkit-details-marker]:hidden">
+        <div className="min-w-0">
+          <p className="text-sm font-black tracking-[-0.01em] text-black">
+            {t("dashboard.createHelpTitle", "Cómo funciona")}
+          </p>
+          <p className="mt-1 overflow-hidden text-xs font-semibold leading-5 text-black/50 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]">
+            {t(
+              "dashboard.createHelpSummary",
+              "Qué poner en cada campo y qué pasa al crear el link."
+            )}
+          </p>
+        </div>
+        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-2xl border border-black/10 bg-white text-black/55 transition group-open:rotate-180">
+          <ChevronDown size={17} />
+        </span>
+      </summary>
+
+      <div className="mt-4 border-t border-black/8 pt-4">
+        <p className="text-xs font-bold leading-5 text-black/58">
+          {t(
+            "dashboard.createHelpIntro",
+            "El smartlink es un único enlace que decide automáticamente a dónde enviar a cada persona según el dispositivo desde el que entra."
+          )}
+        </p>
+        <ol className="mt-4 space-y-3">
+          {steps.map((step, index) => (
+            <li key={step} className="flex gap-3">
+              <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-black text-[10px] font-black text-white">
+                {index + 1}
+              </span>
+              <span className="text-xs font-semibold leading-5 text-black/62">
+                {step}
+              </span>
+            </li>
+          ))}
+        </ol>
+        <p className="mt-4 rounded-2xl bg-white px-4 py-3 text-xs font-bold leading-5 text-black/55">
+          {t(
+            "dashboard.createHelpOutro",
+            "Desde esta pantalla también podrás copiar la URL, descargar el QR, pausar el link y revisar las estadísticas."
+          )}
+        </p>
+      </div>
+    </details>
+  );
+}
+
+function InputField({
+  label,
+  name,
+  value,
+  onChange,
+  placeholder,
+  type = "text",
+  urlField = false,
+  inputMode,
+  autoComplete,
+  toolParamDescription,
+}) {
+  function handleBlur() {
+    if (!urlField || !String(value || "").trim()) return;
+    const normalizedValue = normalizeUrl(value);
+    if (normalizedValue) onChange(normalizedValue);
+  }
+
   return (
     <label className="block">
       <span className="mb-2 block text-sm font-bold text-black/75">{label}</span>
       <input
+        name={name}
         value={value}
         onChange={(event) => onChange(event.target.value)}
+        onBlur={handleBlur}
         placeholder={placeholder}
-        type={type}
+        type={urlField ? "text" : type}
+        inputMode={urlField ? "url" : inputMode}
+        autoComplete={autoComplete}
+        toolparamdescription={toolParamDescription}
         className="h-12 w-full rounded-2xl border border-black/12 bg-[#f8f8f6] px-4 text-sm font-semibold outline-none transition placeholder:text-black/28 focus:border-black/35 focus:bg-white"
       />
     </label>
@@ -1148,7 +1807,7 @@ function LandingPage() {
           "@type": "Person",
           name: "David Trotonda",
           url: siteUrl,
-          logo: `${siteUrl}/favicon.svg`,
+          logo: `${siteUrl}/favicon-512.png`,
         },
         {
           "@type": "WebSite",
@@ -1158,14 +1817,35 @@ function LandingPage() {
         },
         {
           "@type": "SoftwareApplication",
+          "@id": `${siteUrl}/#software`,
           name: brandName,
           applicationCategory: "BusinessApplication",
           operatingSystem: "Web",
           url: siteUrl,
+          isAccessibleForFree: true,
+          license: openSourceLinks.license,
+          sameAs: [openSourceLinks.repository],
           offers: {
             "@type": "Offer",
-            price: "9.99",
+            price: "0",
             priceCurrency: "EUR",
+          },
+        },
+        {
+          "@type": "SoftwareSourceCode",
+          "@id": `${siteUrl}/#source-code`,
+          name: `${brandName} source code`,
+          codeRepository: openSourceLinks.repository,
+          license: openSourceLinks.license,
+          programmingLanguage: ["JavaScript", "JSX", "HTML", "CSS"],
+          runtimePlatform: ["React", "Firebase", "Cloudflare Workers"],
+          targetProduct: {
+            "@id": `${siteUrl}/#software`,
+          },
+          maintainer: {
+            "@type": "Person",
+            name: "David Trotonda",
+            url: siteUrl,
           },
         },
         {
@@ -1206,9 +1886,14 @@ function LandingPage() {
       >
         <div className="grid flex-1 items-start gap-10 py-10 xl:grid-cols-[minmax(0,1.12fr)_minmax(420px,540px)] 2xl:grid-cols-[minmax(0,1.18fr)_minmax(440px,560px)]">
           <div className="mx-auto w-full max-w-[980px] text-center xl:mx-0 xl:text-left">
-            <div className="mx-auto mb-5 inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/75 px-4 py-2 text-xs font-extrabold uppercase tracking-[0.22em] shadow-sm backdrop-blur-md">
-              <Sparkles size={14} /> {t('landing.heroTag')}
-            </div>
+            <Link
+              to={localizePath("/open-source", i18n.language)}
+              className="mx-auto mb-5 inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/75 px-4 py-2 text-xs font-extrabold uppercase tracking-[0.16em] shadow-sm backdrop-blur-md transition hover:-translate-y-0.5 hover:border-black/25 xl:mx-0"
+            >
+              <Code2 size={14} aria-hidden="true" />
+              Open source · Apache 2.0
+              <ArrowRight size={13} aria-hidden="true" />
+            </Link>
 
             <h1 className="mx-auto max-w-[820px] text-center text-[10vw] font-black leading-[0.9] tracking-[-0.055em] sm:text-5xl md:text-6xl lg:text-[72px] xl:mx-0 xl:text-left 2xl:text-[78px]">
               {t('landing.heroTitle')}
@@ -1269,8 +1954,8 @@ function SeoContentSection() {
     },
     {
       icon: QrCode,
-      title: "Código QR para descargar una app en campañas físicas",
-      text: "Convierte carteles, packaging, eventos y mostradores en una URL medible. El mismo smart link puede imprimirse como QR y separar los clics que llegan desde escaneos.",
+      title: "Crea un código QR para tu app, sin fecha de caducidad y gratis",
+      text: "Genera un QR único para tu aplicación. Funciona en iPhone y Android: al escanearlo manda a cada usuario a App Store, Google Play o tu URL alternativa.",
       to: localizePath("/qr-codes", language),
       cta: t("seoContent.qrCta", "Ver cómo crear tu QR"),
     },
@@ -1283,6 +1968,20 @@ function SeoContentSection() {
   const blocks = Array.isArray(translatedBlocks)
     ? translatedBlocks.map((b, i) => ({ ...contentBlocks[i], ...b }))
     : contentBlocks;
+  const tourixyCaseLabel =
+    {
+      en: "Success story · Tourixy",
+      es: "Caso de éxito · Tourixy",
+      fr: "Cas client · Tourixy",
+      ja: "導入事例 · Tourixy",
+      de: "Erfolgsgeschichte · Tourixy",
+      pt: "Caso de sucesso · Tourixy",
+      it: "Caso di successo · Tourixy",
+      ko: "성공 사례 · Tourixy",
+      nl: "Succesverhaal · Tourixy",
+      ar: "قصة نجاح · Tourixy",
+      hi: "सफलता की कहानी · Tourixy",
+    }[language] || "Success story · Tourixy";
 
   return (
     <section className="relative w-full bg-white px-5 py-20 text-black md:px-8 md:py-24">
@@ -1357,7 +2056,7 @@ function SeoContentSection() {
               <p className="mt-3 max-w-xl text-sm font-medium leading-7 text-black/55 md:text-base">
                 {t(
                   "seoContent.useCasesSubtitle",
-                  "Ecommerce, SaaS, restaurantes, fitness, creadores o agencias: un smart link y un QR adaptados a cada modelo.",
+                  "Anuncios, ecommerce, SaaS, restaurantes, fitness o agencias: un smart link y un QR adaptados a cada modelo.",
                 )}
               </p>
             </div>
@@ -1378,6 +2077,7 @@ function SeoContentSection() {
                   saas: Briefcase,
                   restaurants: Utensils,
                   fitness: Dumbbell,
+                  ads: Megaphone,
                   creators: Sparkles,
                   agencies: Building2,
                 }[n.id] || Store;
@@ -1404,23 +2104,355 @@ function SeoContentSection() {
             })}
           </div>
         </div>
+
+        <div className="mt-6 flex justify-center">
+          <div className="inline-flex items-center rounded-full border border-sky-100 bg-white p-1.5 pr-2 shadow-[0_14px_38px_rgba(14,116,144,0.10)]">
+            <img
+              src="/tourixy-favicon.png"
+              alt=""
+              className="h-10 w-10 rounded-full shadow-sm"
+            />
+            <Link
+              to={localizePath("/success-story/tourixy", language)}
+              className="ml-2.5 rounded-full px-2 py-2 text-[12px] font-black uppercase tracking-[0.13em] text-black/70 transition hover:text-black"
+            >
+              {tourixyCaseLabel}
+            </Link>
+            <span className="mx-1 h-5 w-px bg-black/10" aria-hidden="true" />
+            <a
+              href="https://tourixy.com"
+              aria-label="Tourixy.com"
+              className="grid h-9 w-9 place-items-center rounded-full bg-black text-white transition hover:-translate-y-0.5 hover:bg-sky-700"
+            >
+              <ArrowRight size={15} />
+            </a>
+          </div>
+        </div>
       </div>
     </section>
   );
 }
 
+function OpenSourcePage() {
+  const { i18n } = useTranslation();
+  const language = normalizeLanguage(i18n.language);
+  const content = getOpenSourceContent(language);
+  const createPath = localizePath("/#crear", language);
+  const pageUrl = `${siteUrl}${localizePath("/open-source", language)}`;
+  const factIcons = [Code2, ShieldCheck, Building2, Globe];
+  const stepIcons = [Smartphone, BarChart3, Code2];
+
+  const schema = useMemo(
+    () => ({
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebPage",
+          "@id": `${pageUrl}#webpage`,
+          name: content.metaTitle,
+          description: content.metaDescription,
+          url: pageUrl,
+          inLanguage: language,
+          isPartOf: {
+            "@type": "WebSite",
+            name: brandName,
+            url: siteUrl,
+          },
+          about: {
+            "@id": `${siteUrl}/#source-code`,
+          },
+        },
+        {
+          "@type": "SoftwareApplication",
+          "@id": `${siteUrl}/#software`,
+          name: brandName,
+          url: siteUrl,
+          applicationCategory: "BusinessApplication",
+          operatingSystem: "Web",
+          isAccessibleForFree: true,
+          license: openSourceLinks.license,
+          sameAs: [openSourceLinks.repository],
+          offers: {
+            "@type": "Offer",
+            price: "0",
+            priceCurrency: "EUR",
+          },
+        },
+        {
+          "@type": "SoftwareSourceCode",
+          "@id": `${siteUrl}/#source-code`,
+          name: `${brandName} source code`,
+          description: content.metaDescription,
+          url: pageUrl,
+          codeRepository: openSourceLinks.repository,
+          license: openSourceLinks.license,
+          programmingLanguage: ["JavaScript", "JSX", "HTML", "CSS"],
+          runtimePlatform: ["React", "Firebase", "Cloudflare Workers"],
+          targetProduct: {
+            "@id": `${siteUrl}/#software`,
+          },
+          maintainer: {
+            "@type": "Person",
+            name: "David Trotonda",
+            url: siteUrl,
+          },
+        },
+        {
+          "@type": "FAQPage",
+          mainEntity: content.faqs.map((faq) => ({
+            "@type": "Question",
+            name: faq.question,
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: faq.answer,
+            },
+          })),
+        },
+      ],
+    }),
+    [content, language, pageUrl]
+  );
+
+  return (
+    <main
+      className="relative min-h-screen overflow-hidden bg-white text-black"
+      style={{ fontFamily: "'Satoshi', sans-serif" }}
+    >
+      <SEO
+        title={content.metaTitle}
+        description={content.metaDescription}
+        keywords="open source smart link, Apache 2.0, self hosted smart link, App Store Google Play link, open source QR code"
+        path="/open-source"
+        schema={schema}
+      />
+      <LandingNavbar />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.03)_1px,transparent_1px)] bg-[size:44px_44px] opacity-70" />
+
+      <section className="relative z-10 mx-auto w-full max-w-[1220px] px-5 pb-20 pt-32 md:px-8 md:pt-40">
+        <div className="mx-auto max-w-5xl text-center">
+          <div className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/85 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] shadow-sm backdrop-blur-md">
+            <Code2 size={15} aria-hidden="true" />
+            Open source · Apache 2.0
+          </div>
+          <h1 className="mt-7 text-[clamp(46px,7.5vw,92px)] font-black leading-[0.9] tracking-[-0.07em]">
+            {content.title}
+          </h1>
+          <p className="mx-auto mt-7 max-w-3xl text-base font-medium leading-8 text-black/60 md:text-lg">
+            {content.intro}
+          </p>
+          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+            <a
+              href={openSourceLinks.repository}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex h-13 items-center justify-center gap-2 rounded-2xl bg-black px-6 py-4 text-sm font-black text-white shadow-[0_16px_38px_rgba(0,0,0,0.2)] transition hover:-translate-y-0.5"
+            >
+              <Code2 size={18} aria-hidden="true" />
+              {content.repoButton}
+              <ExternalLink size={15} aria-hidden="true" />
+            </a>
+            <Link
+              to={createPath}
+              className="inline-flex h-13 items-center justify-center gap-2 rounded-2xl border border-black/12 bg-white px-6 py-4 text-sm font-black text-black shadow-sm transition hover:-translate-y-0.5 hover:border-black/30"
+            >
+              {content.createButton}
+              <ArrowRight size={16} aria-hidden="true" />
+            </Link>
+          </div>
+        </div>
+
+        <div className="mt-16 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {content.facts.map((fact, index) => {
+            const FactIcon = factIcons[index] || Check;
+            return (
+              <article
+                key={fact.title}
+                className="rounded-[28px] border border-black/8 bg-white/90 p-6 shadow-[0_14px_45px_rgba(0,0,0,0.05)] backdrop-blur"
+              >
+                <div className="grid h-11 w-11 place-items-center rounded-2xl bg-black text-white">
+                  <FactIcon size={19} aria-hidden="true" />
+                </div>
+                <h2 className="mt-5 text-xl font-black tracking-[-0.03em]">{fact.title}</h2>
+                <p className="mt-3 text-sm font-medium leading-7 text-black/55">{fact.text}</p>
+              </article>
+            );
+          })}
+        </div>
+
+        <section className="mt-24">
+          <div className="max-w-3xl">
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-black/35">Link My App</p>
+            <h2 className="mt-4 text-4xl font-black tracking-[-0.055em] md:text-6xl">
+              {content.choiceTitle}
+            </h2>
+            <p className="mt-5 text-base font-medium leading-8 text-black/58 md:text-lg">
+              {content.choiceIntro}
+            </p>
+          </div>
+
+          <div className="mt-9 grid gap-5 lg:grid-cols-2">
+            <article className="rounded-[32px] border border-black/8 bg-[#f7f7f5] p-7 md:p-9">
+              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-white shadow-sm">
+                <Globe size={21} aria-hidden="true" />
+              </div>
+              <h3 className="mt-6 text-3xl font-black tracking-[-0.045em]">{content.hostedTitle}</h3>
+              <p className="mt-4 text-sm font-medium leading-7 text-black/58 md:text-base">
+                {content.hostedText}
+              </p>
+              <Link
+                to={createPath}
+                className="mt-7 inline-flex items-center gap-2 text-sm font-black underline decoration-2 underline-offset-4"
+              >
+                {content.createButton}
+                <ArrowRight size={15} aria-hidden="true" />
+              </Link>
+            </article>
+            <article className="rounded-[32px] bg-black p-7 text-white shadow-[0_24px_70px_rgba(0,0,0,0.18)] md:p-9">
+              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-white/10">
+                <Code2 size={21} aria-hidden="true" />
+              </div>
+              <h3 className="mt-6 text-3xl font-black tracking-[-0.045em]">{content.selfHostedTitle}</h3>
+              <p className="mt-4 text-sm font-medium leading-7 text-white/65 md:text-base">
+                {content.selfHostedText}
+              </p>
+              <a
+                href={openSourceLinks.repository}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-7 inline-flex items-center gap-2 text-sm font-black underline decoration-2 underline-offset-4"
+              >
+                {content.repoButton}
+                <ExternalLink size={15} aria-hidden="true" />
+              </a>
+            </article>
+          </div>
+        </section>
+
+        <section className="mt-24">
+          <h2 className="max-w-4xl text-4xl font-black tracking-[-0.055em] md:text-6xl">
+            {content.howTitle}
+          </h2>
+          <div className="mt-9 grid gap-5 md:grid-cols-3">
+            {content.steps.map((step, index) => {
+              const StepIcon = stepIcons[index] || Check;
+              return (
+                <article key={step.title} className="rounded-[28px] border border-black/8 bg-white p-7 shadow-sm">
+                  <div className="flex items-center justify-between">
+                    <div className="grid h-11 w-11 place-items-center rounded-2xl bg-black text-white">
+                      <StepIcon size={19} aria-hidden="true" />
+                    </div>
+                    <span className="text-xs font-black text-black/25">0{index + 1}</span>
+                  </div>
+                  <h3 className="mt-6 text-2xl font-black tracking-[-0.04em]">{step.title}</h3>
+                  <p className="mt-3 text-sm font-medium leading-7 text-black/55">{step.text}</p>
+                </article>
+              );
+            })}
+          </div>
+        </section>
+
+        <section className="mt-24 grid gap-5 lg:grid-cols-[1.25fr_0.75fr]">
+          <article className="rounded-[32px] border border-black/8 bg-[#f7f7f5] p-7 md:p-10">
+            <h2 className="text-4xl font-black tracking-[-0.055em] md:text-5xl">
+              {content.transparencyTitle}
+            </h2>
+            <p className="mt-5 max-w-3xl text-base font-medium leading-8 text-black/58">
+              {content.transparencyText}
+            </p>
+          </article>
+          <article className="rounded-[32px] border border-black/8 bg-white p-7 md:p-9">
+            <h2 className="text-2xl font-black tracking-[-0.04em]">{content.stackTitle}</h2>
+            <ul className="mt-6 space-y-4">
+              {content.stack.map((item) => (
+                <li key={item} className="flex items-start gap-3 text-sm font-bold leading-6 text-black/65">
+                  <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-black text-white">
+                    <Check size={12} aria-hidden="true" />
+                  </span>
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </article>
+        </section>
+
+        <section className="mt-24 overflow-hidden rounded-[36px] bg-black p-7 text-white shadow-[0_28px_90px_rgba(0,0,0,0.2)] md:p-12">
+          <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-3xl">
+              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-white text-black">
+                <FileText size={21} aria-hidden="true" />
+              </div>
+              <h2 className="mt-6 text-4xl font-black tracking-[-0.055em] md:text-6xl">
+                {content.licenseTitle}
+              </h2>
+              <p className="mt-5 text-base font-medium leading-8 text-white/65">
+                {content.licenseText}
+              </p>
+            </div>
+            <a
+              href={openSourceLinks.license}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl bg-white px-6 py-4 text-sm font-black text-black transition hover:-translate-y-0.5"
+            >
+              {content.licenseButton}
+              <ExternalLink size={15} aria-hidden="true" />
+            </a>
+          </div>
+        </section>
+
+        <section className="mt-24">
+          <h2 className="text-center text-4xl font-black tracking-[-0.055em] md:text-6xl">
+            {content.faqTitle}
+          </h2>
+          <div className="mx-auto mt-9 max-w-4xl space-y-3">
+            {content.faqs.map((faq) => (
+              <details key={faq.question} className="group rounded-[24px] border border-black/8 bg-white p-6 shadow-sm">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-5 text-base font-black [&::-webkit-details-marker]:hidden md:text-lg">
+                  {faq.question}
+                  <ChevronDown className="shrink-0 transition group-open:rotate-180" size={19} aria-hidden="true" />
+                </summary>
+                <p className="mt-4 border-t border-black/8 pt-4 text-sm font-medium leading-7 text-black/58">
+                  {faq.answer}
+                </p>
+              </details>
+            ))}
+          </div>
+        </section>
+
+        <section className="mt-24 rounded-[36px] border border-black/8 bg-white/90 p-8 text-center shadow-[0_24px_70px_rgba(0,0,0,0.08)] backdrop-blur md:p-12">
+          <h2 className="mx-auto max-w-4xl text-4xl font-black tracking-[-0.055em] md:text-6xl">
+            {content.ctaTitle}
+          </h2>
+          <p className="mx-auto mt-5 max-w-2xl text-base font-medium leading-8 text-black/58">
+            {content.ctaText}
+          </p>
+          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+            <Link
+              to={createPath}
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-black px-6 py-4 text-sm font-black text-white transition hover:-translate-y-0.5"
+            >
+              {content.createButton}
+              <ArrowRight size={16} aria-hidden="true" />
+            </Link>
+            <a
+              href={openSourceLinks.repository}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl border border-black/12 bg-white px-6 py-4 text-sm font-black text-black transition hover:-translate-y-0.5"
+            >
+              {content.repoButton}
+              <ExternalLink size={15} aria-hidden="true" />
+            </a>
+          </div>
+        </section>
+      </section>
+
+      <LandingFinalFooter />
+    </main>
+  );
+}
+
 const marketingPages = {
-  precio: {
-    path: "/pricing",
-    title: "Precio de links de descarga para apps",
-    description:
-      "Consulta el precio de Link My App: empieza gratis con 1 link y desbloquea smart links ilimitados, QR y estadísticas con pago único.",
-    eyebrow: "",
-    h1: "",
-    intro: "",
-    content: "pricing",
-    hideHero: true,
-  },
   faqs: {
     path: "/faqs",
     title: "Preguntas frecuentes sobre links de descarga para apps",
@@ -1505,12 +2537,6 @@ function MarketingPage({ pageKey }) {
       )}
       {page.hideHero && <div className="relative h-28 md:h-32" />}
 
-      {page.content === "pricing" && (
-        <>
-          <LandingPricingSection />
-          <LandingPricingExtras />
-        </>
-      )}
       {page.content === "faqs" && (
         <LandingFAQSection openFaq={openFaq} setOpenFaq={setOpenFaq} />
       )}
@@ -1707,6 +2733,22 @@ function FAQSection({ openFaq, setOpenFaq }) {
   );
 }
 
+const linkMyAppTinyStartupsBadgeHtml = `<!-- tinystartups · Launched on Tiny Startups -->
+<a href="https://www.tinystartups.com/startup/link-my-app" target="_blank" rel="noopener"
+   style="display:inline-flex;align-items:center;gap:14px;padding:14px 22px 14px 18px;border-radius:14px;text-decoration:none;font-family:'Inter',system-ui,sans-serif;background:linear-gradient(#fff,#fff) padding-box,linear-gradient(90deg,#3525E6,#D81FE0,#22B8F0) border-box;border:2px solid transparent;color:#0E0B1F">
+  <svg width="56" height="56" viewBox="0 0 100 100">
+    <defs><linearGradient id="tsg" x1=".1" y1="0" x2=".9" y2="1">
+      <stop offset="0%" stop-color="#3525E6"/><stop offset="55%" stop-color="#D81FE0"/><stop offset="100%" stop-color="#22B8F0"/>
+    </linearGradient></defs>
+    <path d="M50 6C52 32 68 48 94 50C68 52 52 68 50 94C48 68 32 52 6 50C32 48 48 32 50 6Z" fill="url(#tsg)"/>
+  </svg>
+  <span style="display:flex;flex-direction:column;line-height:1.15">
+    <span style="font-family:monospace;font-size:9px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#6A6585">Launched on</span>
+    <span style="font-size:22px;font-weight:800;letter-spacing:-0.025em">Tiny Startups</span>
+    <span style="font-size:11px;color:#6A6585;margin-top:4px">tinystartups.com</span>
+  </span>
+</a>`;
+
 function FinalFooter({ theme = "dark" }) {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
@@ -1725,7 +2767,7 @@ function FinalFooter({ theme = "dark" }) {
   const isDark = theme === "dark";
 
   return (
-    <section className={`relative left-1/2 right-1/2 mt-8 w-screen -translate-x-1/2 overflow-hidden border-t ${isDark ? 'border-black/10 bg-white' : 'border-black/10 bg-white'}`}>
+    <section className={`relative left-1/2 mt-8 w-screen -translate-x-1/2 overflow-hidden border-t ${isDark ? 'border-black/10 bg-white' : 'border-black/10 bg-white'}`}>
       <div className={`relative overflow-hidden px-5 pt-20 pb-8 md:px-8 ${isDark ? 'bg-[radial-gradient(circle_at_50%_115%,rgba(64,64,64,0.45),transparent_34%),linear-gradient(120deg,#0d1020_0%,#111113_48%,#181612_100%)] text-white' : 'bg-gray-50 text-black'}`}>
         <div className={`pointer-events-none absolute inset-0 bg-[size:72px_72px] ${isDark ? 'bg-[linear-gradient(to_right,rgba(255,255,255,0.045)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.045)_1px,transparent_1px)]' : 'bg-[linear-gradient(to_right,rgba(0,0,0,0.045)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.045)_1px,transparent_1px)]'}`} />
 
@@ -1754,15 +2796,26 @@ function FinalFooter({ theme = "dark" }) {
           </div>
         </div>
 
-        <footer className={`relative mx-auto mt-20 flex w-full max-w-[1320px] flex-col gap-8 border-t pt-8 md:flex-row md:items-center md:justify-between ${isDark ? 'border-white/10' : 'border-black/10'}`}>
+        <footer className={`relative mx-auto mt-20 flex w-full max-w-[1320px] flex-col gap-8 border-t pt-8 md:flex-row md:items-end md:justify-between ${isDark ? 'border-white/10' : 'border-black/10'}`}>
           <div>
             <div className="flex items-center justify-center gap-3 md:justify-start">
-              <img src="/logo-link-my-app.png" alt="Link My App" className="h-9 w-9 object-contain" />
+              <img src="/logo-link-my-app.avif" alt="Link My App" className="h-9 w-9 object-contain" />
               <span className="text-lg font-black tracking-tight">LINK MY APP</span>
             </div>
-            <p className={`mt-3 max-w-md text-center text-sm font-medium leading-6 md:text-left ${isDark ? 'text-white/45' : 'text-black/50'}`}>
-              {t("footer.brandSubtitle", "Un link de descarga para llevar a cada usuario a la tienda correcta.")}
-            </p>
+            <div className="mt-3 text-center md:text-left">
+              <p className={`text-xs font-black uppercase tracking-[0.18em] ${isDark ? 'text-white/35' : 'text-black/40'}`}>
+                {t("messages.ourWebsites")}
+              </p>
+              <div className="mt-3 flex flex-wrap items-center justify-center gap-2 md:justify-start">
+                <a href="https://skeilapps.com/" target="_blank" rel="noopener" className={`rounded-full border px-3 py-1.5 text-sm font-bold transition ${isDark ? 'border-white/10 bg-white/[0.03] text-white/62 hover:border-white/20 hover:bg-white/[0.07] hover:text-white' : 'border-black/10 bg-black/[0.03] text-black/60 hover:border-black/20 hover:bg-black/[0.07] hover:text-black'}`}>SkeilApps</a>
+                <a href="https://tienrank.com/" target="_blank" rel="noopener" className={`rounded-full border px-3 py-1.5 text-sm font-bold transition ${isDark ? 'border-white/10 bg-white/[0.03] text-white/62 hover:border-white/20 hover:bg-white/[0.07] hover:text-white' : 'border-black/10 bg-black/[0.03] text-black/60 hover:border-black/20 hover:bg-black/[0.07] hover:text-black'}`}>TienRank</a>
+                <a href="https://tuback.link/" target="_blank" rel="noopener" className={`rounded-full border px-3 py-1.5 text-sm font-bold transition ${isDark ? 'border-white/10 bg-white/[0.03] text-white/62 hover:border-white/20 hover:bg-white/[0.07] hover:text-white' : 'border-black/10 bg-black/[0.03] text-black/60 hover:border-black/20 hover:bg-black/[0.07] hover:text-black'}`}>TuBack.link</a>
+              </div>
+            </div>
+            <div
+              className="mt-5 flex max-w-full justify-center overflow-x-auto md:justify-start"
+              dangerouslySetInnerHTML={{ __html: linkMyAppTinyStartupsBadgeHtml }}
+            />
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-3 md:justify-end">
@@ -1807,10 +2860,16 @@ function LoginPage() {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [mode, setMode] = useState("login");
+  const initialLoginParams = useMemo(
+    () => new URLSearchParams(window.location.search),
+    []
+  );
+  const [mode, setMode] = useState(
+    initialLoginParams.get("register") === "1" ? "register" : "login"
+  );
   const [hasPendingDraft] = useState(() => hasLinkDraftData(readLinkDraft()));
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(initialLoginParams.get("email") || "");
   const [password, setPassword] = useState("");
   const [loadingProvider, setLoadingProvider] = useState("");
   const [error, setError] = useState("");
@@ -1827,6 +2886,7 @@ function LoginPage() {
     try {
       const result = await signInWithPopup(auth, googleProvider);
       await ensureUserProfile(result.user);
+      await createPendingSmartLink(result.user);
       navigate(
         localizePath(
           window.location.search.includes("upgrade=pro")
@@ -1836,7 +2896,7 @@ function LoginPage() {
         )
       );
     } catch (nextError) {
-      setError(formatAuthError(nextError));
+      setError(formatAuthError(nextError, t));
     } finally {
       setLoadingProvider("");
     }
@@ -1848,18 +2908,46 @@ function LoginPage() {
 
     setError("");
     setMessage("");
+
+    const normalizedEmail = normalizeEmail(email);
+    if (mode === "register" && !name.trim()) {
+      setError(t("messages.nameRequired"));
+      return;
+    }
+    if (!normalizedEmail) {
+      setError(t("messages.emailRequired"));
+      return;
+    }
+    if (!isValidEmailAddress(normalizedEmail)) {
+      setError(t("messages.emailInvalid"));
+      return;
+    }
+    if (!password) {
+      setError(t("messages.passwordRequired"));
+      return;
+    }
+    if (mode === "register" && password.length < 6) {
+      setError(t("messages.passwordLength"));
+      return;
+    }
+
+    setEmail(normalizedEmail);
     setLoadingProvider("email");
     try {
+      let authenticatedUser = null;
       if (mode === "register") {
-        const result = await createUserWithEmailAndPassword(auth, email, password);
+        const result = await createUserWithEmailAndPassword(auth, normalizedEmail, password);
         if (name.trim()) {
           await updateProfile(result.user, { displayName: name.trim() });
         }
-        await ensureUserProfile(auth.currentUser || result.user);
+        authenticatedUser = auth.currentUser || result.user;
+        await ensureUserProfile(authenticatedUser);
       } else {
-        const result = await signInWithEmailAndPassword(auth, email, password);
-        await ensureUserProfile(result.user);
+        const result = await signInWithEmailAndPassword(auth, normalizedEmail, password);
+        authenticatedUser = result.user;
+        await ensureUserProfile(authenticatedUser);
       }
+      await createPendingSmartLink(authenticatedUser);
       navigate(
         localizePath(
           window.location.search.includes("upgrade=pro")
@@ -1869,24 +2957,52 @@ function LoginPage() {
         )
       );
     } catch (nextError) {
-      setError(formatAuthError(nextError));
+      setError(formatAuthError(nextError, t));
     } finally {
       setLoadingProvider("");
     }
   }
 
   async function handleResetPassword() {
-    if (!email || !firebaseReady || !auth) {
-      setError("Escribe tu email para enviarte el reset.");
+    const normalizedEmail = normalizeEmail(email);
+    if (!normalizedEmail || !firebaseReady || !auth) {
+      setMessage("");
+      setError(
+        t(
+          "login.resetEmailRequired",
+          "Escribe tu email para enviarte el enlace de recuperación."
+        )
+      );
+      return;
+    }
+    if (!isValidEmailAddress(normalizedEmail)) {
+      setMessage("");
+      setError(t("messages.emailInvalid"));
       return;
     }
 
     setError("");
+    setMessage("");
+    setEmail(normalizedEmail);
+    setLoadingProvider("reset");
     try {
-      await sendPasswordResetEmail(auth, email);
-      setMessage("Te he enviado el email para cambiar la contraseña.");
-    } catch (nextError) {
-      setError(formatAuthError(nextError));
+      auth.languageCode = getFirebaseAuthLanguage(i18n.language);
+      await sendPasswordResetEmail(auth, normalizedEmail);
+      setMessage(
+        t(
+          "login.resetEmailSent",
+          "Si existe una cuenta con ese email, recibirás un enlace para cambiar la contraseña."
+        )
+      );
+    } catch {
+      setError(
+        t(
+          "login.resetEmailError",
+          "No se ha podido enviar el email de recuperación. Revisa la dirección e inténtalo de nuevo."
+        )
+      );
+    } finally {
+      setLoadingProvider("");
     }
   }
 
@@ -1902,7 +3018,7 @@ function LoginPage() {
         <div className="grid w-full overflow-hidden rounded-[34px] border border-black/10 bg-white shadow-[0_28px_90px_rgba(0,0,0,0.08)] lg:grid-cols-[0.9fr_1fr]">
           <div className="hidden bg-black p-10 text-white lg:block">
             <Link to={localizePath("/", i18n.language)} className="inline-flex items-center gap-3">
-              <img src="/logo-link-my-app.png" alt="Link My App" className="h-10 w-10 object-contain" />
+              <img src="/logo-link-my-app.avif" alt="Link My App" className="h-10 w-10 object-contain" />
               <span className="text-xl font-black">Link My App</span>
             </Link>
             <div className="mt-28">
@@ -1958,28 +3074,43 @@ function LoginPage() {
                 <span className="h-px flex-1 bg-black/10" />
               </div>
 
-              <form className="space-y-4" onSubmit={handleEmailSubmit}>
+              <form
+                className="space-y-4"
+                onSubmit={handleEmailSubmit}
+                toolname={mode === "login" ? "login_with_email" : "register_with_email"}
+                tooldescription={mode === "login" ? "Logs an existing Link My App user in with email and password." : "Creates a Link My App account with name, email, and password."}
+              >
                 {mode === "register" && (
                   <InputField
                     label={t("login.nameLabel", "Nombre")}
+                    name="name"
                     value={name}
                     onChange={setName}
                     placeholder={t("login.namePlaceholder", "Tu nombre")}
+                    autoComplete="name"
+                    toolParamDescription="User's display name for the new account."
                   />
                 )}
                 <InputField
                   label={t("login.emailLabel", "Email")}
+                  name="email"
                   value={email}
                   onChange={setEmail}
-                  placeholder="tu@email.com"
-                  type="email"
+                  placeholder={t("messages.emailPlaceholder")}
+                  type="text"
+                  inputMode="email"
+                  autoComplete="email"
+                  toolParamDescription="User's email address."
                 />
                 <InputField
                   label={t("login.passwordLabel", "Contraseña")}
+                  name="password"
                   value={password}
                   onChange={setPassword}
                   placeholder={t("login.passwordPlaceholder", "Mínimo 6 caracteres")}
                   type="password"
+                  autoComplete={mode === "login" ? "current-password" : "new-password"}
+                  toolParamDescription="User's password."
                 />
 
                 {error && (
@@ -2026,9 +3157,12 @@ function LoginPage() {
                 <button
                   type="button"
                   onClick={handleResetPassword}
+                  disabled={loadingProvider === "reset"}
                   className="text-black/60 transition hover:text-black"
                 >
-                  Recuperar contraseña
+                  {loadingProvider === "reset"
+                    ? t("login.resetPasswordSending", "Enviando…")
+                    : t("login.resetPassword")}
                 </button>
               </div>
             </div>
@@ -2132,20 +3266,17 @@ function DashboardPage() {
   const [showProModal, setShowProModal] = useState(false);
   const [showAdminModal, setShowAdminModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [linkPendingDeletion, setLinkPendingDeletion] = useState(null);
   const [optimisticPro, setOptimisticPro] = useState(false);
   const upgradeStartedRef = useRef(false);
   const [toast, showToast] = useToast();
-  const isPro = optimisticPro || profile?.plan === "pro";
-  const visibleProfile = isPro
-    ? {
-        ...(profile || {}),
-        plan: "pro",
-        planLabel:
-          profile?.plan === "pro" && profile?.planLabel
-            ? profile.planLabel
-            : "Pro de por vida",
-      }
-    : profile;
+  const adminMode = isAdminUser(user);
+  const isPro = true;
+  const visibleProfile = {
+    ...(profile || {}),
+    plan: "free",
+    planLabel: t("dashboard.freePlan", "Gratis"),
+  };
 
 
   
@@ -2156,7 +3287,7 @@ useEffect(() => {
   }, [profile?.plan]);
 
   useEffect(() => {
-    if (!firebaseReady || !db || !user) return undefined;
+    if (!firebaseReady || !db || !user || adminMode) return undefined;
 
     const linksQuery = query(ref(db, "links"), orderByChild("ownerId"), equalTo(user.uid));
 
@@ -2171,12 +3302,12 @@ useEffect(() => {
         setLinks(nextLinks);
         setLoadingLinks(false);
       },
-      (nextError) => {
-        setError(nextError.message);
+      () => {
+        setError(t("messages.loadLinksError"));
         setLoadingLinks(false);
       }
     );
-  }, [user]);
+  }, [user, adminMode]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -2221,6 +3352,7 @@ useEffect(() => {
     if (
       params.get("upgrade") !== "pro" ||
       !user ||
+      adminMode ||
       links.length === 0 ||
       upgradeStartedRef.current ||
       isPro
@@ -2230,10 +3362,10 @@ useEffect(() => {
 
     upgradeStartedRef.current = true;
     handleUpgrade();
-  }, [user, isPro, links.length]);
+  }, [user, adminMode, isPro, links.length]);
 
   useEffect(() => {
-    if (!firebaseReady || !db || !user || links.length === 0) {
+    if (!firebaseReady || !db || !user || adminMode || links.length === 0) {
       setCounts({});
       return;
     }
@@ -2241,67 +3373,41 @@ useEffect(() => {
     let cancelled = false;
 
     async function loadCounts() {
-      const nextCounts = Object.fromEntries(
-        links.map((item) => [item.id, { ...emptyStats, days: getLastSevenDays() }])
-      );
-      const eventsQuery = query(
-        ref(db, "clickEvents"),
-        orderByChild("ownerId"),
-        equalTo(user.uid)
-      );
-      const snapshot = await get(eventsQuery);
+      const edgeStats = await fetchEdgeStats(user);
+      let dailyRows = edgeStats?.rows || [];
 
-      Object.values(snapshot.val() || {}).forEach((event) => {
-        if (!nextCounts[event.linkId]) return;
-        const destination = event.destination || "fallback";
-        const source = event.source || "written";
-        const eventDate = event.createdAt
-          ? new Date(event.createdAt).toISOString().slice(0, 10)
-          : "";
-        const dayStats = nextCounts[event.linkId].days.find(
-          (day) => day.key === eventDate
+      if (!edgeStats?.legacyMigrated) {
+        const eventsQuery = query(
+          ref(db, "clickEvents"),
+          orderByChild("ownerId"),
+          equalTo(user.uid)
         );
+        const snapshot = await get(eventsQuery);
+        dailyRows = mergeDailyStats(
+          dailyRows,
+          eventsToDailyStats(Object.values(snapshot.val() || {}))
+        );
+      }
 
-        nextCounts[event.linkId].total += 1;
-        if (destination in nextCounts[event.linkId]) {
-          nextCounts[event.linkId][destination] += 1;
-        }
-        if (source === "qr") {
-          nextCounts[event.linkId].qr += 1;
-          if (destination === "ios") nextCounts[event.linkId].qr_ios += 1;
-          else if (destination === "android") nextCounts[event.linkId].qr_android += 1;
-          else nextCounts[event.linkId].qr_fallback += 1;
-        } else {
-          nextCounts[event.linkId].written += 1;
-          if (destination === "ios") nextCounts[event.linkId].written_ios += 1;
-          else if (destination === "android") nextCounts[event.linkId].written_android += 1;
-          else nextCounts[event.linkId].written_fallback += 1;
-        }
-        if (dayStats && destination in dayStats) {
-          dayStats[destination] += 1;
-        }
-      });
-
-      Object.values(nextCounts).forEach((stats) => {
-        stats.estimatedInstalls = estimateDownloads(stats);
-        stats.days = stats.days.map((day) => ({
-          ...day,
-          estimatedInstalls: estimateDownloads(day),
-        }));
-      });
-
-      if (!cancelled) setCounts(nextCounts);
+      if (!cancelled) setCounts(buildStatsForLinks(links, dailyRows));
     }
 
     loadCounts().catch(console.error);
     return () => {
       cancelled = true;
     };
-  }, [links, user]);
+  }, [links, user, adminMode]);
 
-  async function copyToClipboard(value) {
-    await navigator.clipboard.writeText(value);
-    showToast("Copiado");
+  async function copyToClipboard(
+    value,
+    successMessage = t("messages.copied")
+  ) {
+    try {
+      await navigator.clipboard.writeText(value);
+      showToast(successMessage);
+    } catch {
+      setError(t("messages.copyError"));
+    }
   }
 
   async function downloadQrImage(qrUrl, title) {
@@ -2314,23 +3420,46 @@ useEffect(() => {
       link.download = `${slugFromInput(title) || "link-my-app"}-qr.png`;
       link.click();
       URL.revokeObjectURL(objectUrl);
-      showToast("QR descargado");
+      showToast(t("messages.qrDownloaded"));
     } catch {
       window.open(qrUrl, "_blank", "noopener,noreferrer");
     }
   }
 
   async function toggleActive(link) {
-    await update(ref(db, `links/${link.id}`), {
-      active: !link.active,
-      updatedAt: serverTimestamp(),
-    });
+    setError("");
+    try {
+      const nextActive = !link.active;
+      const updatedAt = serverTimestamp();
+      await update(ref(db), {
+        [`links/${link.id}/active`]: nextActive,
+        [`links/${link.id}/updatedAt`]: updatedAt,
+        [`publicLinks/${link.id}`]: nextActive
+          ? publicLinkData({ ...link, active: true, updatedAt })
+          : null,
+      });
+      await syncLinkAtEdge(user, link.id);
+    } catch {
+      setError(t("messages.actionError"));
+    }
   }
 
   async function removeLink(link) {
-    const confirmed = window.confirm(`Eliminar ${link.title}?`);
-    if (!confirmed) return;
-    await remove(ref(db, `links/${link.id}`));
+    setError("");
+    try {
+      await syncLinkAtEdge(user, link.id, {
+        previousSlug: link.slug,
+        action: "delete",
+        purgeStats: true,
+      });
+      await update(ref(db), {
+        [`links/${link.id}`]: null,
+        [`publicLinks/${link.id}`]: null,
+      });
+      setLinkPendingDeletion(null);
+    } catch {
+      setError(t("messages.actionError"));
+    }
   }
 
   async function handleSignOut() {
@@ -2371,7 +3500,7 @@ useEffect(() => {
         setUpgradeError("");
         setShowSuccessModal(true);
       } catch (err) {
-        setUpgradeError(err.message);
+        setUpgradeError(t("messages.upgradeError"));
       } finally {
         setUpgrading(false);
       }
@@ -2382,8 +3511,8 @@ useEffect(() => {
     try {
       const isEnglish = i18n.language && i18n.language.startsWith("en");
       await startStripeCheckout(user, isEnglish ? "usd" : "eur");
-    } catch (nextError) {
-      setUpgradeError(nextError.message);
+    } catch {
+      setUpgradeError(t("messages.upgradeError"));
       setUpgrading(false);
     }
   }
@@ -2396,6 +3525,10 @@ useEffect(() => {
     (sum, value) => sum + (value?.estimatedInstalls || 0),
     0
   );
+
+  if (adminMode) {
+    return <AdminDashboardPage onSignOut={handleSignOut} />;
+  }
 
   return (
     <main className="min-h-screen bg-[#f7f7f6] text-black">
@@ -2428,23 +3561,15 @@ useEffect(() => {
                 <h2 className="text-xl font-black tracking-tight">{t("dashboard.createTitle", "Crea Smartlink")}</h2>
               </div>
             </div>
+            {!loadingLinks && links.length === 0 && <DashboardCreateHelp />}
             <LinkCreateForm
               compact
               loadDraft
               hasExistingLinks={links.length > 0}
               isPro={isPro}
-              onChannelLocked={() => {
-                setUpgradeError("");
-                setShowProModal(true);
-              }}
               buttonLabel={t("dashboard.createButton", "Crea Smartlink")}
-              disabled={!isPro && links.length >= 1}
-              onDisabledSubmit={() => {
-                setUpgradeError("");
-                setShowProModal(true);
-              }}
               onCreated={(slug) => {
-                showToast(`Creado: ${slug}`);
+                showToast(t("messages.created", { slug }));
               }}
             />
           </div>
@@ -2543,6 +3668,12 @@ useEffect(() => {
             {links.map((item, index) => {
               const defaultLinkUrl = publicLinkForSlug(publicBaseUrl, item.slug);
               const linkUrl = publicUrlForCustomOrSlug(item.slug, item.customUrl);
+              const websiteLinkHtml = buildWebsiteLinkHtml(
+                defaultLinkUrl,
+                t("dashboard.websiteLinkAnchor", "Descargar {{app}}", {
+                  app: item.title,
+                })
+              );
               const qrLinkUrl = `${linkUrl}?src=qr`;
               const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(
                 qrLinkUrl
@@ -2597,7 +3728,7 @@ useEffect(() => {
                             <div className="flex justify-around text-center border-b border-black/5 pb-4 mb-4">
                               <div><p className="text-[10px] font-black uppercase tracking-[0.1em] text-black/50">Android</p><p className="font-bold">{linkStats.written_android || 0}</p></div>
                               <div><p className="text-[10px] font-black uppercase tracking-[0.1em] text-black/50">iOS</p><p className="font-bold">{linkStats.written_ios || 0}</p></div>
-                              <div><p className="text-[10px] font-black uppercase tracking-[0.1em] text-black/50">Otros</p><p className="font-bold">{linkStats.written_fallback || 0}</p></div>
+                              <div><p className="text-[10px] font-black uppercase tracking-[0.1em] text-black/50">{t("dashboard.others", "Otros")}</p><p className="font-bold">{linkStats.written_fallback || 0}</p></div>
                             </div>
                             <div className="mb-3 flex items-center justify-center gap-2">
                               <p className="text-xs font-black">
@@ -2619,7 +3750,7 @@ useEffect(() => {
                             <div className="flex justify-around text-center">
                               <div><p className="text-[10px] font-black uppercase tracking-[0.1em] text-black/50">Google Play</p><p className="font-bold">{Math.round((linkStats.written_android || 0) * 0.24)}</p></div>
                               <div><p className="text-[10px] font-black uppercase tracking-[0.1em] text-black/50">App Store</p><p className="font-bold">{Math.round((linkStats.written_ios || 0) * 0.22)}</p></div>
-                              <div><p className="text-[10px] font-black uppercase tracking-[0.1em] text-black/50">Otros</p><p className="font-bold">{Math.round((linkStats.written_fallback || 0) * 0.01)}</p></div>
+                              <div><p className="text-[10px] font-black uppercase tracking-[0.1em] text-black/50">{t("dashboard.others", "Otros")}</p><p className="font-bold">{Math.round((linkStats.written_fallback || 0) * 0.01)}</p></div>
                             </div>
                           </div>
 
@@ -2628,7 +3759,7 @@ useEffect(() => {
                             <div className="flex justify-around text-center border-b border-black/5 pb-4 mb-4">
                               <div><p className="text-[10px] font-black uppercase tracking-[0.1em] text-black/50">Android</p><p className="font-bold">{linkStats.qr_android || 0}</p></div>
                               <div><p className="text-[10px] font-black uppercase tracking-[0.1em] text-black/50">iOS</p><p className="font-bold">{linkStats.qr_ios || 0}</p></div>
-                              <div><p className="text-[10px] font-black uppercase tracking-[0.1em] text-black/50">Otros</p><p className="font-bold">{linkStats.qr_fallback || 0}</p></div>
+                              <div><p className="text-[10px] font-black uppercase tracking-[0.1em] text-black/50">{t("dashboard.others", "Otros")}</p><p className="font-bold">{linkStats.qr_fallback || 0}</p></div>
                             </div>
                             <div className="mb-3 flex items-center justify-center gap-2">
                               <p className="text-xs font-black">
@@ -2664,6 +3795,19 @@ useEffect(() => {
                           onClick={() => copyToClipboard(linkUrl)}
                         />
                         <ActionButton
+                          icon={Code2}
+                          label={t("dashboard.copyForWebsite", "Copiar HTML para web")}
+                          onClick={() =>
+                            copyToClipboard(
+                              websiteLinkHtml,
+                              t(
+                                "dashboard.websiteHtmlCopied",
+                                "HTML para web copiado"
+                              )
+                            )
+                          }
+                        />
+                        <ActionButton
                           icon={ExternalLink}
                           label={t("dashboard.open", "Abrir")}
                           onClick={() => window.open(linkUrl, "_blank", "noopener,noreferrer")}
@@ -2677,15 +3821,21 @@ useEffect(() => {
                           icon={Trash2}
                           label={t("dashboard.delete", "Eliminar")}
                           danger
-                          onClick={() => removeLink(item)}
+                          onClick={() => setLinkPendingDeletion(item)}
                         />
                       </div>
+                      <p className="mt-3 text-xs font-semibold leading-5 text-black/45">
+                        {t(
+                          "dashboard.websiteLinkSeoHint",
+                          "El HTML para web crea un enlace rastreable a link-my.app sin nofollow. El CMS de destino puede modificar sus atributos."
+                        )}
+                      </p>
                     </div>
 
                     <div className="flex flex-col items-center gap-3 lg:items-end">
                       <img
                         src={qrUrl}
-                        alt={`QR de ${item.title}`}
+                        alt={t("messages.qrAlt", { app: item.title })}
                         className="h-32 w-32 rounded-2xl border border-black/10 bg-white p-2 shadow-sm"
                       />
                       <button
@@ -2698,13 +3848,6 @@ useEffect(() => {
                     </div>
                   </div>
                 </article>
-                {!isPro && index === 0 && (
-                  <ProUpgradeCard
-                    onUpgrade={handleUpgrade}
-                    upgrading={upgrading}
-                    error={upgradeError}
-                  />
-                )}
                 </React.Fragment>
               );
             })}
@@ -2721,21 +3864,49 @@ useEffect(() => {
         />
       )}
 
-      {showProModal && (
-        <ProLimitModal
-          onClose={() => setShowProModal(false)}
-          onUpgrade={handleUpgrade}
-          upgrading={upgrading}
-          error={upgradeError}
-        />
-      )}
-
       {showAdminModal && (
         <AdminPanelModal onClose={() => setShowAdminModal(false)} />
       )}
 
       {showSuccessModal && (
         <PremiumSuccessModal onClose={() => setShowSuccessModal(false)} />
+      )}
+
+      {linkPendingDeletion && (
+        <div
+          className="fixed inset-0 z-[90] flex items-center justify-center bg-black/45 px-4 py-8 backdrop-blur-sm"
+          onClick={() => setLinkPendingDeletion(null)}
+        >
+          <section
+            className="w-full max-w-md rounded-[30px] bg-white p-6 text-black shadow-[0_30px_100px_rgba(0,0,0,0.3)]"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <h2 className="text-2xl font-black tracking-tight">
+              {t("messages.deleteLinkTitle")}
+            </h2>
+            <p className="mt-3 text-sm font-semibold leading-6 text-black/60">
+              {t("messages.deleteLinkConfirm", {
+                title: linkPendingDeletion.title,
+              })}
+            </p>
+            <div className="mt-6 grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setLinkPendingDeletion(null)}
+                className="h-11 rounded-2xl border border-black/10 text-sm font-black"
+              >
+                {t("messages.cancel")}
+              </button>
+              <button
+                type="button"
+                onClick={() => removeLink(linkPendingDeletion)}
+                className="h-11 rounded-2xl bg-red-600 text-sm font-black text-white"
+              >
+                {t("messages.confirmDelete")}
+              </button>
+            </div>
+          </section>
+        </div>
       )}
 
       {toast && (
@@ -2747,6 +3918,23 @@ useEffect(() => {
   );
 }
 
+function AdminDashboardPage({ onSignOut }) {
+  return (
+    <main className="min-h-screen bg-[#f7f7f6] text-black">
+      <SEO
+        title="Administración"
+        description="Panel interno para gestionar usuarios, cuentas preparadas, smart links y códigos promocionales."
+        path="/dashboard"
+        robots="noindex,nofollow"
+      />
+      <DashboardHeader onSignOut={onSignOut} />
+      <section className="mx-auto w-full max-w-[1360px] px-5 pb-12 pt-28 md:px-8">
+        <AdminPanelModal embedded />
+      </section>
+    </main>
+  );
+}
+
 function DashboardHeader({ onSignOut }) {
   const { t, i18n } = useTranslation();
   const homePath = localizePath("/", i18n.language);
@@ -2754,7 +3942,7 @@ function DashboardHeader({ onSignOut }) {
   return (
     <header className="fixed left-1/2 top-4 z-40 flex w-[calc(100vw-16px)] max-w-[1360px] -translate-x-1/2 items-center justify-between rounded-[24px] border border-black/10 bg-white/70 px-4 py-3 shadow-[0_3px_22px_rgba(0,0,0,0.10)] backdrop-blur-xl">
       <Link to={homePath} className="flex items-center gap-2">
-        <img src="/logo-link-my-app.png" alt="Link My App" className="h-9 w-9 object-contain shadow-[0_12px_26px_rgba(0,0,0,0.18)]" />
+        <img src="/logo-link-my-app.avif" alt="Link My App" className="h-9 w-9 object-contain shadow-[0_12px_26px_rgba(0,0,0,0.18)]" />
         <span className="text-lg font-black">Link My App</span>
       </Link>
       <nav className="flex items-center gap-2">
@@ -2808,7 +3996,7 @@ function AccountPanel({ user, profile, onOpenSettings, onOpenAdmin }) {
             </span>
           </div>
         </div>
-        {adminEmail && user.email === adminEmail && (
+        {isAdminUser(user) && (
           <button
             type="button"
             onClick={onOpenAdmin}
@@ -2837,6 +4025,7 @@ function AccountDetailsModal({ user, profile, onDeleted, onClose }) {
   const navigate = useNavigate();
   const [billingLoading, setBillingLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [savingProfile, setSavingProfile] = useState(false);
   const [error, setError] = useState("");
   const displayName = profile?.displayName || user.displayName || user.email || t("dashboard.userDefault", "Usuario");
@@ -2854,7 +4043,11 @@ function AccountDetailsModal({ user, profile, onDeleted, onClose }) {
 
   async function saveProfile() {
     const nextName = name.trim();
-    if (!nextName || savingProfile) return;
+    if (!nextName) {
+      setError(t("messages.profileNameRequired"));
+      return;
+    }
+    if (savingProfile) return;
 
     setError("");
     setSavingProfile(true);
@@ -2862,12 +4055,19 @@ function AccountDetailsModal({ user, profile, onDeleted, onClose }) {
       if (auth.currentUser) {
         await updateProfile(auth.currentUser, { displayName: nextName });
       }
-      await update(ref(db, `users/${user.uid}`), {
+      const publicProfile = publicProfileData({
+        ...(profile || {}),
+        uid: user.uid,
         displayName: nextName,
         updatedAt: serverTimestamp(),
       });
-    } catch (nextError) {
-      setError(nextError.message);
+      await update(ref(db), {
+        [`users/${user.uid}/displayName`]: nextName,
+        [`users/${user.uid}/updatedAt`]: serverTimestamp(),
+        [`publicProfiles/${user.uid}`]: publicProfile,
+      });
+    } catch {
+      setError(t("messages.profileSaveError"));
     } finally {
       setSavingProfile(false);
     }
@@ -2878,26 +4078,35 @@ function AccountDetailsModal({ user, profile, onDeleted, onClose }) {
     setBillingLoading(true);
     try {
       await startStripePortal(user);
-    } catch (nextError) {
-      setError(nextError.message);
+    } catch {
+      setError(t("messages.billingError"));
       setBillingLoading(false);
     }
   }
 
   async function handleDeleteAccount() {
-    const confirmed = window.confirm(
-      t("dashboard.deleteConfirm", "Vas a borrar tu cuenta, tus links y tus estadísticas. Esta acción no se puede deshacer.")
-    );
-    if (!confirmed) return;
-
     setError("");
     setDeleting(true);
     try {
       const linksSnapshot = await get(
         query(ref(db, "links"), orderByChild("ownerId"), equalTo(user.uid))
       );
-      const removals = Object.keys(linksSnapshot.val() || {}).map((linkId) =>
-        remove(ref(db, `links/${linkId}`))
+      const ownedLinks = Object.entries(linksSnapshot.val() || {});
+      await Promise.all(
+        ownedLinks.map(([linkId, link]) =>
+          syncLinkAtEdge(user, linkId, {
+            previousSlug: link.slug,
+            action: "delete",
+            purgeStats: true,
+          })
+        )
+      );
+      await deleteAccountStatsAtEdge(user);
+      const linkRemovals = Object.fromEntries(
+        ownedLinks.flatMap(([linkId]) => [
+          [`links/${linkId}`, null],
+          [`publicLinks/${linkId}`, null],
+        ])
       );
       const eventsSnapshot = await get(
         query(ref(db, "clickEvents"), orderByChild("ownerId"), equalTo(user.uid))
@@ -2905,15 +4114,21 @@ function AccountDetailsModal({ user, profile, onDeleted, onClose }) {
       const eventRemovals = Object.keys(eventsSnapshot.val() || {}).map((eventId) =>
         remove(ref(db, `clickEvents/${eventId}`))
       );
-      await Promise.all([...removals, ...eventRemovals]);
-      await remove(ref(db, `users/${user.uid}`));
+      if (Object.keys(linkRemovals).length > 0) {
+        await update(ref(db), linkRemovals);
+      }
+      await Promise.all(eventRemovals);
+      await update(ref(db), {
+        [`users/${user.uid}`]: null,
+        [`publicProfiles/${user.uid}`]: null,
+      });
       await deleteUser(auth.currentUser);
       onDeleted?.();
     } catch (nextError) {
       const message =
         nextError?.code === "auth/requires-recent-login"
-          ? "Por seguridad, vuelve a iniciar sesión y después borra la cuenta."
-          : nextError.message;
+          ? t("messages.deleteRecentLogin")
+          : t("messages.actionError");
       setError(message);
       setDeleting(false);
     }
@@ -3000,15 +4215,36 @@ function AccountDetailsModal({ user, profile, onDeleted, onClose }) {
           <p className="mt-2 text-sm font-semibold leading-6 text-red-900/70">
             {t("dashboard.deleteWarning", "Si borras la cuenta se eliminan tus smartlinks, estadísticas y datos del panel.")}
           </p>
-          <button
-            type="button"
-            onClick={handleDeleteAccount}
-            disabled={deleting}
-            className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-2xl bg-red-600 text-sm font-black text-white transition hover:-translate-y-0.5 disabled:opacity-50"
-          >
-            {deleting ? <Loader2 className="animate-spin" size={16} /> : <Trash2 size={15} />}
-            Borrar cuenta
-          </button>
+          {!confirmingDelete ? (
+            <button
+              type="button"
+              onClick={() => setConfirmingDelete(true)}
+              className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-2xl bg-red-600 text-sm font-black text-white transition hover:-translate-y-0.5"
+            >
+              <Trash2 size={15} />
+              {t("messages.deleteAccount")}
+            </button>
+          ) : (
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setConfirmingDelete(false)}
+                disabled={deleting}
+                className="h-11 rounded-2xl border border-red-200 text-sm font-black text-red-700 disabled:opacity-50"
+              >
+                {t("messages.cancel")}
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteAccount}
+                disabled={deleting}
+                className="flex h-11 items-center justify-center gap-2 rounded-2xl bg-red-600 text-sm font-black text-white disabled:opacity-50"
+              >
+                {deleting && <Loader2 className="animate-spin" size={16} />}
+                {t("messages.confirmDelete")}
+              </button>
+            </div>
+          )}
         </div>
 
         {error && (
@@ -3021,112 +4257,1170 @@ function AccountDetailsModal({ user, profile, onDeleted, onClose }) {
   );
 }
 
-function AdminPanelModal({ onClose }) {
-  const { i18n } = useTranslation();
+function AdminPanelModal({ onClose, embedded = false }) {
+  const { user } = useAuth();
+  const { t, i18n } = useTranslation();
   const [promoCodes, setPromoCodes] = useState({});
   const [newPromoCode, setNewPromoCode] = useState("");
+  const [usersById, setUsersById] = useState({});
+  const [allLinks, setAllLinks] = useState([]);
+  const [allDailyStats, setAllDailyStats] = useState([]);
+  const [preparedAccounts, setPreparedAccounts] = useState({});
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedUserId, setSelectedUserId] = useState("");
   const [saving, setSaving] = useState(false);
+  const [savingAccount, setSavingAccount] = useState(false);
+  const [creatingSelectedLink, setCreatingSelectedLink] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+  const [showVisitsModal, setShowVisitsModal] = useState(false);
+  const [visitsFrom, setVisitsFrom] = useState(() => {
+    const date = new Date();
+    date.setDate(date.getDate() - 29);
+    return adminDateInputValue(date);
+  });
+  const [visitsTo, setVisitsTo] = useState(() => adminDateInputValue());
+  const [selectedLinkForm, setSelectedLinkForm] = useState(emptyLinkForm);
+  const [preparedForm, setPreparedForm] = useState({
+    email: "",
+    displayName: "",
+    bio: "",
+    appTitle: "",
+    iosUrl: "",
+    androidUrl: "",
+    fallbackUrl: "",
+    customUrl: "",
+  });
+
+  const reloadAdminData = useCallback(async () => {
+    if (!firebaseReady || !db || !user) {
+      setLoading(false);
+      setError("Firebase no está configurado.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const [promoSnapshot, usersSnapshot, linksSnapshot, preparedSnapshot, edgeStats] =
+        await Promise.all([
+          get(ref(db, "settings/promoCodes")),
+          get(query(ref(db, "users"), orderByChild("createdAt"), limitToLast(500))),
+          get(query(ref(db, "links"), orderByChild("createdAt"), limitToLast(1000))),
+          get(
+            query(
+              ref(db, "preparedAccounts"),
+              orderByChild("updatedAt"),
+              limitToLast(250)
+            )
+          ),
+          fetchEdgeStats(user, { admin: true }),
+        ]);
+
+      setPromoCodes(promoSnapshot.val() || {});
+      setUsersById(usersSnapshot.val() || {});
+      setPreparedAccounts(preparedSnapshot.val() || {});
+      setAllLinks(
+        Object.entries(linksSnapshot.val() || {})
+          .map(([id, value]) => ({ id, ...value }))
+          .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+      );
+
+      let dailyRows = edgeStats?.rows || [];
+      if (!edgeStats?.legacyMigrated) {
+        const clicksSnapshot = await get(ref(db, "clickEvents"));
+        dailyRows = mergeDailyStats(
+          dailyRows,
+          eventsToDailyStats(Object.values(clicksSnapshot.val() || {}))
+        );
+      }
+      setAllDailyStats(dailyRows);
+      setError("");
+    } catch (nextError) {
+      setError(nextError.message || "No se pudo cargar la administración.");
+    } finally {
+      setLoading(false);
+    }
+  }, [user]);
 
   useEffect(() => {
-    const promoRef = ref(db, "settings/promoCodes");
+    void reloadAdminData();
+  }, [reloadAdminData]);
 
-    const unsubPromo = onValue(promoRef, (snap) => {
-      if (snap.exists()) {
-        setPromoCodes(snap.val());
-      } else {
-        setPromoCodes({});
-      }
-      setLoading(false);
+  const registeredUsers = useMemo(
+    () =>
+      Object.entries(usersById)
+        .map(([uid, value]) => ({ uid, ...value }))
+        .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)),
+    [usersById]
+  );
+
+  const linksByOwner = useMemo(() => {
+    return allLinks.reduce((groups, item) => {
+      const ownerId = item.ownerId || "sin-owner";
+      groups[ownerId] = groups[ownerId] || [];
+      groups[ownerId].push(item);
+      return groups;
+    }, {});
+  }, [allLinks]);
+
+  const preparedItems = useMemo(
+    () =>
+      Object.entries(preparedAccounts)
+        .map(([key, value]) => ({ key, ...value }))
+        .sort((a, b) => (b.updatedAt || b.createdAt || 0) - (a.updatedAt || a.createdAt || 0)),
+    [preparedAccounts]
+  );
+
+  const filteredUsers = useMemo(() => {
+    const search = searchTerm.trim().toLowerCase();
+    if (!search) return registeredUsers;
+
+    return registeredUsers.filter((item) => {
+      const userLinks = linksByOwner[item.uid] || [];
+      const haystack = [
+        item.displayName,
+        item.email,
+        item.uid,
+        item.plan,
+        item.registrationLanguage,
+        formatRegistrationLanguage(item, true),
+        ...userLinks.flatMap((link) => [link.title, link.slug, link.iosUrl, link.androidUrl, link.fallbackUrl]),
+      ]
+        .join(" ")
+        .toLowerCase();
+      return haystack.includes(search);
     });
+  }, [registeredUsers, linksByOwner, searchTerm]);
 
-    return () => {
-      unsubPromo();
-    };
-  }, []);
+  const selectedUser =
+    registeredUsers.find((item) => item.uid === selectedUserId) ||
+    filteredUsers[0] ||
+    registeredUsers[0] ||
+    null;
+  const selectedLinks = selectedUser ? linksByOwner[selectedUser.uid] || [] : [];
+  const selectedLinkStats = useMemo(
+    () => buildStatsForLinks(selectedLinks, allDailyStats),
+    [selectedLinks, allDailyStats]
+  );
+  const selectedAccountTotals = useMemo(() => {
+    return selectedLinks.reduce(
+      (totals, item) => {
+        const stats = selectedLinkStats[item.id] || emptyStats;
+        totals.total += stats.total || 0;
+        totals.qr += stats.qr || 0;
+        totals.written += stats.written || 0;
+        totals.estimatedInstalls += stats.estimatedInstalls || 0;
+        return totals;
+      },
+      { total: 0, qr: 0, written: 0, estimatedInstalls: 0 }
+    );
+  }, [selectedLinks, selectedLinkStats]);
+  const activeLinks = allLinks.filter((item) => item.active).length;
+  const allVisitCount = allDailyStats.reduce(
+    (total, row) => total + Math.max(0, Number(row.clicks || 0)),
+    0
+  );
+  const pendingPrepared = preparedItems.filter((item) => item.status !== "applied").length;
+  const visitRows = useMemo(
+    () => buildAdminVisitRows(allLinks, allDailyStats, usersById, visitsFrom, visitsTo),
+    [allLinks, allDailyStats, usersById, visitsFrom, visitsTo]
+  );
+  const visitPeriodTotal = visitRows.reduce((sum, row) => sum + row.periodVisits, 0);
+  const visitHistoricalTotal = visitRows.reduce((sum, row) => sum + row.totalVisits, 0);
+
+  function loginLinkForEmail(email) {
+    const url = new URL(localizePath("/login", i18n.language), window.location.origin);
+    url.searchParams.set("email", email);
+    url.searchParams.set("register", "1");
+    return url.toString();
+  }
+
+  async function copyValue(value, label = "Copiado") {
+    await navigator.clipboard.writeText(value);
+    setNotice(label);
+    window.setTimeout(() => setNotice(""), 2600);
+  }
+
+  async function copyRegisteredUsersTable() {
+    const escapeCell = (value) =>
+      String(value ?? "")
+        .replaceAll("\t", " ")
+        .replaceAll(/\r?\n/g, " ");
+    const rows = filteredUsers.map((item) => {
+      const activeUserLinks = (linksByOwner[item.uid] || [])
+        .filter((link) => link.active)
+        .map((link) => publicLinkForSlug(publicBaseUrl, link.slug));
+
+      return [
+        item.displayName || "Usuario",
+        item.email || "",
+        formatRegistrationLanguage(item, true),
+        activeUserLinks.join(" | "),
+        formatExportDate(item.createdAt),
+      ];
+    });
+    const table = [
+      ["Nombre", "Email", "Idioma", "Enlaces", "Fecha de registro"],
+      ...rows,
+    ]
+      .map((row) => row.map(escapeCell).join("\t"))
+      .join("\n");
+
+    await copyValue(
+      table,
+      `${filteredUsers.length} usuarios copiados por columnas`
+    );
+  }
+
+  function updatePreparedForm(field, value) {
+    setPreparedForm((current) => ({ ...current, [field]: value }));
+  }
+
+  function updateSelectedLinkForm(field, value) {
+    setSelectedLinkForm((current) => ({ ...current, [field]: value }));
+  }
+
+  async function handleCreateSelectedUserLink(event) {
+    event.preventDefault();
+    if (!selectedUser || !user || creatingSelectedLink) return;
+
+    setError("");
+    setNotice("");
+    setCreatingSelectedLink(true);
+    try {
+      const slug = await createSmartLinkForAccount(selectedLinkForm, selectedUser, user);
+      setSelectedLinkForm(emptyLinkForm);
+      setNotice(`Link creado para ${selectedUser.email || selectedUser.displayName}: ${publicLinkForSlug(publicBaseUrl, slug)}`);
+      await reloadAdminData();
+    } catch (nextError) {
+      setError(nextError.message);
+    } finally {
+      setCreatingSelectedLink(false);
+    }
+  }
+
+  async function handlePrepareAccount(event) {
+    event.preventDefault();
+    if (!user || savingAccount) return;
+
+    setError("");
+    setNotice("");
+    setSavingAccount(true);
+    try {
+      const hasLinkDraft = [
+        preparedForm.appTitle,
+        preparedForm.iosUrl,
+        preparedForm.androidUrl,
+        preparedForm.fallbackUrl,
+        preparedForm.customUrl,
+      ].some((value) => value.trim());
+      const token = await user.getIdToken();
+      const response = await fetch(adminPrepareAccountUrl, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: preparedForm.email,
+          displayName: preparedForm.displayName,
+          bio: preparedForm.bio,
+          public: true,
+          links: hasLinkDraft
+            ? [
+                {
+                  title: preparedForm.appTitle,
+                  iosUrl: preparedForm.iosUrl,
+                  androidUrl: preparedForm.androidUrl,
+                  fallbackUrl: preparedForm.fallbackUrl,
+                  customUrl: preparedForm.customUrl,
+                },
+              ]
+            : [],
+        }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(data.error || "No se pudo preparar la cuenta.");
+      }
+
+      const accessLink = loginLinkForEmail(preparedForm.email);
+      setNotice(
+        data.userExisted
+          ? "Cuenta actualizada y link creado para el usuario existente."
+          : "Cuenta preparada. Cuando se registre con ese email, verá estos datos."
+      );
+      setPreparedForm({
+        email: "",
+        displayName: "",
+        bio: "",
+        appTitle: "",
+        iosUrl: "",
+        androidUrl: "",
+        fallbackUrl: "",
+        customUrl: "",
+      });
+      if (!data.userExisted) {
+        await navigator.clipboard.writeText(accessLink).catch(() => {});
+      }
+      await reloadAdminData();
+    } catch (nextError) {
+      setError(nextError.message);
+    } finally {
+      setSavingAccount(false);
+    }
+  }
 
   async function handleAddPromo() {
     const code = newPromoCode.trim().toUpperCase();
     if (!code) return;
     setSaving(true);
-    await set(ref(db, `settings/promoCodes/${code}`), {
-      active: true,
-      createdAt: serverTimestamp(),
-    });
-    setNewPromoCode("");
-    setSaving(false);
+    setError("");
+    try {
+      await set(ref(db, `settings/promoCodes/${code}`), {
+        active: true,
+        createdAt: serverTimestamp(),
+      });
+      setPromoCodes((current) => ({
+        ...current,
+        [code]: { active: true, createdAt: Date.now() },
+      }));
+      setNewPromoCode("");
+    } catch (nextError) {
+      setError(nextError.message);
+    } finally {
+      setSaving(false);
+    }
   }
 
   async function handleDeletePromo(code) {
     if (confirm(`¿Eliminar código ${code}?`)) {
       await set(ref(db, `settings/promoCodes/${code}`), null);
+      setPromoCodes((current) => {
+        const next = { ...current };
+        delete next[code];
+        return next;
+      });
     }
+  }
+
+  const panel = (
+      <section
+        className={
+          embedded
+            ? "w-full rounded-[34px] border border-black/10 bg-white p-4 text-black shadow-sm md:p-7"
+            : "max-h-[94vh] w-full max-w-7xl overflow-y-auto rounded-[34px] border border-black/10 bg-white p-4 text-black shadow-xl md:p-7"
+        }
+        onClick={embedded ? undefined : (event) => event.stopPropagation()}
+      >
+        <div className="flex flex-col justify-between gap-4 md:flex-row md:items-start">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-black/40">
+              Panel interno
+            </p>
+            <h2 className="mt-1 text-3xl font-black tracking-tight">Administración</h2>
+          </div>
+          {!embedded && (
+            <button
+              type="button"
+              onClick={onClose}
+              className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl border border-black/10 bg-[#f7f7f6] text-black transition hover:bg-black hover:text-white"
+              aria-label="Cerrar administración"
+            >
+              <X size={18} />
+            </button>
+          )}
+        </div>
+
+        <div className="mt-5 grid gap-2 sm:grid-cols-5">
+          <MiniStat label="Usuarios" value={registeredUsers.length} />
+          <MiniStat label="Links" value={allLinks.length} />
+          <MiniStat label="Activos" value={activeLinks} />
+          <MiniStat
+            label="Visitas"
+            value={allVisitCount}
+            onClick={() => setShowVisitsModal(true)}
+            ariaLabel="Ver registro de visitas"
+          />
+          <MiniStat label="Preparadas" value={pendingPrepared} />
+        </div>
+
+        {(error || notice) && (
+          <div className="mt-4 grid gap-2">
+            {error && (
+              <p className="rounded-2xl bg-red-50 px-4 py-3 text-sm font-bold text-red-700">
+                {error}
+              </p>
+            )}
+            {notice && (
+              <p className="rounded-2xl bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-800">
+                {notice}
+              </p>
+            )}
+          </div>
+        )}
+
+        {loading ? (
+          <div className="mt-8 flex justify-center">
+            <Loader2 className="animate-spin text-black" size={24} />
+          </div>
+        ) : (
+          <div className="mt-6 grid gap-5 lg:grid-cols-[360px_1fr]">
+            <aside className="space-y-5">
+              <form
+                className="rounded-[28px] border border-black/10 bg-[#f7f7f6] p-4"
+                onSubmit={handlePrepareAccount}
+              >
+                <h3 className="text-sm font-black uppercase tracking-[0.14em] text-black/45">
+                  Crear cuenta preparada
+                </h3>
+                <div className="mt-4 grid gap-3">
+                  <InputField
+                    label="Email del usuario"
+                    name="prepared_email"
+                    value={preparedForm.email}
+                    onChange={(value) => updatePreparedForm("email", value)}
+                    placeholder="cliente@email.com"
+                    type="email"
+                    autoComplete="email"
+                  />
+                  <InputField
+                    label="Nombre"
+                    name="prepared_name"
+                    value={preparedForm.displayName}
+                    onChange={(value) => updatePreparedForm("displayName", value)}
+                    placeholder="Nombre visible"
+                    autoComplete="name"
+                  />
+                  <label className="block">
+                    <span className="mb-2 block text-sm font-bold text-black/75">Datos / nota interna</span>
+                    <textarea
+                      value={preparedForm.bio}
+                      onChange={(event) => updatePreparedForm("bio", event.target.value)}
+                      rows={3}
+                      placeholder="Datos que verá en su cuenta"
+                      className="w-full resize-none rounded-2xl border border-black/12 bg-white px-4 py-3 text-sm font-semibold outline-none transition placeholder:text-black/28 focus:border-black/35"
+                    />
+                  </label>
+                  <div className="rounded-2xl border border-black/10 bg-white p-3">
+                    <p className="text-[10px] font-black uppercase tracking-[0.16em] text-black/35">
+                      Link inicial opcional
+                    </p>
+                    <div className="mt-3 grid gap-3">
+                      <InputField
+                        label="Nombre de app"
+                        name="prepared_app"
+                        value={preparedForm.appTitle}
+                        onChange={(value) => updatePreparedForm("appTitle", value)}
+                        placeholder="Mi app"
+                      />
+                      <InputField
+                        label="App Store"
+                        name="prepared_ios"
+                        value={preparedForm.iosUrl}
+                        onChange={(value) => updatePreparedForm("iosUrl", value)}
+                        placeholder="https://apps.apple.com/..."
+                        urlField
+                      />
+                      <InputField
+                        label="Google Play"
+                        name="prepared_android"
+                        value={preparedForm.androidUrl}
+                        onChange={(value) => updatePreparedForm("androidUrl", value)}
+                        placeholder="https://play.google.com/..."
+                        urlField
+                      />
+                      <InputField
+                        label="Web alternativa"
+                        name="prepared_fallback"
+                        value={preparedForm.fallbackUrl}
+                        onChange={(value) => updatePreparedForm("fallbackUrl", value)}
+                        placeholder="https://tuweb.com"
+                        urlField
+                      />
+                      <InputField
+                        label="URL corta"
+                        name="prepared_slug"
+                        value={preparedForm.customUrl}
+                        onChange={(value) => updatePreparedForm("customUrl", value)}
+                        placeholder="mi-app"
+                        autoComplete="off"
+                      />
+                    </div>
+                  </div>
+                  <button
+                    disabled={savingAccount || !preparedForm.email.trim()}
+                    className="flex h-12 items-center justify-center gap-2 rounded-2xl bg-black text-sm font-black text-white transition hover:-translate-y-0.5 disabled:opacity-50"
+                  >
+                    {savingAccount ? <Loader2 className="animate-spin" size={16} /> : <Plus size={16} />}
+                    Preparar cuenta
+                  </button>
+                </div>
+              </form>
+
+              <div className="rounded-[28px] border border-black/10 bg-[#f7f7f6] p-4">
+                <h3 className="text-sm font-black uppercase tracking-[0.14em] text-black/45">
+                  Códigos promocionales
+                </h3>
+                <div className="mt-3 flex gap-2">
+                  <input
+                    value={newPromoCode}
+                    onChange={(event) => setNewPromoCode(event.target.value)}
+                    placeholder="NUEVO_CODIGO"
+                    className="min-w-0 flex-1 rounded-xl border border-black/10 px-3 py-2 text-sm font-bold uppercase text-black"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddPromo}
+                    disabled={saving || !newPromoCode.trim()}
+                    className="flex h-10 items-center justify-center gap-2 rounded-xl bg-black px-4 text-xs font-black text-white disabled:opacity-50"
+                  >
+                    Añadir
+                  </button>
+                </div>
+                <div className="mt-4 grid gap-2">
+                  {Object.keys(promoCodes).length === 0 ? (
+                    <p className="py-2 text-center text-xs font-semibold text-black/40">No hay códigos activos.</p>
+                  ) : (
+                    Object.keys(promoCodes).map((code) => (
+                      <div key={code} className="flex items-center justify-between rounded-xl border border-black/5 bg-white px-4 py-3">
+                        <span className="text-sm font-black uppercase text-black">{code}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleDeletePromo(code)}
+                          className="p-1 text-red-500 hover:text-red-700"
+                          aria-label={`Eliminar ${code}`}
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </aside>
+
+            <section className="min-w-0 space-y-5">
+              <div className="rounded-[28px] border border-black/10 bg-white p-4">
+                <div className="flex flex-col justify-between gap-3 xl:flex-row xl:items-center">
+                  <div>
+                    <h3 className="text-xl font-black tracking-tight">Usuarios registrados</h3>
+                    <p className="mt-1 text-sm font-semibold text-black/45">
+                      Celdas listas para copiar a tu herramienta de email marketing.
+                    </p>
+                  </div>
+                  <div className="flex flex-col gap-2 sm:flex-row">
+                    <label className="relative block sm:w-80">
+                      <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-black/35" size={17} />
+                      <input
+                        value={searchTerm}
+                        onChange={(event) => setSearchTerm(event.target.value)}
+                        placeholder="Buscar usuario o link"
+                        className="h-11 w-full rounded-2xl border border-black/10 bg-[#f7f7f6] pl-10 pr-4 text-sm font-bold outline-none focus:border-black/30"
+                      />
+                    </label>
+                    <button
+                      type="button"
+                      onClick={copyRegisteredUsersTable}
+                      disabled={filteredUsers.length === 0}
+                      className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-black px-4 text-sm font-black text-white transition hover:bg-black/80 disabled:cursor-not-allowed disabled:opacity-35"
+                    >
+                      <Copy size={16} />
+                      Copiar columnas
+                    </button>
+                  </div>
+                </div>
+
+                <div className="mt-4 space-y-4">
+                  <div className="max-h-[430px] overflow-auto rounded-[22px] border border-black/10">
+                    <table className="w-full min-w-[920px] border-collapse text-left">
+                      <thead className="sticky top-0 z-10 bg-[#eeeeec]">
+                        <tr className="text-[10px] font-black uppercase tracking-[0.14em] text-black/45">
+                          <th className="w-[18%] border-b border-black/10 px-4 py-3">Nombre</th>
+                          <th className="w-[24%] border-b border-black/10 px-4 py-3">Email</th>
+                          <th className="w-[14%] border-b border-black/10 px-4 py-3">Idioma</th>
+                          <th className="w-[29%] border-b border-black/10 px-4 py-3">Enlaces</th>
+                          <th className="w-[15%] border-b border-black/10 px-4 py-3">Fecha</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredUsers.length === 0 ? (
+                          <tr>
+                            <td colSpan={5} className="bg-[#f7f7f6] p-5 text-center text-sm font-bold text-black/45">
+                              No hay usuarios con esa búsqueda.
+                            </td>
+                          </tr>
+                        ) : (
+                          filteredUsers.map((item) => {
+                            const activeUserLinks = (linksByOwner[item.uid] || []).filter(
+                              (link) => link.active
+                            );
+                            const selected = selectedUser?.uid === item.uid;
+                            const selectedText = selected ? "text-white" : "text-black";
+                            const mutedText = selected ? "text-white/55" : "text-black/45";
+
+                            return (
+                              <tr
+                                key={item.uid}
+                                tabIndex={0}
+                                aria-selected={selected}
+                                onClick={() => setSelectedUserId(item.uid)}
+                                onKeyDown={(event) => {
+                                  if (event.key === "Enter" || event.key === " ") {
+                                    event.preventDefault();
+                                    setSelectedUserId(item.uid);
+                                  }
+                                }}
+                                className={`cursor-pointer border-b border-black/10 align-top outline-none transition last:border-b-0 ${
+                                  selected
+                                    ? "bg-black"
+                                    : "bg-[#f7f7f6] hover:bg-black/[0.045] focus:bg-black/[0.045]"
+                                }`}
+                              >
+                                <td className={`px-4 py-3 text-sm font-black ${selectedText}`}>
+                                  <span className="block max-w-[220px] break-words">
+                                    {item.displayName || "Usuario"}
+                                  </span>
+                                </td>
+                                <td className={`px-4 py-3 text-sm font-bold ${selectedText}`}>
+                                  <span className="block break-all">{item.email || "Sin email"}</span>
+                                </td>
+                                <td className="px-4 py-3">
+                                  <span
+                                    className={`inline-flex rounded-full px-2.5 py-1 text-xs font-black ${
+                                      selected
+                                        ? "bg-white/12 text-white"
+                                        : getRegistrationLanguageCode(item)
+                                          ? "bg-blue-50 text-blue-700"
+                                          : "bg-black/5 text-black/40"
+                                    }`}
+                                  >
+                                    {formatRegistrationLanguage(item)}
+                                  </span>
+                                </td>
+                                <td className="px-4 py-3">
+                                  {activeUserLinks.length === 0 ? (
+                                    <span className={`text-xs font-bold ${mutedText}`}>Sin enlaces activos</span>
+                                  ) : (
+                                    <div className="grid gap-1">
+                                      <span className={`break-all text-xs font-black ${selectedText}`}>
+                                        {publicLinkForSlug(publicBaseUrl, activeUserLinks[0].slug)}
+                                      </span>
+                                      {activeUserLinks.length > 1 && (
+                                        <span className={`text-[11px] font-black ${mutedText}`}>
+                                          +{activeUserLinks.length - 1} enlaces más
+                                        </span>
+                                      )}
+                                    </div>
+                                  )}
+                                </td>
+                                <td className={`whitespace-nowrap px-4 py-3 text-xs font-black ${mutedText}`}>
+                                  {formatTimestamp(item.createdAt)}
+                                </td>
+                              </tr>
+                            );
+                          })
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div className="min-w-0 rounded-[24px] border border-black/10 bg-[#f7f7f6] p-4">
+                    {!selectedUser ? (
+                      <p className="text-center text-sm font-bold text-black/45">Selecciona un usuario.</p>
+                    ) : (
+                      <>
+                        <div className="flex flex-col justify-between gap-3 md:flex-row md:items-start">
+                          <div className="min-w-0">
+                            <p className="text-xs font-black uppercase tracking-[0.16em] text-black/35">Cuenta</p>
+                            <h4 className="mt-1 truncate text-2xl font-black">{selectedUser.displayName || "Usuario"}</h4>
+                            <div className="mt-1 flex flex-wrap items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => copyValue(selectedUser.email || "", "Email copiado")}
+                                className="break-all text-left text-sm font-black text-blue-600"
+                              >
+                                {selectedUser.email || "Sin email"}
+                              </button>
+                              <span className="rounded-full bg-blue-50 px-2.5 py-1 text-[11px] font-black text-blue-700">
+                                {formatRegistrationLanguage(selectedUser, true)}
+                              </span>
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => copyValue(loginLinkForEmail(selectedUser.email || ""), "Link de acceso copiado")}
+                            className="inline-flex h-10 items-center justify-center gap-2 rounded-2xl bg-black px-3 text-xs font-black text-white"
+                          >
+                            <Copy size={14} />
+                            Link acceso
+                          </button>
+                        </div>
+
+                        <div className="mt-4 grid gap-2 md:grid-cols-3">
+                          <AccountRow label="UID" value={selectedUser.uid} />
+                          <AccountRow label="Plan" value={selectedUser.planLabel || selectedUser.plan || "Gratis"} />
+                          <AccountRow label="Alta" value={formatTimestamp(selectedUser.createdAt)} />
+                        </div>
+
+                        <div className="mt-4 grid gap-2 sm:grid-cols-4">
+                          <MiniStat label="Visitas" value={selectedAccountTotals.total} />
+                          <MiniStat label="Enlace" value={selectedAccountTotals.written} />
+                          <MiniStat label="QR" value={selectedAccountTotals.qr} />
+                          <MiniStat label="Descargas" value={selectedAccountTotals.estimatedInstalls} />
+                        </div>
+
+                        <form
+                          className="mt-4 rounded-2xl border border-black/10 bg-white p-4"
+                          onSubmit={handleCreateSelectedUserLink}
+                        >
+                          <div className="flex flex-col justify-between gap-2 md:flex-row md:items-center">
+                            <div>
+                              <h5 className="text-sm font-black uppercase tracking-[0.14em] text-black/45">
+                                Crear link para esta cuenta
+                              </h5>
+                              <p className="mt-1 text-xs font-semibold text-black/45">
+                                El enlace quedará dentro del panel de {selectedUser.email || selectedUser.displayName}.
+                              </p>
+                            </div>
+                            <button
+                              disabled={creatingSelectedLink}
+                              className="inline-flex h-10 items-center justify-center gap-2 rounded-2xl bg-black px-4 text-xs font-black text-white disabled:opacity-50"
+                            >
+                              {creatingSelectedLink ? <Loader2 className="animate-spin" size={14} /> : <Plus size={14} />}
+                              Crear link
+                            </button>
+                          </div>
+                          <div className="mt-4 grid gap-3 md:grid-cols-2">
+                            <InputField
+                              label="Nombre de app"
+                              name="selected_link_title"
+                              value={selectedLinkForm.title}
+                              onChange={(value) => updateSelectedLinkForm("title", value)}
+                              placeholder="Mi app"
+                            />
+                            <InputField
+                              label="URL corta"
+                              name="selected_link_slug"
+                              value={selectedLinkForm.customUrl}
+                              onChange={(value) => updateSelectedLinkForm("customUrl", value)}
+                              placeholder="mi-app"
+                              autoComplete="off"
+                            />
+                            <InputField
+                              label="App Store"
+                              name="selected_link_ios"
+                              value={selectedLinkForm.iosUrl}
+                              onChange={(value) => updateSelectedLinkForm("iosUrl", value)}
+                              placeholder="https://apps.apple.com/..."
+                              urlField
+                            />
+                            <InputField
+                              label="Google Play"
+                              name="selected_link_android"
+                              value={selectedLinkForm.androidUrl}
+                              onChange={(value) => updateSelectedLinkForm("androidUrl", value)}
+                              placeholder="https://play.google.com/..."
+                              urlField
+                            />
+                            <div className="md:col-span-2">
+                              <InputField
+                                label="Web alternativa"
+                                name="selected_link_fallback"
+                                value={selectedLinkForm.fallbackUrl}
+                                onChange={(value) => updateSelectedLinkForm("fallbackUrl", value)}
+                                placeholder="https://tuweb.com"
+                                urlField
+                              />
+                            </div>
+                          </div>
+                        </form>
+
+                        <div className="mt-4 grid gap-3">
+                          {selectedLinks.length === 0 ? (
+                            <p className="rounded-2xl bg-white p-4 text-center text-sm font-bold text-black/45">
+                              Este usuario todavía no tiene links.
+                            </p>
+                          ) : (
+                            selectedLinks.map((item) => {
+                              const linkUrl = publicUrlForCustomOrSlug(item.slug, item.customUrl);
+                              const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(`${linkUrl}?src=qr`)}`;
+                              const linkStats = selectedLinkStats[item.id] || emptyStats;
+                              return (
+                                <article key={item.id} className="rounded-2xl border border-black/10 bg-white p-4">
+                                  <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                                    <div className="min-w-0">
+                                      <div className="flex flex-wrap items-center gap-2">
+                                        <h5 className="truncate text-lg font-black">{item.title}</h5>
+                                        <span className={`rounded-full px-2 py-1 text-[10px] font-black ${item.active ? "bg-emerald-50 text-emerald-700" : "bg-zinc-100 text-zinc-500"}`}>
+                                          {item.active ? t("dashboard.active", "Activo") : t("dashboard.paused", "Pausado")}
+                                        </span>
+                                      </div>
+                                      <button
+                                        type="button"
+                                        onClick={() => copyValue(linkUrl, "Smart link copiado")}
+                                        className="mt-1 break-all text-left text-sm font-black text-blue-600"
+                                      >
+                                        {linkUrl}
+                                      </button>
+                                      <div className="mt-3 grid gap-2 md:grid-cols-3">
+                                        <Destination label="iOS" url={item.iosUrl} />
+                                        <Destination label="Android" url={item.androidUrl} />
+                                        <Destination label={t("dashboard.others", "Otros")} url={item.fallbackUrl} />
+                                      </div>
+                                      <div className="mt-3 grid gap-2 sm:grid-cols-4">
+                                        <MiniStat label="Visitas" value={linkStats.total || 0} />
+                                        <MiniStat label="Enlace" value={linkStats.written || 0} />
+                                        <MiniStat label="QR" value={linkStats.qr || 0} />
+                                        <MiniStat label="Descargas" value={linkStats.estimatedInstalls || 0} />
+                                      </div>
+                                      <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                                        <AdminStatBreakdown
+                                          label="Destino"
+                                          values={[
+                                            ["iOS", linkStats.ios || 0],
+                                            ["Android", linkStats.android || 0],
+                                            [t("dashboard.others", "Otros"), linkStats.fallback || 0],
+                                          ]}
+                                        />
+                                        <AdminStatBreakdown
+                                          label="Desde enlace"
+                                          values={[
+                                            ["iOS", linkStats.written_ios || 0],
+                                            ["Android", linkStats.written_android || 0],
+                                            [t("dashboard.others", "Otros"), linkStats.written_fallback || 0],
+                                          ]}
+                                        />
+                                        <AdminStatBreakdown
+                                          label="Desde QR"
+                                          values={[
+                                            ["iOS", linkStats.qr_ios || 0],
+                                            ["Android", linkStats.qr_android || 0],
+                                            [t("dashboard.others", "Otros"), linkStats.qr_fallback || 0],
+                                          ]}
+                                        />
+                                      </div>
+                                    </div>
+                                    <div className="flex shrink-0 items-center gap-2 md:flex-col">
+                                      <img
+                                        src={qrUrl}
+                                        alt={`QR de ${item.title}`}
+                                        className="h-20 w-20 rounded-2xl border border-black/10 bg-white p-1"
+                                      />
+                                      <button
+                                        type="button"
+                                        onClick={() => copyValue(qrUrl, "URL del QR copiada")}
+                                        className="inline-flex h-9 items-center gap-2 rounded-xl border border-black/10 px-3 text-xs font-black"
+                                      >
+                                        <QrCode size={14} />
+                                        QR
+                                      </button>
+                                    </div>
+                                  </div>
+                                </article>
+                              );
+                            })
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-[28px] border border-black/10 bg-white p-4">
+                <h3 className="text-xl font-black tracking-tight">Cuentas preparadas</h3>
+                <div className="mt-4 grid gap-2 md:grid-cols-2">
+                  {preparedItems.length === 0 ? (
+                    <p className="rounded-2xl bg-[#f7f7f6] p-4 text-sm font-bold text-black/45 md:col-span-2">
+                      No hay cuentas preparadas todavía.
+                    </p>
+                  ) : (
+                    preparedItems.map((item) => {
+                      const accessLink = loginLinkForEmail(item.email || "");
+                      const preparedLinkCount = Array.isArray(item.links)
+                        ? item.links.length
+                        : Object.keys(item.links || {}).length;
+                      return (
+                        <div key={item.key} className="rounded-2xl border border-black/10 bg-[#f7f7f6] p-4">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                              <p className="truncate text-sm font-black">{item.displayName || item.email}</p>
+                              <p className="mt-1 truncate text-xs font-bold text-black/45">{item.email}</p>
+                            </div>
+                            <span className={`shrink-0 rounded-full px-2 py-1 text-[10px] font-black ${item.status === "applied" ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`}>
+                              {item.status === "applied" ? "Aplicada" : "Pendiente"}
+                            </span>
+                          </div>
+                          <div className="mt-3 flex flex-wrap gap-2 text-[11px] font-black uppercase tracking-[0.1em] text-black/35">
+                            <span>{preparedLinkCount} links</span>
+                            <span>{formatTimestamp(item.updatedAt || item.createdAt)}</span>
+                          </div>
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            <button
+                              type="button"
+                              onClick={() => copyValue(accessLink, "Link de acceso copiado")}
+                              className="inline-flex h-9 items-center gap-2 rounded-xl bg-black px-3 text-xs font-black text-white"
+                            >
+                              <Copy size={14} />
+                              Acceso
+                            </button>
+                            {item.consumedBy && (
+                              <button
+                                type="button"
+                                onClick={() => setSelectedUserId(item.consumedBy)}
+                                className="inline-flex h-9 items-center gap-2 rounded-xl border border-black/10 bg-white px-3 text-xs font-black"
+                              >
+                                Ver usuario
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            </section>
+          </div>
+        )}
+      </section>
+  );
+
+  const visitsModal = showVisitsModal ? (
+    <AdminVisitsModal
+      fromDate={visitsFrom}
+      toDate={visitsTo}
+      onFromDateChange={setVisitsFrom}
+      onToDateChange={setVisitsTo}
+      onClose={() => setShowVisitsModal(false)}
+      rows={visitRows}
+      periodTotal={visitPeriodTotal}
+      historicalTotal={visitHistoricalTotal}
+    />
+  ) : null;
+
+  if (embedded) return <>{panel}{visitsModal}</>;
+
+  return (
+    <>
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 px-3 py-5 backdrop-blur-sm md:px-5 md:py-8"
+        onClick={onClose}
+      >
+        {panel}
+      </div>
+      {visitsModal}
+    </>
+  );
+}
+
+function AdminVisitsModal({
+  fromDate,
+  toDate,
+  onFromDateChange,
+  onToDateChange,
+  onClose,
+  rows,
+  periodTotal,
+  historicalTotal,
+}) {
+  const hasValidRange = Boolean(fromDate && toDate && fromDate <= toDate);
+  const formatDate = (value) =>
+    value
+      ? new Date(`${value}T00:00:00`).toLocaleDateString("es-ES", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        })
+      : "—";
+
+  function setPreset(days) {
+    const to = new Date();
+    const from = new Date();
+    from.setDate(from.getDate() - (days - 1));
+    onFromDateChange(adminDateInputValue(from));
+    onToDateChange(adminDateInputValue(to));
+  }
+
+  const dayCursor = toDate || adminDateInputValue();
+  const todayCursor = adminDateInputValue();
+  const nextDayDisabled = dayCursor >= todayCursor;
+
+  function setSingleDay(value) {
+    onFromDateChange(value);
+    onToDateChange(value);
+  }
+
+  function shiftDay(offset) {
+    const nextDay = shiftAdminCalendarDate(dayCursor, offset);
+    if (!nextDay) return;
+    setSingleDay(nextDay);
   }
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 px-4 py-8 backdrop-blur-sm"
+      className="fixed inset-0 z-[80] flex items-center justify-center bg-black/45 px-3 py-5 backdrop-blur-sm md:px-5 md:py-8"
       onClick={onClose}
     >
       <section
-        className="w-full max-w-lg overflow-hidden rounded-[34px] border border-black/10 bg-white p-6 text-black shadow-xl md:p-8"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="admin-visits-title"
+        className="max-h-[94vh] w-full max-w-6xl overflow-y-auto rounded-[34px] border border-black/10 bg-white p-4 text-black shadow-[0_30px_120px_rgba(0,0,0,0.25)] md:p-7"
         onClick={(event) => event.stopPropagation()}
       >
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col justify-between gap-4 md:flex-row md:items-start">
           <div>
-            <h2 className="text-2xl font-black">Administración</h2>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-black/40">
+              Registro de actividad
+            </p>
+            <h2 id="admin-visits-title" className="mt-1 text-3xl font-black tracking-tight">
+              Visitas por fecha
+            </h2>
+            <p className="mt-2 max-w-2xl text-sm font-semibold leading-6 text-black/50">
+              Filtra un periodo para saber qué usuario y qué smart link están generando visitas. El total del link incluye todo su histórico.
+            </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="grid h-10 w-10 place-items-center rounded-2xl border border-black/10 bg-[#f7f7f6] text-black transition hover:bg-black hover:text-white"
+            className="grid h-10 w-10 shrink-0 place-items-center self-end rounded-2xl border border-black/10 bg-[#f7f7f6] text-black transition hover:bg-black hover:text-white md:self-start"
+            aria-label="Cerrar registro de visitas"
           >
             <X size={18} />
           </button>
         </div>
 
-        {loading ? (
-          <div className="mt-8 flex justify-center"><Loader2 className="animate-spin text-black" size={24} /></div>
-        ) : (
-          <div className="mt-6 grid gap-6">
-            <div className="rounded-2xl border border-black/10 bg-[#f7f7f6] p-4">
-              <h3 className="text-sm font-black uppercase tracking-[0.1em] text-black/40">Códigos Promocionales</h3>
-              <div className="mt-3 flex gap-2">
+        <div className="mt-6 rounded-[26px] border border-black/10 bg-[#f7f7f6] p-4">
+          <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="block">
+                <span className="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-black/45">
+                  Desde
+                </span>
                 <input
-                  value={newPromoCode}
-                  onChange={(e) => setNewPromoCode(e.target.value)}
-                  placeholder="NUEVO_CODIGO"
-                  className="flex-1 rounded-xl border border-black/10 px-3 py-2 text-sm font-bold text-black uppercase"
+                  type="date"
+                  value={fromDate}
+                  onChange={(event) => onFromDateChange(event.target.value)}
+                  className="h-11 w-full rounded-2xl border border-black/10 bg-white px-3 text-sm font-black outline-none focus:border-black/35"
                 />
+              </label>
+              <label className="block">
+                <span className="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-black/45">
+                  Hasta
+                </span>
+                <input
+                  type="date"
+                  value={toDate}
+                  onChange={(event) => onToDateChange(event.target.value)}
+                  className="h-11 w-full rounded-2xl border border-black/10 bg-white px-3 text-sm font-black outline-none focus:border-black/35"
+                />
+              </label>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="inline-flex items-center overflow-hidden rounded-xl border border-black/10 bg-white">
                 <button
                   type="button"
-                  onClick={handleAddPromo}
-                  disabled={saving || !newPromoCode.trim()}
-                  className="flex h-10 px-4 items-center justify-center gap-2 rounded-xl bg-black text-xs font-black text-white disabled:opacity-50"
+                  onClick={() => shiftDay(-1)}
+                  aria-label="Ver el día anterior"
+                  title="Día anterior"
+                  className="grid h-10 w-10 place-items-center text-black/60 transition hover:bg-black hover:text-white"
                 >
-                  Añadir
+                  <ChevronLeft size={17} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSingleDay(dayCursor)}
+                  className="h-10 border-x border-black/10 px-3 text-xs font-black text-black/65 transition hover:bg-black/5"
+                >
+                  Día {formatDate(dayCursor)}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => shiftDay(1)}
+                  disabled={nextDayDisabled}
+                  aria-label="Ver el día siguiente"
+                  title="Día siguiente"
+                  className="grid h-10 w-10 place-items-center text-black/60 transition hover:bg-black hover:text-white disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-black/60"
+                >
+                  <ChevronRight size={17} />
                 </button>
               </div>
-              <div className="mt-4 grid gap-2">
-                {Object.keys(promoCodes).length === 0 ? (
-                  <p className="text-xs text-black/40 font-semibold text-center py-2">No hay códigos activos.</p>
-                ) : (
-                  Object.keys(promoCodes).map((code) => (
-                    <div key={code} className="flex items-center justify-between rounded-xl border border-black/5 bg-white px-4 py-3">
-                      <span className="text-sm font-black uppercase text-black">{code}</span>
-                      <button
-                        onClick={() => handleDeletePromo(code)}
-                        className="text-red-500 hover:text-red-700 p-1"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  ))
-                )}
-              </div>
+              {[7, 30, 90].map((days) => (
+                <button
+                  key={days}
+                  type="button"
+                  onClick={() => setPreset(days)}
+                  className="h-10 rounded-xl border border-black/10 bg-white px-3 text-xs font-black text-black/65 transition hover:bg-black hover:text-white"
+                >
+                  {days === 7 ? "7 días" : days === 30 ? "30 días" : "90 días"}
+                </button>
+              ))}
             </div>
           </div>
-        )}
+
+          {!hasValidRange && (
+            <p className="mt-3 rounded-2xl bg-red-50 px-3 py-2 text-xs font-bold text-red-700">
+              La fecha de inicio debe ser anterior o igual a la fecha final.
+            </p>
+          )}
+
+          <div className="mt-4 grid gap-2 sm:grid-cols-3">
+            <MiniStat label="Visitas del periodo" value={hasValidRange ? periodTotal : 0} />
+            <MiniStat label="Total histórico" value={hasValidRange ? historicalTotal : 0} />
+            <MiniStat label="Links con actividad" value={hasValidRange ? rows.filter((row) => row.periodVisits > 0).length : 0} />
+          </div>
+        </div>
+
+        <div className="mt-5 overflow-hidden rounded-[24px] border border-black/10">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[900px] border-collapse text-left">
+              <thead className="bg-[#eeeeec]">
+                <tr className="text-[10px] font-black uppercase tracking-[0.14em] text-black/45">
+                  <th className="border-b border-black/10 px-4 py-3">Usuario</th>
+                  <th className="border-b border-black/10 px-4 py-3">Link</th>
+                  <th className="border-b border-black/10 px-4 py-3 text-right">Visitas periodo</th>
+                  <th className="border-b border-black/10 px-4 py-3 text-right">Total del link</th>
+                  <th className="border-b border-black/10 px-4 py-3">Última visita</th>
+                </tr>
+              </thead>
+              <tbody>
+                {!hasValidRange || rows.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="bg-[#f7f7f6] px-4 py-10 text-center text-sm font-bold text-black/45">
+                      {hasValidRange ? "No hay visitas en este periodo." : "Selecciona un periodo válido."}
+                    </td>
+                  </tr>
+                ) : (
+                  rows.map((row) => (
+                    <tr key={row.linkId} className="border-b border-black/10 align-top last:border-b-0">
+                      <td className="bg-[#f7f7f6] px-4 py-3">
+                        <p className="max-w-[240px] break-words text-sm font-black">{row.userName}</p>
+                        <p className="mt-1 max-w-[240px] break-all text-xs font-semibold text-black/45">{row.userEmail}</p>
+                      </td>
+                      <td className="px-4 py-3">
+                        <p className="max-w-[360px] break-words text-sm font-black">{row.title}</p>
+                        <a
+                          href={publicLinkForSlug(publicBaseUrl, row.slug)}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="mt-1 block max-w-[360px] break-all text-xs font-black text-blue-600 hover:underline"
+                        >
+                          {publicLinkForSlug(publicBaseUrl, row.slug)}
+                        </a>
+                      </td>
+                      <td className="px-4 py-3 text-right text-lg font-black text-black">{row.periodVisits}</td>
+                      <td className="px-4 py-3 text-right text-lg font-black text-black">{row.totalVisits}</td>
+                      <td className="whitespace-nowrap px-4 py-3 text-xs font-black text-black/55">{formatDate(row.lastVisit)}</td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </section>
     </div>
   );
@@ -3139,6 +5433,24 @@ function AccountRow({ label, value }) {
         {label}
       </p>
       <p className="mt-1 break-words text-sm font-black text-black/75">{value}</p>
+    </div>
+  );
+}
+
+function AdminStatBreakdown({ label, values }) {
+  return (
+    <div className="rounded-2xl border border-black/10 bg-[#f7f7f6] p-3">
+      <p className="text-[10px] font-black uppercase tracking-[0.16em] text-black/35">
+        {label}
+      </p>
+      <div className="mt-2 grid gap-1">
+        {values.map(([name, value]) => (
+          <div key={name} className="flex items-center justify-between gap-3 text-xs font-black text-black/65">
+            <span>{name}</span>
+            <span>{value}</span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -3159,13 +5471,13 @@ function ProUpgradeCard({ onUpgrade, upgrading, error }) {
       <div className="relative grid gap-7 lg:grid-cols-[1fr_minmax(340px,380px)] lg:items-start">
         <div>
           <p className="text-xs font-black uppercase tracking-[0.24em] text-white/45">
-            {t("dashboard.unlockProTag", "Desbloquea Pro")}
+            {t("dashboard.unlockProTag", "Todo desbloqueado")}
           </p>
           <h2 className={`mt-3 text-[clamp(24px,3.5vw,48px)] ${i18n.language.startsWith('fr') ? '' : 'sm:whitespace-nowrap'} font-black leading-[0.9] tracking-[-0.06em]`}>
-            {t("dashboard.unlockProTitle", "Crea links sin límites")}
+            {t("dashboard.unlockProTitle", "Funciones gratis incluidas")}
           </h2>
           <p className="mt-5 max-w-2xl text-sm font-medium leading-7 text-white/60 md:text-base">
-            {t("dashboard.unlockProDesc", "Tu primer link ya está creado. Pasa a Pro para crear todos los links que quieras de por vida, medir campañas y ver estadísticas en tiempo real.")}
+            {t("dashboard.unlockProDesc", "Puedes crear todos los links que quieras gratis, medir campañas y ver estadísticas en tiempo real.")}
           </p>
           <div className="mt-6 grid gap-3 sm:grid-cols-2">
             {features.map((feature) => (
@@ -3184,9 +5496,9 @@ function ProUpgradeCard({ onUpgrade, upgrading, error }) {
 
         <div className="rounded-[28px] bg-white p-5 text-black shadow-[0_22px_55px_rgba(0,0,0,0.32)] mt-6 lg:mt-20">
           <div className="flex items-end gap-2">
-            <span className="text-6xl font-black tracking-[-0.08em]">{t("dashboard.price", "9,99€")}</span>
+            <span className="text-6xl font-black tracking-[-0.08em]">{t("dashboard.price", "0€")}</span>
             <span className="pb-3 text-xs font-black uppercase leading-tight text-black/42">
-              {t("pricingComparison.paymentLabel", "Pago único\nDe por vida").split("\n").map((line, i) => (
+              {t("pricingComparison.paymentLabel", "Gratis\npara siempre").split("\n").map((line, i) => (
                 <React.Fragment key={i}>
                   {line}
                   <br />
@@ -3211,7 +5523,7 @@ function ProUpgradeCard({ onUpgrade, upgrading, error }) {
             disabled={upgrading}
             className="mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-black text-sm font-black text-white transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {upgrading ? <Loader2 className="animate-spin" size={16} /> : t("pricingComparison.unlock", "Desbloquear Pro")}
+            {upgrading ? <Loader2 className="animate-spin" size={16} /> : t("pricingComparison.unlock", "Crear cuenta gratis")}
             {!upgrading && <ArrowRight size={15} />}
           </button>
         </div>
@@ -3235,31 +5547,31 @@ function ProLimitModal({ onClose, onUpgrade, upgrading, error }) {
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-xs font-black uppercase tracking-[0.24em] text-white/42">
-              {t("dashboard.unlockProTag", "Desbloquea Pro")}
+              {t("dashboard.unlockProTag", "Todo desbloqueado")}
             </p>
             <h2 className={`mt-3 text-[clamp(24px,5vw,48px)] ${i18n.language.startsWith('fr') ? '' : 'sm:whitespace-nowrap'} font-black leading-[0.9] tracking-[-0.06em]`}>
-              {t("dashboard.unlockProTitle", "Crea links sin límites")}
+              {t("dashboard.unlockProTitle", "Funciones gratis incluidas")}
             </h2>
           </div>
           <button
             type="button"
             onClick={onClose}
             className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl border border-white/10 bg-white/5 text-white transition hover:bg-white hover:text-black"
-            aria-label="Cerrar Pro"
+            aria-label={t("messages.closeModal")}
           >
             <X size={18} />
           </button>
         </div>
 
         <p className="mt-5 text-base font-medium leading-7 text-white/62">
-          {t("dashboard.unlockProModalDesc", "Puedes crear todos los links que quieras de por vida. Incluye QR ilimitados, estadísticas en tiempo real e historial completo de clics.")}
+          {t("dashboard.unlockProModalDesc", "Los links ilimitados, QR, estadísticas en tiempo real e historial completo están disponibles gratis.")}
         </p>
 
         <div className="mt-6 rounded-[28px] bg-white p-5 text-black">
           <div className="flex items-end gap-2">
-            <span className="text-6xl font-black tracking-[-0.08em]">{t("dashboard.price", "9,99€")}</span>
+            <span className="text-6xl font-black tracking-[-0.08em]">{t("dashboard.price", "0€")}</span>
             <span className="pb-3 text-xs font-black uppercase leading-tight text-black/42">
-              {t("pricingComparison.paymentLabel", "Pago único\nDe por vida").split("\n").map((line, i) => (
+              {t("pricingComparison.paymentLabel", "Gratis\npara siempre").split("\n").map((line, i) => (
                 <React.Fragment key={i}>
                   {line}
                   <br />
@@ -3284,7 +5596,7 @@ function ProLimitModal({ onClose, onUpgrade, upgrading, error }) {
             disabled={upgrading}
             className="mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-black text-sm font-black text-white transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {upgrading ? <Loader2 className="animate-spin" size={16} /> : t("pricingComparison.unlock", "Desbloquear Pro")}
+            {upgrading ? <Loader2 className="animate-spin" size={16} /> : t("pricingComparison.unlock", "Crear cuenta gratis")}
             {!upgrading && <ArrowRight size={15} />}
           </button>
         </div>
@@ -3336,27 +5648,37 @@ function FeedbackPanel() {
   const { user } = useAuth();
   const { t } = useTranslation();
   const [feedback, setFeedback] = useState("");
-  const [sent, setSent] = useState(false);
+  const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
 
   async function handleFeedbackSubmit(event) {
     event.preventDefault();
-    if (!feedback.trim() || loading || !feedbackEndpoint) return;
+    if (loading) return;
+    if (!feedback.trim()) {
+      setStatus({ type: "error", message: t("messages.feedbackRequired") });
+      return;
+    }
+    if (!feedbackEndpoint) {
+      setStatus({ type: "error", message: t("messages.feedbackError") });
+      return;
+    }
 
+    setStatus(null);
     setLoading(true);
     try {
-      await fetch(feedbackEndpoint, {
+      const response = await fetch(feedbackEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ feedback: feedback.trim(), email: user?.email || "Anónimo" }),
       });
-    } catch (error) {
-      console.error(error);
+      if (!response.ok) throw new Error("feedback-request-failed");
+      setFeedback("");
+      setStatus({ type: "success", message: t("messages.feedbackSent") });
+      window.setTimeout(() => setStatus(null), 3000);
+    } catch {
+      setStatus({ type: "error", message: t("messages.feedbackError") });
     } finally {
       setLoading(false);
-      setFeedback("");
-      setSent(true);
-      window.setTimeout(() => setSent(false), 3000);
     }
   }
 
@@ -3364,16 +5686,26 @@ function FeedbackPanel() {
     <div className="rounded-[28px] border border-black/10 bg-white p-5 shadow-sm">
       <p className="text-sm font-black text-black">{t("dashboard.ratePlatforms", "Valóranos en Trustpilot")}</p>
       <div className="mt-3 grid grid-cols-1 gap-2">
-        <ReviewButton imgSrc="https://skeilapps.com/wp-content/uploads/2026/05/trsutpiklfds-Photoroom.png" label="Trustpilot" href="https://es.trustpilot.com/review/link-my.app" target="_blank" rel="noopener noreferrer" />
+        <ReviewButton imgSrc="/trustpilot-logo.svg" label="Trustpilot" href="https://es.trustpilot.com/review/link-my.app" target="_blank" rel="noopener noreferrer" />
       </div>
       <p className="mt-6 mb-3 text-sm font-black text-black">{t("dashboard.leaveSuggestion", "Déjanos cualquier sugerencia")}</p>
-      <form className="space-y-2" onSubmit={handleFeedbackSubmit}>
+      <form
+        className="space-y-2"
+        onSubmit={handleFeedbackSubmit}
+        toolname="send_feedback"
+        tooldescription="Sends product feedback or a support suggestion to the Link My App team."
+      >
         <label className="block">
+          <span className="sr-only">
+            {t("dashboard.leaveSuggestion", "Déjanos cualquier sugerencia")}
+          </span>
           <textarea
+            name="feedback_message"
             value={feedback}
             onChange={(event) => setFeedback(event.target.value)}
             rows={3}
             placeholder={t("dashboard.suggestionPlaceholder", "Algo que funcione mal o que mejorarías...")}
+            toolparamdescription="Feedback, support note, bug report, or product improvement suggestion."
             className="w-full resize-none rounded-2xl border border-black/10 bg-[#f7f7f6] px-3 py-3 text-sm font-semibold outline-none placeholder:text-black/30 focus:border-black/30"
           />
         </label>
@@ -3383,9 +5715,13 @@ function FeedbackPanel() {
         >
           {loading ? <Loader2 size={16} className="animate-spin" /> : t("dashboard.sendFeedback", "Enviar comentario")}
         </button>
-        {sent && (
-          <p className="text-center text-xs font-black text-emerald-700">
-            Gracias, comentario guardado para revisar.
+        {status && (
+          <p
+            className={`text-center text-xs font-black ${
+              status.type === "success" ? "text-emerald-700" : "text-red-700"
+            }`}
+          >
+            {status.message}
           </p>
         )}
       </form>
@@ -3407,6 +5743,7 @@ function ReviewButton({ imgSrc, label, href = "#", ...props }) {
 
 function EstimatedDownloadsInfo() {
   const [open, setOpen] = useState(false);
+  const { t } = useTranslation();
 
   return (
     <div className="mt-3 rounded-2xl bg-[#f7f7f6] px-4 py-3">
@@ -3418,15 +5755,14 @@ function EstimatedDownloadsInfo() {
         <span className="grid h-5 w-5 place-items-center rounded-full border border-black/20 text-black">
           <Info size={13} />
         </span>
-        Cómo calculamos las descargas
+        {t("dashboard.estimateDetailsTitle", "Cómo calculamos las descargas")}
       </button>
       {open && (
         <p className="mt-2 text-sm font-medium leading-6 text-black/55">
-          Son descargas estimadas, no verificadas por SDK. Calculamos un número
-          entero aplicando una conversión media: App Store 22%, Google Play 24% y
-          escritorio u otros dispositivos 1%. El análisis puede apoyarse en
-          señales como IP, país, hora, fuente del clic y repetición para hacer la
-          estimación más realista cuando esos datos estén disponibles.
+          {t(
+            "dashboard.estimateDetailsText",
+            "Son descargas estimadas, no verificadas por SDK. Calculamos un número entero aplicando una conversión media: App Store 22%, Google Play 24% y escritorio u otros dispositivos 1%. El análisis puede apoyarse en señales como IP, país, hora, fuente del clic y repetición para hacer la estimación más realista cuando esos datos estén disponibles.",
+          )}
         </p>
       )}
     </div>
@@ -3435,6 +5771,7 @@ function EstimatedDownloadsInfo() {
 
 function AnalyticsDetails({ stats }) {
   const [open, setOpen] = useState(false);
+  const { t } = useTranslation();
   const days = stats?.days?.length ? stats.days : getLastSevenDays();
   const maxValue = Math.max(
     1,
@@ -3465,7 +5802,7 @@ function AnalyticsDetails({ stats }) {
       >
         <span className="inline-flex items-center gap-2">
           <BarChart3 size={16} />
-          Ver gráfica de clics y descargas
+          {t("dashboard.chartToggle", "Ver gráfica de clics y descargas")}
         </span>
         <ChevronDown size={17} className={`transition ${open ? "rotate-180" : ""}`} />
       </button>
@@ -3475,11 +5812,11 @@ function AnalyticsDetails({ stats }) {
           <div className="flex flex-wrap gap-3 text-xs font-black text-black/55">
             <ChartLegend color="#2563eb" label="App Store" />
             <ChartLegend color="#16a34a" label="Google Play" />
-            <ChartLegend color="#71717a" label="Otros" />
-            <ChartLegend color="#000000" label="Descargas estimadas" />
+            <ChartLegend color="#71717a" label={t("dashboard.others", "Otros")} />
+            <ChartLegend color="#000000" label={t("dashboard.estimatedDownloads", "Descargas estimadas")} />
           </div>
 
-          <svg className="mt-4 h-40 w-full" viewBox="0 0 300 140" role="img" aria-label="Gráfica de estadísticas">
+          <svg className="mt-4 h-40 w-full" viewBox="0 0 300 140" role="img" aria-label={t("dashboard.chartAriaLabel", "Gráfica de estadísticas")}>
             <path d="M18 118 H286" stroke="#e5e7eb" strokeWidth="2" />
             <path d="M18 26 H286" stroke="#f1f5f9" strokeWidth="1" />
             <path d="M18 72 H286" stroke="#f1f5f9" strokeWidth="1" />
@@ -3534,7 +5871,7 @@ function ProfilePanel({ user, profile, profileUrl, onCopy }) {
       if (auth.currentUser) {
         await updateProfile(auth.currentUser, { displayName: name.trim() });
       }
-      await update(ref(db, `users/${user.uid}`), {
+      const nextProfile = {
         uid: user.uid,
         displayName: name.trim() || user.email?.split("@")[0] || "Usuario",
         email: user.email || "",
@@ -3542,6 +5879,10 @@ function ProfilePanel({ user, profile, profileUrl, onCopy }) {
         bio: bio.trim(),
         public: true,
         updatedAt: serverTimestamp(),
+      };
+      await update(ref(db), {
+        [`users/${user.uid}`]: { ...(profile || {}), ...nextProfile },
+        [`publicProfiles/${user.uid}`]: publicProfileData({ ...(profile || {}), ...nextProfile }),
       });
       setEditing(false);
     } catch (nextError) {
@@ -3607,19 +5948,29 @@ function ProfilePanel({ user, profile, profileUrl, onCopy }) {
           </div>
         </>
       ) : (
-        <form className="mt-5 space-y-4" onSubmit={saveProfile}>
+        <form
+          className="mt-5 space-y-4"
+          onSubmit={saveProfile}
+          toolname="update_public_profile"
+          tooldescription="Updates the user's public profile name and bio."
+        >
           <InputField
             label="Nombre público"
+            name="public_name"
             value={name}
             onChange={setName}
             placeholder="Tu nombre"
+            autoComplete="name"
+            toolParamDescription="Public display name for the user profile."
           />
           <label className="block">
             <span className="mb-2 block text-sm font-bold text-black/75">Bio</span>
             <textarea
+              name="profile_bio"
               value={bio}
               onChange={(event) => setBio(event.target.value)}
               rows={3}
+              toolparamdescription="Short public bio shown on the user profile."
               className="w-full resize-none rounded-2xl border border-black/12 bg-[#f8f8f6] px-4 py-3 text-sm font-semibold outline-none transition placeholder:text-black/28 focus:border-black/35 focus:bg-white"
             />
           </label>
@@ -3657,15 +6008,31 @@ function Stat({ label, value }) {
   );
 }
 
-function MiniStat({ label, value }) {
-  return (
-    <div className="rounded-2xl border border-black/10 bg-[#f7f7f6] px-3 py-2">
+function MiniStat({ label, value, onClick, ariaLabel }) {
+  const className = "rounded-2xl border border-black/10 bg-[#f7f7f6] px-3 py-2";
+  const content = (
+    <>
       <div className="text-lg font-black">{value}</div>
       <div className="text-[9px] font-black uppercase tracking-[0.13em] text-black/35">
         {label}
       </div>
-    </div>
+    </>
   );
+
+  if (onClick) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        aria-label={ariaLabel || `Ver ${label}`}
+        className={`${className} w-full text-left transition hover:-translate-y-0.5 hover:border-black/25 hover:bg-white focus:outline-none focus:ring-2 focus:ring-black/20`}
+      >
+        {content}
+      </button>
+    );
+  }
+
+  return <div className={className}>{content}</div>;
 }
 
 function Destination({ label, url }) {
@@ -3680,9 +6047,8 @@ function Destination({ label, url }) {
 }
 
 /**
- * Pro-gated UI: bar of social channels under each link. For free users every
- * click opens the upgrade modal. For Pro users a click creates a new smart
- * link suffixed with the channel id so they can track installs per source.
+ * Channel bar under each link. A click creates a new smart link suffixed with
+ * the channel id so users can track installs per source.
  */
 function ChannelStripe({ item, isPro, onLockedClick, onCreated }) {
   const { t } = useTranslation();
@@ -3691,10 +6057,6 @@ function ChannelStripe({ item, isPro, onLockedClick, onCreated }) {
   const { user } = useAuth();
 
   async function handleClick(channel) {
-    if (!isPro) {
-      onLockedClick?.(channel);
-      return;
-    }
     if (busyChannel) return;
     try {
       setBusyChannel(channel.id);
@@ -3720,22 +6082,12 @@ function ChannelStripe({ item, isPro, onLockedClick, onCreated }) {
             {t("dashboard.channelsTag", "¿De dónde vendrán las descargas?")}
           </p>
           <p className="mt-1 text-[12px] font-medium text-black/55">
-            {isPro
-              ? t(
-                  "dashboard.channelsHintPro",
-                  "Crea un enlace por canal para medir cada uno por separado.",
-                )
-              : t(
-                  "dashboard.channelsHint",
-                  "Crea un enlace por red social y mide qué canal trae más descargas (requiere Pro).",
-                )}
+            {t(
+              "dashboard.channelsHintPro",
+              "Crea un enlace por canal para medir cada uno por separado.",
+            )}
           </p>
         </div>
-        {!isPro && (
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-black px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-white">
-            <Lock size={11} /> Pro
-          </span>
-        )}
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2">
@@ -3748,9 +6100,7 @@ function ChannelStripe({ item, isPro, onLockedClick, onCreated }) {
               onClick={() => handleClick(channel)}
               disabled={busy}
               className={`group relative inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-black transition hover:-translate-y-0.5 ${
-                isPro
-                  ? "border-black/10 bg-white text-black hover:border-black/30"
-                  : "border-black/10 bg-white/70 text-black/55 hover:border-black/25 hover:text-black"
+                "border-black/10 bg-white text-black hover:border-black/30"
               } ${busy ? "opacity-60" : ""}`}
             >
               <span
@@ -3759,9 +6109,6 @@ function ChannelStripe({ item, isPro, onLockedClick, onCreated }) {
                 aria-hidden
               />
               {channel.label}
-              {!isPro && (
-                <Lock size={11} className="text-black/40 group-hover:text-black/70" />
-              )}
               {busy && <Loader2 size={11} className="animate-spin" />}
             </button>
           );
@@ -3864,28 +6211,29 @@ function ProfilePage() {
       return undefined;
     }
 
-    let unsubscribeLinks = () => {};
-
     async function loadProfile() {
-      const profileSnapshot = await get(ref(db, `users/${uid}`));
-      setProfile(profileSnapshot.exists() ? profileSnapshot.val() : null);
+      const profileSnapshot = await getWithLegacyFallback(
+        ref(db, `publicProfiles/${uid}`),
+        ref(db, `users/${uid}`)
+      );
+      setProfile(profileSnapshot?.exists() ? profileSnapshot.val() : null);
 
-      const linksQuery = query(ref(db, "links"), orderByChild("ownerId"), equalTo(uid));
+      const linksSnapshot = await getWithLegacyFallback(
+        query(ref(db, "publicLinks"), orderByChild("ownerId"), equalTo(uid)),
+        query(ref(db, "links"), orderByChild("ownerId"), equalTo(uid))
+      );
+      const data = linksSnapshot?.val() || {};
+      const nextLinks = Object.entries(data)
+        .map(([id, value]) => ({ id, ...value }))
+        .filter((item) => item.active)
+        .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
-      unsubscribeLinks = onValue(linksQuery, (snapshot) => {
-        const data = snapshot.val() || {};
-        const nextLinks = Object.entries(data)
-          .map(([id, value]) => ({ id, ...value }))
-          .filter((item) => item.active)
-          .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-
-        setLinks(nextLinks);
-        setLoading(false);
-      });
+      setLinks(nextLinks);
+      setLoading(false);
     }
 
     loadProfile().catch(() => setLoading(false));
-    return () => unsubscribeLinks();
+    return undefined;
   }, [uid]);
 
   if (loading) return <FullScreenLoader />;
@@ -3962,39 +6310,37 @@ function ProfilePage() {
 }
 
 function RedirectPage() {
+  const { t } = useTranslation();
   const { slug } = useParams();
   const didRun = useRef(false);
-  const [status, setStatus] = useState("Cargando...");
+  const [status, setStatus] = useState(() => t("messages.redirecting"));
   const [targetUrl, setTargetUrl] = useState("");
   const [showWatermark, setShowWatermark] = useState(true);
 
-
-  
 useEffect(() => {
     if (didRun.current) return;
     didRun.current = true;
 
     if (!firebaseReady || !db || !slug) {
-      setStatus("Firebase no está configurado.");
+      setStatus(t("messages.serviceUnavailableText"));
       return;
     }
 
     async function redirect() {
-      const snapshot = await get(
+      const snapshot = await getWithLegacyFallback(
+        query(ref(db, "publicLinks"), orderByChild("slug"), equalTo(slug)),
         query(ref(db, "links"), orderByChild("slug"), equalTo(slug))
       );
-      const data = snapshot.val() || {};
+      const data = snapshot?.val() || {};
       const activeEntry = Object.entries(data).find(([, item]) => item.active);
 
       if (!activeEntry) {
-        setStatus("Este enlace no existe o está pausado.");
+        setStatus(t("messages.linkUnavailable"));
         return;
       }
 
       const [linkId, link] = activeEntry;
-      const ownerSnapshot = await get(ref(db, `users/${link.ownerId}`)).catch(() => null);
-      const ownerPlan = ownerSnapshot?.exists() ? ownerSnapshot.val()?.plan : "free";
-      setShowWatermark(ownerPlan !== "pro");
+      setShowWatermark(false);
       const destination = detectDestination(navigator.userAgent);
       const source = normalizeClickSource(
         new URLSearchParams(window.location.search).get("src") ||
@@ -4002,18 +6348,24 @@ useEffect(() => {
           "",
         document.referrer
       );
-      const nextTarget =
+      const nextTarget = normalizeUrl(
         destination === "ios"
           ? link.iosUrl
           : destination === "android"
             ? link.androidUrl
-            : link.fallbackUrl;
+            : link.fallbackUrl
+      );
+
+      if (!nextTarget) {
+        setStatus(t("messages.linkUnavailable"));
+        return;
+      }
 
       setTargetUrl(nextTarget);
-      setStatus("Cargando...");
+      setStatus(t("messages.redirecting"));
 
       const eventRef = push(ref(db, "clickEvents"));
-      await set(eventRef, {
+      void set(eventRef, {
         linkId,
         ownerId: link.ownerId,
         ownerLinkKey: `${link.ownerId}_${linkId}`,
@@ -4027,15 +6379,14 @@ useEffect(() => {
       window.location.replace(nextTarget);
     }
 
-    redirect().catch((nextError) => setStatus(nextError.message));
-  }, [slug]);
+    redirect().catch(() => setStatus(t("messages.redirectError")));
+  }, [slug, t]);
 
   return (
     <main className="grid min-h-screen place-items-center bg-white px-5 text-black">
       <SEO {...{
-    title: `Redirigiendo a la tienda correcta`,
-    description:
-      "Smart link de descarga que envía al usuario a App Store, Google Play o al destino alternativo configurado.",
+    title: t("messages.redirectSeoTitle"),
+    description: t("messages.redirectSeoDescription"),
     path: slug ? `/${slug}` : "/r",
     robots: "noindex,follow",
   }} />
@@ -4050,7 +6401,7 @@ useEffect(() => {
               href={targetUrl}
               className="mt-4 inline-flex items-center gap-2 text-sm font-black text-blue-600"
             >
-              Abrir destino <ExternalLink size={15} />
+              {t("messages.openDestination")} <ExternalLink size={15} />
             </a>
           )}
         </div>
@@ -4067,7 +6418,19 @@ useEffect(() => {
   );
 }
 
-const legalUpdatedAt = "24 de marzo de 2026";
+const legalUpdatedAtByLanguage = {
+  en: "March 24, 2026",
+  es: "24 de marzo de 2026",
+  fr: "24 mars 2026",
+  ja: "2026年3月24日",
+  de: "24. März 2026",
+  pt: "24 de março de 2026",
+  it: "24 marzo 2026",
+  ko: "2026년 3월 24일",
+  nl: "24 maart 2026",
+  ar: "24 مارس 2026",
+  hi: "24 मार्च 2026",
+};
 
 export function LegalNavbar() {
   const { t, i18n } = useTranslation();
@@ -4076,7 +6439,7 @@ export function LegalNavbar() {
     <nav className="fixed left-1/2 top-4 z-[9999] w-[calc(100vw-16px)] max-w-[930px] -translate-x-1/2 rounded-[24px] border border-black/10 bg-white/55 px-3 py-2 shadow-[inset_0_0_14px_rgba(255,255,255,0.85),0_3px_22px_rgba(0,0,0,0.10)] backdrop-blur-xl md:top-6 md:rounded-[30px] md:px-5 md:py-3 lg:px-7">
       <div className="flex items-center justify-between gap-3">
         <Link to={localizePath("/", language)} className="flex shrink-0 items-center gap-2 transition hover:opacity-80">
-            <img src="/logo-link-my-app.png" alt="Link My App" className="h-8 w-8 md:h-9 md:w-9 object-contain shadow-[0_12px_26px_rgba(0,0,0,0.18)]" />
+            <img src="/logo-link-my-app.avif" alt="Link My App" className="h-8 w-8 md:h-9 md:w-9 object-contain shadow-[0_12px_26px_rgba(0,0,0,0.18)]" />
           <span className="text-[18px] font-bold tracking-tight text-black md:text-[22px]">
             Link My App
           </span>
@@ -4086,7 +6449,6 @@ export function LegalNavbar() {
           <Link to={localizePath("/", language)} className="text-[17px] font-semibold text-black transition-colors duration-300 hover:text-black/55">{t("nav.home", "Inicio")}</Link>
           <Link to={localizePath("/what-we-do", language)} className="text-[17px] font-semibold text-black transition-colors duration-300 hover:text-black/55">{t("nav.how", "Qué hacemos")}</Link>
           <Link to={localizePath("/faqs", language)} className="text-[17px] font-semibold text-black transition-colors duration-300 hover:text-black/55">{t("nav.faqs", "Faqs")}</Link>
-          <Link to={localizePath("/pricing", language)} className="text-[17px] font-semibold text-black transition-colors duration-300 hover:text-black/55">{t("nav.price", "Precio")}</Link>
         </div>
 
         <Link
@@ -4103,8 +6465,52 @@ export function LegalNavbar() {
 function LegalPage({ type }) {
   const { i18n } = useTranslation();
   const language = normalizeLanguage(i18n.language);
-  const legalPagesByLanguage = { en: legalPagesEn, es: legalPagesEs, fr: legalPagesFr };
-  const legalTabsByLanguage = { en: legalTabsEn, es: legalTabsEs, fr: legalTabsFr };
+  const [legalContent, setLegalContent] = useState(null);
+
+  useEffect(() => {
+    let active = true;
+    import("./lib/legalPages.js").then((module) => {
+      if (active) setLegalContent(module);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  if (!legalContent) {
+    return (
+      <main className="grid min-h-screen place-items-center bg-white text-black">
+        <Loader2 className="animate-spin" size={24} />
+      </main>
+    );
+  }
+
+  const {
+    legalPagesEn,
+    legalPagesEs,
+    legalPagesFr,
+    legalPagesJa,
+    legalPagesDe,
+    legalPagesPt,
+    legalPagesIt,
+    legalPagesKo,
+    legalPagesNl,
+    legalPagesAr,
+    legalPagesHi,
+    legalTabsEn,
+    legalTabsEs,
+    legalTabsFr,
+    legalTabsJa,
+    legalTabsDe,
+    legalTabsPt,
+    legalTabsIt,
+    legalTabsKo,
+    legalTabsNl,
+    legalTabsAr,
+    legalTabsHi,
+  } = legalContent;
+  const legalPagesByLanguage = { en: legalPagesEn, es: legalPagesEs, fr: legalPagesFr, ja: legalPagesJa, de: legalPagesDe, pt: legalPagesPt, it: legalPagesIt, ko: legalPagesKo, nl: legalPagesNl, ar: legalPagesAr, hi: legalPagesHi };
+  const legalTabsByLanguage = { en: legalTabsEn, es: legalTabsEs, fr: legalTabsFr, ja: legalTabsJa, de: legalTabsDe, pt: legalTabsPt, it: legalTabsIt, ko: legalTabsKo, nl: legalTabsNl, ar: legalTabsAr, hi: legalTabsHi };
   const legalUiByLanguage = {
     en: {
       pageLabel: "Legal page",
@@ -4124,31 +6530,76 @@ function LegalPage({ type }) {
       responsible: "Responsable",
       titleSuffix: "de",
     },
+    ja: {
+      pageLabel: "法的ページ",
+      updated: "最終更新:",
+      responsible: "管理者",
+      titleSuffix: "|",
+    },
+    de: {
+      pageLabel: "Rechtliche Seite",
+      updated: "Letzte Aktualisierung:",
+      responsible: "Verantwortlicher",
+      titleSuffix: "von",
+    },
+    pt: {
+      pageLabel: "Página legal",
+      updated: "Última atualização:",
+      responsible: "Responsável",
+      titleSuffix: "de",
+    },
+    it: {
+      pageLabel: "Pagina legale",
+      updated: "Ultimo aggiornamento:",
+      responsible: "Titolare",
+      titleSuffix: "di",
+    },
+    ko: {
+      pageLabel: "법적 페이지",
+      updated: "최종 업데이트:",
+      responsible: "관리자",
+      titleSuffix: "|",
+    },
+    nl: {
+      pageLabel: "Juridische pagina",
+      updated: "Laatst bijgewerkt:",
+      responsible: "Verantwoordelijke",
+      titleSuffix: "van",
+    },
+    ar: {
+      pageLabel: "صفحة قانونية",
+      updated: "آخر تحديث:",
+      responsible: "المسؤول",
+      titleSuffix: "من",
+    },
+    hi: {
+      pageLabel: "Legal page",
+      updated: "Last updated:",
+      responsible: "Controller",
+      titleSuffix: "from",
+    },
   };
   const legalPages = legalPagesByLanguage[language] || legalPagesEn;
   const legalTabs = legalTabsByLanguage[language] || legalTabsEn;
   const legalUi = legalUiByLanguage[language] || legalUiByLanguage.en;
   const page = legalPages[type] || legalPages.terms;
   const Icon = page.icon;
-  const legalSchema = useMemo(
-    () => ({
-      "@context": "https://schema.org",
-      "@type": "WebPage",
-      name: `${page.title} | ${brandName}`,
-      url: `${siteUrl}${localizePath(page.path, language)}`,
-      inLanguage: language,
-      isPartOf: {
-        "@type": "WebSite",
-        name: brandName,
-        url: siteUrl,
-      },
-      publisher: {
-        "@type": "Organization",
-        name: "David Trotonda",
-      },
-    }),
-    [page, language]
-  );
+  const legalSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: `${page.title} | ${brandName}`,
+    url: `${siteUrl}${localizePath(page.path, language)}`,
+    inLanguage: language,
+    isPartOf: {
+      "@type": "WebSite",
+      name: brandName,
+      url: siteUrl,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "David Trotonda",
+    },
+  };
 
   return (
     <main className="relative min-h-screen bg-white text-black selection:bg-black selection:text-white">
@@ -4194,7 +6645,10 @@ function LegalPage({ type }) {
               {page.title}
             </h1>
             <p className="mt-7 text-base font-medium leading-8 text-black/52 md:text-lg">
-              {legalUi.updated} <span className="font-black text-black/72">{legalUpdatedAt}</span>
+              {legalUi.updated}{" "}
+              <span className="font-black text-black/72">
+                {legalUpdatedAtByLanguage[language] || legalUpdatedAtByLanguage.en}
+              </span>
             </p>
           </div>
 
@@ -4269,7 +6723,7 @@ function NotFoundPage() {
   }} />
       <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.035)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.035)_1px,transparent_1px)] bg-[size:44px_44px]" />
       <section className="relative w-full max-w-xl rounded-[34px] border border-black/10 bg-white p-8 text-center shadow-[0_28px_90px_rgba(0,0,0,0.08)]">
-        <img src="/logo-link-my-app.png" alt="Link My App" className="mx-auto h-16 w-16 object-contain shadow-[0_12px_26px_rgba(0,0,0,0.18)]" />
+        <img src="/logo-link-my-app.avif" alt="Link My App" className="mx-auto h-16 w-16 object-contain shadow-[0_12px_26px_rgba(0,0,0,0.18)]" />
         <p className="mt-6 text-xs font-black uppercase tracking-[0.22em] text-black/35">
           Error 404
         </p>
@@ -4376,8 +6830,9 @@ function App() {
               <Route path={getLocalizedRouteSegment("/privacy", language)} element={<LegalPage type="privacy" />} />
               <Route path={getLocalizedRouteSegment("/cookies", language)} element={<LegalPage type="cookies" />} />
               <Route path={getLocalizedRouteSegment("/terms", language)} element={<LegalPage type="terms" />} />
+              <Route path={getLocalizedRouteSegment("/open-source", language)} element={<OpenSourcePage />} />
               <Route path={getLocalizedRouteSegment("/faqs", language)} element={<MarketingPage pageKey="faqs" />} />
-              <Route path={getLocalizedRouteSegment("/pricing", language)} element={<MarketingPage pageKey="precio" />} />
+              <Route path={getLocalizedRouteSegment("/pricing", language)} element={<Navigate to={localizePath("/", language)} replace />} />
               <Route path={getLocalizedRouteSegment("/what-we-do", language)} element={<MarketingPage pageKey="comoFunciona" />} />
               <Route path={getLocalizedRouteSegment("/qr-codes", language)} element={<QrLandingPage />} />
               <Route path={getLocalizedRouteSegment("/use-cases", language)} element={<UseCasesHub />} />
@@ -4400,19 +6855,26 @@ function App() {
               <Route path={getLocalizedRouteSegment("/blog", language)} element={<BlogIndex />} />
               <Route path={`${getLocalizedRouteSegment("/blog", language)}/:slug`} element={<BlogPost />} />
               <Route
+                path={getLocalizedRouteSegment("/success-story/tourixy", language)}
+                element={<TourixyCaseStudy />}
+              />
+              <Route
                 path="como-funciona"
                 element={<MarketingPage pageKey="comoFunciona" />}
               />
             </Route>
           ))}
-          <Route path="/precio" element={<MarketingPage pageKey="precio" />} />
-          <Route path="/tarifs" element={<MarketingPage pageKey="precio" />} />
+          <Route path="/precio" element={<Navigate to="/es" replace />} />
+          <Route path="/tarifs" element={<Navigate to="/fr" replace />} />
           <Route path="/que-hacemos" element={<MarketingPage pageKey="comoFunciona" />} />
           <Route path="/que-faisons-nous" element={<MarketingPage pageKey="comoFunciona" />} />
           <Route path="/privacidad" element={<LegalPage type="privacy" />} />
           <Route path="/terminos" element={<LegalPage type="terms" />} />
           <Route path="/confidentialite" element={<LegalPage type="privacy" />} />
           <Route path="/conditions" element={<LegalPage type="terms" />} />
+          <Route path="/en" element={<Navigate to="/" replace />} />
+          <Route path="/en/blog" element={<BlogIndex />} />
+          <Route path="/en/blog/:slug" element={<BlogPost />} />
           
           <Route path="/r/:slug" element={<RedirectPage />} />
           <Route path="/:slug" element={<RedirectPage />} />

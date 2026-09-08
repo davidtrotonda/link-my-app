@@ -138,29 +138,29 @@ export default function QrLandingPage() {
 
   const pageTitle = t(
     "qr.metaTitle",
-    "Crea un único código QR para App Store y Google Play",
+    "Crea un código QR para tu app gratis y sin caducidad",
   );
   const pageDescription = t(
     "qr.metaDescription",
-    "Genera un QR inteligente para tu app: un solo código que envía a iPhone a App Store, a Android a Google Play y al resto a tu web. Listo para carteles, packaging y campañas físicas.",
+    "Crea un QR gratis para tu app, sin fecha de caducidad. Funciona con iPhone y Android y envía cada escaneo a App Store, Google Play o tu enlace alternativo.",
   );
 
   const benefits = useMemo(
     () => [
       {
         icon: Smartphone,
-        title: t("qr.benefit1Title", "Un solo QR para los dos sistemas"),
+        title: t("qr.benefit1Title", "Envía cada móvil a su tienda"),
         text: t(
           "qr.benefit1Text",
-          "No imprimas dos QR ni obligues al usuario a elegir tienda. El mismo código lleva a App Store o Google Play según el móvil.",
+          "Un solo QR detecta si el móvil es iPhone o Android y lo manda directamente a App Store o Google Play.",
         ),
       },
       {
         icon: ScanLine,
-        title: t("qr.benefit2Title", "Listo para imprimir en cualquier soporte"),
+        title: t("qr.benefit2Title", "Sin fecha de caducidad"),
         text: t(
           "qr.benefit2Text",
-          "Descárgalo en alta resolución y úsalo en carteles, vinilos, packaging, flyers, mesas de eventos o pantallas.",
+          "El QR queda unido a una URL estable. Puedes usarlo en carteles, packaging, flyers, eventos o pantallas sin crear otro cada mes.",
         ),
       },
       {
@@ -303,7 +303,7 @@ export default function QrLandingPage() {
         q: t("qr.faq6Q", "¿Cuánto cuesta crear el QR de mi app?"),
         a: t(
           "qr.faq6A",
-          "Puedes generar tu primer QR gratis. Con Pro tienes QR ilimitados para distintas campañas, carteles, ubicaciones o partners.",
+          "Puedes generar QR ilimitados gratis para distintas campañas, carteles, ubicaciones o partners.",
         ),
       },
     ],
@@ -386,18 +386,18 @@ export default function QrLandingPage() {
         <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
           <div>
             <p className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/80 px-4 py-2 text-xs font-black uppercase tracking-[0.22em] text-black/45 shadow-sm">
-              <QrCode size={14} /> {t("qr.eyebrow", "Código QR para apps")}
+              <QrCode size={14} /> {t("qr.eyebrow", "QR gratis para tu app")}
             </p>
             <h1 className="mt-5 text-[clamp(38px,6vw,72px)] font-black leading-[0.95] tracking-[-0.06em]">
               {t(
                 "qr.h1",
-                "Un solo QR para App Store y Google Play",
+                "Crea un código QR para tu app, gratis y sin caducidad",
               )}
             </h1>
             <p className="mt-6 max-w-xl text-base font-medium leading-8 text-black/60 md:text-lg">
               {t(
                 "qr.subtitle",
-                "Imprime un único código QR en carteles, packaging o flyers. Detecta el móvil del usuario y lo lleva al App Store, a Google Play o a una URL alternativa.",
+                "Genera un único QR para tu aplicación. Si el usuario escanea con iPhone va a App Store, si escanea con Android va a Google Play, y el resto a tu enlace alternativo. Sin fecha de caducidad y gratis.",
               )}
             </p>
 
@@ -409,17 +409,17 @@ export default function QrLandingPage() {
                 {t("qr.ctaPrimary", "Crear mi QR gratis")} <QrCode size={16} />
               </Link>
               <Link
-                to={localizePath("/pricing", language)}
+                to={localizePath("/login", language)}
                 className="inline-flex items-center justify-center gap-2 rounded-full border border-black/12 bg-white px-6 py-3 text-sm font-black tracking-[-0.01em] text-black transition hover:-translate-y-0.5 hover:border-black/25"
               >
-                {t("qr.ctaSecondary", "Ver precio")}
+                {t("qr.ctaSecondary", "Crear cuenta gratis")}
               </Link>
             </div>
 
             <ul className="mt-7 grid gap-2.5 text-sm font-medium text-black/65">
               {[
-                t("qr.heroBullet1", "1 QR gratis para tu primera app"),
-                t("qr.heroBullet2", "Detecta iPhone, Android y ordenador"),
+                t("qr.heroBullet1", "QR gratis y sin fecha de caducidad"),
+                t("qr.heroBullet2", "Funciona para iPhone, Android y ordenador"),
                 t("qr.heroBullet3", "Estadísticas separadas para escaneos QR"),
               ].map((line) => (
                 <li key={line} className="flex items-center gap-2">
@@ -616,12 +616,12 @@ export default function QrLandingPage() {
                 {t("qr.finalCtaTag", "Empieza gratis")}
               </p>
               <h2 className="mt-3 text-[clamp(28px,4vw,48px)] font-black leading-[0.95] tracking-[-0.05em]">
-                {t("qr.finalCtaTitle", "Crea tu QR de descarga en menos de 1 minuto")}
+                {t("qr.finalCtaTitle", "Crea ahora el QR gratis de tu app")}
               </h2>
               <p className="mt-3 max-w-xl text-sm font-medium leading-7 text-white/65 md:text-base">
                 {t(
                   "qr.finalCtaSubtitle",
-                  "Pega los enlaces de App Store y Google Play, descarga tu QR y úsalo donde quieras.",
+                  "Un único QR, sin fecha de caducidad, que abre App Store en iPhone y Google Play en Android.",
                 )}
               </p>
             </div>

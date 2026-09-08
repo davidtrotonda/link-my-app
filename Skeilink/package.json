@@ -1,0 +1,37 @@
+{
+  "name": "link-my-app",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "prebuild": "node scripts/generate-blog-sitemap.mjs",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "deploy": "npm run build && FUNCTIONS_DISCOVERY_TIMEOUT=60 firebase deploy --only hosting,database,functions --project skeilink --force && npm run deploy:run-public",
+    "deploy:hosting": "npm run build && firebase deploy --only hosting,database --project skeilink",
+    "deploy:functions": "FUNCTIONS_DISCOVERY_TIMEOUT=60 firebase deploy --only functions --project skeilink --force && npm run deploy:run-public",
+    "deploy:run-public": "node scripts/disable-run-invoker-iam.mjs",
+    "deploy:all": "npm run build && firebase deploy --project skeilink --force && npm run deploy:run-public"
+  },
+  "dependencies": {
+    "firebase": "^12.6.0",
+    "i18next": "^26.2.0",
+    "i18next-browser-languagedetector": "^8.2.1",
+    "i18next-http-backend": "^4.0.0",
+    "lucide-react": "^0.556.0",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "react-helmet-async": "^3.0.0",
+    "react-i18next": "^17.0.8",
+    "react-router-dom": "^7.10.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^5.1.1",
+    "autoprefixer": "^10.4.22",
+    "firebase-tools": "^15.18.0",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.19",
+    "vite": "^7.2.7"
+  }
+}

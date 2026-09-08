@@ -30,7 +30,7 @@ import {
 } from "./lib/i18nRoutes.js";
 
 const brandLogoUrl =
-  "/logo-link-my-app.png";
+  "/logo-link-my-app.avif";
 
 export function PremiumNavbar() {
   const { t, i18n } = useTranslation();
@@ -41,7 +41,6 @@ export function PremiumNavbar() {
     { label: t("nav.home"), href: localizePath("/", language) },
     { label: t("nav.how"), href: localizePath("/what-we-do", language) },
     { label: t("nav.faqs"), href: localizePath("/faqs", language) },
-    { label: t("nav.price"), href: localizePath("/pricing", language) },
   ];
   const loginHref = localizePath("/login", language);
 
@@ -49,7 +48,7 @@ export function PremiumNavbar() {
     <nav className="fixed left-1/2 top-4 z-[9999] w-[calc(100vw-16px)] max-w-[930px] -translate-x-1/2 rounded-[24px] border border-black/10 bg-white/45 px-3 py-2 shadow-[inset_0_0_14px_rgba(255,255,255,0.85),0_3px_22px_rgba(0,0,0,0.10)] backdrop-blur-xl md:top-6 md:rounded-[30px] md:px-5 md:py-3 lg:px-7">
       <div className="flex items-center justify-between gap-3">
         <a href={localizePath("/", language)} className="flex shrink-0 items-center gap-2 transition hover:opacity-80">
-          <img src="/logo-link-my-app.png" alt="Link My App" className="h-8 w-8 md:h-9 md:w-9 object-contain shadow-[0_12px_26px_rgba(0,0,0,0.18)]" />
+          <img src="/logo-link-my-app.avif" alt="Link My App" className="h-8 w-8 md:h-9 md:w-9 object-contain shadow-[0_12px_26px_rgba(0,0,0,0.18)]" />
           <span className="text-[18px] font-bold tracking-tight text-black md:text-[22px]">
             Link My App
           </span>
@@ -79,7 +78,7 @@ export function PremiumNavbar() {
             type="button"
             onClick={() => setOpen(!open)}
             className="grid h-10 w-10 place-items-center rounded-2xl bg-transparent text-black lg:hidden"
-            aria-label="Abrir menú"
+            aria-label={t("messages.openMenu")}
           >
             {open ? <X size={25} strokeWidth={2.4} /> : <Menu size={27} strokeWidth={2.4} />}
           </button>
@@ -108,12 +107,6 @@ export function PremiumNavbar() {
 
 export function SmartLinkFlow() {
   const { t } = useTranslation();
-  const appStoreLogo =
-    "https://skeilapps.com/wp-content/uploads/2026/05/apple-Photoroom.png";
-  const playStoreLogo =
-    "https://skeilapps.com/wp-content/uploads/2026/05/android-Photoroom.png";
-  const appIconUrl =
-    "https://skeilapps.com/wp-content/uploads/2025/12/icono-SkeilEcom.png";
 
   const topLeftPath = "M450 95 C450 150 250 140 250 192";
   const topCenterPath = "M450 95 L450 192";
@@ -130,7 +123,7 @@ export function SmartLinkFlow() {
   return (
     <section
       className="slf-section"
-      aria-label="Smart link hacia App Store, web y Google Play"
+      aria-label={t("messages.smartLinkVisualLabel")}
     >
       <style>{`
         .slf-section {
@@ -325,8 +318,8 @@ export function SmartLinkFlow() {
         }
 
         .slf-store-image.play {
-          width: clamp(30px, 7.3cqw, 66px);
-          height: clamp(30px, 7.3cqw, 66px);
+          width: clamp(18px, 4.4cqw, 40px);
+          height: clamp(18px, 4.4cqw, 40px);
         }
 
         .slf-windows-icon {
@@ -765,16 +758,21 @@ export function SmartLinkFlow() {
 
         <div className="slf-link-pill">
           <div className="slf-mini-logo">
-            <img src={appIconUrl} alt="Icono de la app" />
+            <img src="/logo-link-my-app.avif" alt="Link My App" />
           </div>
           <div className="slf-link-text">{t("landing.previewUrl", "link-my.app/descargar-app")}</div>
         </div>
 
-        <div className="slf-store-card left" aria-label="App Store">
-          <img className="slf-store-image app" src={appStoreLogo} alt="App Store" />
+        <div className="slf-store-card left" aria-hidden="true">
+          <svg className="slf-store-image" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              fill="currentColor"
+              d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.78.78-.04 1.94-.8 3.32-.66 1.48.06 2.68.73 3.36 1.83-2.92 1.62-2.4 5.37.5 6.48-.68 1.9-1.53 3.6-2.26 4.54zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.02 4.46-3.74 4.25z"
+            />
+          </svg>
         </div>
 
-        <div className="slf-windows-card" aria-label="Otros dispositivos">
+        <div className="slf-windows-card" aria-hidden="true">
           <svg className="slf-windows-icon" viewBox="0 0 24 24" aria-hidden="true">
             <path fill="#00A4EF" d="M3 5.2 10.8 4v7.4H3V5.2Z" />
             <path fill="#7FBA00" d="M12 3.8 21 2.5v8.9h-9V3.8Z" />
@@ -783,11 +781,11 @@ export function SmartLinkFlow() {
           </svg>
         </div>
 
-        <div className="slf-store-card right" aria-label="Google Play">
-          <img className="slf-store-image play" src={playStoreLogo} alt="Google Play" />
+        <div className="slf-store-card right" aria-hidden="true">
+          <img className="slf-store-image play" src="/google-play-prism.svg" alt="Google Play" />
         </div>
 
-        <div className="slf-globe-pill" aria-label="Internet">
+        <div className="slf-globe-pill" aria-hidden="true">
           <svg className="slf-internet-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="12" r="10" />
             <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
@@ -805,7 +803,7 @@ export function SmartLinkFlow() {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
               <path d="m15 18-6-6 6-6" />
             </svg>
-            Buscar
+            {t("messages.mockupIosBack")}
           </div>
 
           <div className="slf-app-store-content">
@@ -996,7 +994,10 @@ export const animationStyles = `
   }
 `;
 
-export const SimulationStep1 = () => (
+export const SimulationStep1 = () => {
+  const { t } = useTranslation();
+
+  return (
   <div className="relative h-64 w-full overflow-hidden rounded-2xl bg-[#f8f9fa] flex items-center justify-center p-4 border border-black/5">
     <div className="relative w-full max-w-[210px] h-full rounded-[20px] bg-white shadow-[0_10px_30px_rgba(0,0,0,0.06)] border border-slate-100 overflow-hidden flex flex-col">
       <div className="flex justify-between items-center px-4 py-2.5 border-b border-slate-50">
@@ -1012,20 +1013,20 @@ export const SimulationStep1 = () => (
       
       <div className="px-4 pt-3 flex items-center justify-between">
         <div className="w-12 h-12 shrink-0 rounded-full bg-black p-[2px] border-2 border-red-500">
-          <img src="https://skeilapps.com/wp-content/uploads/2025/12/icono-SkeilEcom.png" alt="Profile" className="w-full h-full object-cover rounded-full" />
+          <img src="/partner-logos/skeilapps-logo.png" alt="SkeilApps" className="w-full h-full object-cover rounded-full" />
         </div>
         <div className="flex gap-3 text-center">
-          <div className="flex flex-col items-center"><span className="text-[11px] font-black leading-none text-slate-800">142</span><span className="text-[6px] font-semibold text-slate-500 mt-0.5">Posts</span></div>
-          <div className="flex flex-col items-center"><span className="text-[11px] font-black leading-none text-slate-800">12K</span><span className="text-[6px] font-semibold text-slate-500 mt-0.5">Followers</span></div>
-          <div className="flex flex-col items-center"><span className="text-[11px] font-black leading-none text-slate-800">240</span><span className="text-[6px] font-semibold text-slate-500 mt-0.5">Following</span></div>
+          <div className="flex flex-col items-center"><span className="text-[11px] font-black leading-none text-slate-800">142</span><span className="text-[6px] font-semibold text-slate-500 mt-0.5">{t("blogCovers.posts", "Posts")}</span></div>
+          <div className="flex flex-col items-center"><span className="text-[11px] font-black leading-none text-slate-800">12K</span><span className="text-[6px] font-semibold text-slate-500 mt-0.5">{t("blogCovers.followers", "Followers")}</span></div>
+          <div className="flex flex-col items-center"><span className="text-[11px] font-black leading-none text-slate-800">240</span><span className="text-[6px] font-semibold text-slate-500 mt-0.5">{t("blogCovers.following", "Following")}</span></div>
         </div>
       </div>
 
       <div className="px-4 pt-2 pb-2 relative z-10 text-[8px] leading-[1.3] text-slate-700">
         <div className="font-black text-slate-900 text-[9px] mb-0.5">SkeilApps Agency</div>
-        <div className="text-slate-400 mb-0.5">Software Company</div>
-        <div>Creando links de descarga para apps 🚀</div>
-        <div>Descarga nuestra app abajo 👇</div>
+        <div className="text-slate-400 mb-0.5">{t("blogCovers.softwareCompany", "Software Company")}</div>
+        <div>{t("blogCovers.creatingDownloadLinks", "Creando links de descarga para apps 🚀")}</div>
+        <div>{t("blogCovers.downloadBelow", "Descarga nuestra app abajo 👇")}</div>
 
         <div className="relative inline-block mt-1">
           <div 
@@ -1068,7 +1069,8 @@ export const SimulationStep1 = () => (
       </div>
     </div>
   </div>
-);
+  );
+};
 
 export const SimulationStep2 = () => (
   <div className="relative h-64 w-full overflow-hidden rounded-2xl bg-[#090b10] flex items-center justify-center p-4 border border-black/5">
@@ -1181,7 +1183,7 @@ export const SimulationStep3 = () => (
       className="absolute bottom-5 left-[22%] -translate-x-1/2 grid h-16 w-16 place-items-center rounded-[18px] border border-slate-100 bg-white shadow-[0_10px_25px_rgba(0,0,0,0.06)] z-10 transition-all"
       style={{ animation: "pop-store-ios 4s infinite" }}
     >
-      <img src="https://skeilapps.com/wp-content/uploads/2026/05/ChatGPT-Image-19-may-2026-18_09_01-Photoroom.png" alt="App Store" className="block h-10 w-10 object-contain drop-shadow-sm" />
+      <img src="/apple-logo.svg" alt="App Store" className="block h-10 w-10 object-contain drop-shadow-sm" />
       <div className="absolute inset-0 rounded-[18px] border-2 border-blue-400 opacity-0" style={{ animation: "flash-border-ios 4s infinite" }}></div>
     </div>
 
@@ -1189,7 +1191,7 @@ export const SimulationStep3 = () => (
       className="absolute bottom-5 left-[63%] -translate-x-1/2 grid h-16 w-16 place-items-center rounded-[18px] border border-slate-100 bg-white shadow-[0_10px_25px_rgba(0,0,0,0.06)] z-10 transition-all"
       style={{ animation: "pop-store-and 4s infinite 2s" }}
     >
-      <img src="https://skeilapps.com/wp-content/uploads/2025/12/play-store.webp" alt="Google Play" className="block h-10 w-10 object-contain drop-shadow-sm" />
+      <img src="/google-play-prism.svg" alt="Google Play" className="block h-10 w-10 object-contain drop-shadow-sm" />
       <div className="absolute inset-0 rounded-[18px] border-2 border-green-400 opacity-0" style={{ animation: "flash-border-and 4s infinite 2s" }}></div>
     </div>
   </div>
@@ -1263,20 +1265,17 @@ export function ModernSimulationsSection() {
   );
 }
 
-const freeFeatures = [
-  "1 smart link activo",
-  "1 código QR automático",
-];
-
-const proFeatures = [
+const includedFeatures = [
   "Smart links ilimitados",
-  "QR ilimitados para carteles y campañas",
+  "Códigos QR ilimitados",
   "Estadísticas completas de clics",
   "Clics separados por iPhone, Android y ordenador",
-  "Campañas por ubicación: Instagram, web, QR, email o tienda física",
+  "Campañas por Instagram, TikTok, web, QR, email o tienda física",
   "Historial completo de clics",
   "Panel para gestionar todas tus apps",
-  "Enlaces personalizados y editables",
+  "Editar destinos sin reimprimir QR",
+  "Slugs personalizados y editables",
+  "Soporte por email",
 ];
 
 function FeatureList({ items, dark = false }) {
@@ -1299,82 +1298,44 @@ function FeatureList({ items, dark = false }) {
 }
 
 export function PricingComparisonSection() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const freeItems = t("pricingComparison.freeFeatures", { returnObjects: true });
   const proItems = t("pricingComparison.proFeatures", { returnObjects: true });
-  const paymentLabel = t("pricingComparison.paymentLabel").split("\n");
+  const allItems = [
+    ...(Array.isArray(freeItems) ? freeItems : []),
+    ...(Array.isArray(proItems) ? proItems : []),
+  ];
+  const featureItems = allItems.length > 0 ? allItems : includedFeatures;
 
   return (
     <section id="pricing" className="relative w-full bg-white px-5 py-20 text-black md:px-8 md:py-24">
       <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.03)_1px,transparent_1px)] bg-[size:44px_44px] opacity-70" />
 
-      <div className="relative mx-auto max-w-[1120px]">
+      <div className="relative mx-auto max-w-[940px]">
         <div className="mx-auto w-full max-w-[1120px] text-center">
-          <h2 className="mx-auto mt-3 w-full max-w-[920px] text-center text-[clamp(34px,9vw,62px)] font-black leading-[0.95] tracking-[-0.055em] md:whitespace-nowrap">
+          <h2 className="mx-auto mt-3 w-full max-w-[920px] text-center text-[clamp(34px,9vw,62px)] font-black leading-[0.95] tracking-[-0.055em]">
             {t("pricingComparison.title")}
           </h2>
         </div>
 
-        <div className="mt-12 grid gap-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-stretch">
-          <article className="rounded-[34px] border border-black/10 bg-[#f1f1ef] p-6 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.65),0_22px_80px_rgba(0,0,0,0.08)] backdrop-blur-xl md:p-8">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h3 className="text-3xl font-black tracking-[-0.04em]">{t("pricingComparison.freeTitle")}</h3>
-                <p className="mt-3 max-w-sm text-sm font-medium leading-6 text-black/55">
-                  {t("pricingComparison.freeText")}
-                </p>
-              </div>
-              <span className="rounded-full border border-black/10 px-4 py-2 text-xs font-black text-black/45">
-                {t("pricingComparison.freeBadge")}
-              </span>
-            </div>
-
-            <div className="mt-7 rounded-[26px] border border-black/10 bg-[linear-gradient(180deg,#ffffff,#f7f7f5)] p-5 shadow-[inset_0_1px_4px_rgba(0,0,0,0.07),0_12px_36px_rgba(0,0,0,0.05)]">
-              <div className="flex items-end gap-2">
-                <span className="pb-2 text-lg font-black text-black/35">€</span>
-                <span className="text-6xl font-black tracking-[-0.08em]">0</span>
-                <span className="pb-3 text-xs font-black uppercase text-black/42">{t("pricingComparison.freeTitle")}</span>
-              </div>
-              <div className="mt-5 grid h-11 place-items-center rounded-2xl bg-[#e4e4e2] text-sm font-black text-black/55">
-                {t("pricingComparison.firstLink")}
-              </div>
-            </div>
-            <FeatureList items={Array.isArray(freeItems) ? freeItems : freeFeatures} />
-          </article>
-
-          <article className="relative overflow-hidden rounded-[34px] border border-black bg-[#10100f] p-6 text-white shadow-[0_28px_90px_rgba(0,0,0,0.18)] md:p-8">
+        <div className="mt-12">
+          <article className="relative overflow-hidden rounded-[34px] border border-black bg-[#10100f] p-6 text-white shadow-[0_28px_90px_rgba(0,0,0,0.18)] md:p-9">
             <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.06)_1px,transparent_1px)] bg-[size:44px_44px]" />
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_10%,rgba(255,255,255,0.12),transparent_34%),linear-gradient(135deg,rgba(255,255,255,0.08),transparent_45%)]" />
             <div className="relative">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h3 className="text-3xl font-black tracking-[-0.04em]">{t("pricingComparison.proTitle")}</h3>
-                  <p className="mt-3 max-w-sm text-sm font-medium leading-6 text-white/58">
-                    {t("pricingComparison.proText")}
+                  <h3 className="text-3xl font-black tracking-[-0.04em] md:text-4xl">{t("pricingComparison.proTitle")}</h3>
+                  <p className="mt-3 max-w-2xl text-sm font-medium leading-6 text-white/58 md:text-base md:leading-7">
+                    {t("pricingComparison.freeText")}
                   </p>
                 </div>
                 <span className="rounded-full bg-white px-4 py-2 text-xs font-black text-black">
-                  {t("pricingComparison.best")}
+                  {t("pricingComparison.freeBadge")}
                 </span>
               </div>
 
-              <div className="mt-7 rounded-[26px] bg-white p-5 text-black shadow-[0_22px_50px_rgba(0,0,0,0.28)]">
-                <div className="flex flex-wrap items-end gap-2">
-                  <span className="pb-2 text-lg font-black text-black/35">{t("dashboard.priceCurrency", "€")}</span>
-                  <span className="text-6xl font-black tracking-[-0.08em]">{t("dashboard.priceValue", "9,99")}</span>
-                  <span className="pb-3 text-xs font-black uppercase leading-tight text-black/42">
-                    {paymentLabel[0]}<br />{paymentLabel[1] || ""}
-                  </span>
-                </div>
-                <a
-                  href={localizePath("/login?upgrade=pro", i18n.language)}
-                  className="mt-5 flex h-11 items-center justify-center gap-2 rounded-2xl bg-black text-sm font-black text-white transition hover:-translate-y-0.5"
-                >
-                  {t("pricingComparison.unlock")}
-                  <ArrowRight size={15} />
-                </a>
-              </div>
-              <FeatureList items={Array.isArray(proItems) ? proItems : proFeatures} dark />
+              <FeatureList items={featureItems} dark />
             </div>
           </article>
         </div>
@@ -1385,8 +1346,8 @@ export function PricingComparisonSection() {
 
 /**
  * Extra content rendered only on the dedicated pricing page (/pricing,
- * /es/precio, /fr/tarifs) — NOT on the home. Adds a detailed comparison
- * table, "why one-time" reasoning, pricing FAQ and a final CTA.
+ * /es/precio, /fr/tarifs) — NOT on the home. Adds a detailed feature
+ * table, free-plan reasoning, FAQ and a final CTA.
  */
 export function PricingPageExtras() {
   const { t, i18n } = useTranslation();
@@ -1409,16 +1370,16 @@ export function PricingPageExtras() {
   const reasons = t("pricingExtras.reasons", { returnObjects: true });
   const reasonsFallback = [
     {
-      title: "Sin suscripción mensual",
-      text: "Pagas una vez 9,99 € y la cuenta Pro queda activa sin renovaciones ni cargos sorpresa.",
+      title: "Gratis desde el primer día",
+      text: "Puedes crear todos tus smart links y QR sin introducir tarjeta ni pasar por checkout.",
     },
     {
-      title: "Precio congelado de por vida",
-      text: "Si subimos los precios para nuevos usuarios, tu pago original no se ve afectado.",
+      title: "Funciones desbloqueadas",
+      text: "Las estadísticas, campañas por canal, slugs personalizados e historial están incluidos en la cuenta gratis.",
     },
     {
       title: "Sin compromisos ni contratos",
-      text: "No hay permanencia ni periodo mínimo. Es una compra, no una membresía.",
+      text: "No hay pago único, renovación mensual ni permanencia. El producto queda abierto para todos los usuarios.",
     },
   ];
   const reasonItems = Array.isArray(reasons) && reasons.length > 0 ? reasons : reasonsFallback;
@@ -1426,28 +1387,24 @@ export function PricingPageExtras() {
   const pricingFaqs = t("pricingExtras.faqs", { returnObjects: true });
   const pricingFaqsFallback = [
     {
-      q: "¿Es realmente un único pago?",
-      a: "Sí. Pagas 9,99 € una sola vez y tu cuenta queda como Pro de por vida. Sin renovaciones automáticas, sin facturación mensual o anual.",
+      q: "¿Link My App tiene precio?",
+      a: "No. Link My App es gratis y las funciones principales están desbloqueadas para todas las cuentas.",
     },
     {
-      q: "¿Hay límite de smart links o QR en Pro?",
-      a: "No. Con Pro creas todos los smart links y QR que quieras para distintas apps, campañas, canales o ubicaciones físicas.",
+      q: "¿Hay límite de smart links o QR?",
+      a: "No. Puedes crear smart links y QR ilimitados para distintas apps, campañas, canales o ubicaciones físicas.",
     },
     {
       q: "¿Qué pasa con los enlaces que ya tenía en Gratis?",
-      a: "Se mantienen y siguen funcionando. Al actualizar a Pro se desbloquean estadísticas avanzadas, slugs personalizados y enlaces ilimitados.",
+      a: "Se mantienen y siguen funcionando. Las estadísticas avanzadas, slugs personalizados y enlaces ilimitados están incluidos gratis.",
     },
     {
       q: "¿Puedo cambiar el destino de un enlace sin reimprimir el QR?",
       a: "Sí. Tus smart links son estables: puedes cambiar la URL de App Store, Google Play o la alternativa cuando quieras y el QR ya impreso sigue funcionando.",
     },
     {
-      q: "¿Aceptáis tarjetas y otros métodos de pago?",
-      a: "El pago se realiza con tarjeta, Apple Pay o Google Pay según tu dispositivo. La transacción se procesa de forma segura por nuestro proveedor de pagos.",
-    },
-    {
-      q: "¿Puedo facturar el pago a mi empresa?",
-      a: "Sí. Tras el pago recibes un recibo y, si lo necesitas, podemos emitir una factura con los datos fiscales de tu empresa escribiéndonos por email.",
+      q: "¿Necesito tarjeta para empezar?",
+      a: "No. Puedes crear tu cuenta y usar el panel sin introducir tarjeta ni pasar por checkout.",
     },
   ];
   const faqItems = Array.isArray(pricingFaqs) && pricingFaqs.length > 0 ? pricingFaqs : pricingFaqsFallback;
@@ -1481,39 +1438,32 @@ export function PricingPageExtras() {
           </div>
 
           <div className="mt-12 overflow-hidden rounded-[28px] border border-black/10 bg-white shadow-[0_18px_55px_rgba(0,0,0,0.04)]">
-            <div className="grid grid-cols-[1.4fr_1fr_1fr] bg-black/[0.04] text-[12px] font-black uppercase tracking-[0.16em] text-black/60">
+            <div className="grid grid-cols-[1.5fr_1fr] bg-black/[0.04] text-[12px] font-black uppercase tracking-[0.16em] text-black/60">
               <div className="px-5 py-4 md:px-6">{t("pricingExtras.colFeature", "Función")}</div>
               <div className="px-5 py-4 text-center md:px-6">{t("pricingComparison.freeTitle", "Gratis")}</div>
-              <div className="px-5 py-4 text-center md:px-6">
-                <span className="inline-flex items-center gap-1.5">
-                  {t("pricingComparison.proTitle", "Pro")}
-                  <Star size={11} fill="currentColor" />
-                </span>
-              </div>
             </div>
             {rows.map((row, i) => (
               <div
                 key={i}
-                className={`grid grid-cols-[1.4fr_1fr_1fr] items-center border-t border-black/8 ${i % 2 === 1 ? "bg-black/[0.015]" : ""}`}
+                className={`grid grid-cols-[1.5fr_1fr] items-center border-t border-black/8 ${i % 2 === 1 ? "bg-black/[0.015]" : ""}`}
               >
                 <div className="px-5 py-4 text-sm font-bold text-black/75 md:px-6">{row.feature}</div>
                 <div className="px-5 py-4 text-center md:px-6">{renderCell(row.free)}</div>
-                <div className="px-5 py-4 text-center md:px-6">{renderCell(row.pro)}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ─── Why one-time payment ─── */}
+      {/* Free-plan reasoning */}
       <section className="relative w-full bg-white px-5 py-20 text-black md:px-8 md:py-24">
         <div className="mx-auto max-w-[1120px]">
           <div className="mx-auto max-w-2xl text-center">
             <p className="text-xs font-black uppercase tracking-[0.24em] text-black/45">
-              {t("pricingExtras.whyTag", "Por qué un único pago")}
+              {t("pricingExtras.whyTag", "Sin pagos")}
             </p>
             <h2 className="mt-3 text-[clamp(28px,4.4vw,48px)] font-black leading-[0.95] tracking-[-0.05em]">
-              {t("pricingExtras.whyTitle", "Sin suscripciones ni sorpresas mensuales")}
+              {t("pricingExtras.whyTitle", "Sin suscripciones ni barreras de pago")}
             </h2>
           </div>
 
@@ -1540,7 +1490,7 @@ export function PricingPageExtras() {
           <div className="mx-auto max-w-2xl text-center">
             <p className="text-xs font-black uppercase tracking-[0.24em] text-black/45">FAQ</p>
             <h2 className="mt-3 text-[clamp(28px,4.4vw,48px)] font-black leading-[0.95] tracking-[-0.05em]">
-              {t("pricingExtras.faqTitle", "Preguntas frecuentes sobre el precio")}
+              {t("pricingExtras.faqTitle", "Preguntas frecuentes sobre el plan gratis")}
             </h2>
           </div>
 
@@ -1593,7 +1543,7 @@ export function PricingPageExtras() {
               <p className="mt-3 max-w-xl text-sm font-medium leading-7 text-white/65 md:text-base">
                 {t(
                   "pricingExtras.ctaSubtitle",
-                  "Sin tarjeta. Sin compromisos. Cuando lo necesites, desbloquea Pro con un único pago.",
+                  "Sin tarjeta. Sin checkout. Todas las funciones están disponibles desde tu panel.",
                 )}
               </p>
             </div>
@@ -1734,7 +1684,7 @@ export function FinalFooter({ theme = "light" }) {
   }
   
   return (
-    <section className={`relative left-1/2 right-1/2 w-screen -translate-x-1/2 overflow-hidden ${isDark ? 'bg-[#000000]' : 'bg-white'}`}>
+    <section className={`relative left-1/2 w-screen -translate-x-1/2 overflow-hidden ${isDark ? 'bg-[#000000]' : 'bg-white'}`}>
       <style>{`
         .footer-curve-notch {
           position: absolute;
@@ -1795,15 +1745,22 @@ export function FinalFooter({ theme = "light" }) {
           </div>
         </div>
 
-        <footer className="relative mx-auto mt-20 flex w-full max-w-[1320px] flex-col gap-8 border-t border-white/10 pt-8 md:flex-row md:items-center md:justify-between">
+        <footer className="relative mx-auto mt-20 flex w-full max-w-[1320px] flex-col gap-8 border-t border-white/10 pt-8 md:flex-row md:items-end md:justify-between">
           <div>
             <div className="flex items-center justify-center gap-3 md:justify-start">
-              <img src="/logo-link-my-app.png" alt="Link My App" className="h-9 w-9 object-contain" />
+              <img src="/logo-link-my-app.avif" alt="Link My App" className="h-9 w-9 object-contain" />
               <span className="text-lg font-black tracking-tight">LINK MY APP</span>
             </div>
-            <p className="mt-3 max-w-md text-center text-sm font-medium leading-6 text-white/45 md:text-left">
-              {t("footer.brandSubtitle")}
-            </p>
+            <div className="mt-3 text-center md:text-left">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-white/35">
+                {t("messages.ourWebsites")}
+              </p>
+              <div className="mt-3 flex flex-wrap items-center justify-center gap-2 md:justify-start">
+                <a href="https://skeilapps.com/" target="_blank" rel="noopener" className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-sm font-bold text-white/62 transition hover:border-white/20 hover:bg-white/[0.07] hover:text-white">SkeilApps</a>
+                <a href="https://tienrank.com/" target="_blank" rel="noopener" className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-sm font-bold text-white/62 transition hover:border-white/20 hover:bg-white/[0.07] hover:text-white">TienRank</a>
+                <a href="https://tuback.link/" target="_blank" rel="noopener" className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-sm font-bold text-white/62 transition hover:border-white/20 hover:bg-white/[0.07] hover:text-white">TuBack.link</a>
+              </div>
+            </div>
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-3 md:justify-end">

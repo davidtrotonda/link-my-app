@@ -1,0 +1,11 @@
+# Link My App
+
+Link My App creates one smart URL and one QR code for App Store, Google Play, and fallback web traffic.
+
+Primary agent resources:
+
+- https://link-my.app/llms.txt
+- https://link-my.app/llms-full.txt
+- https://link-my.app/agent-guide.md
+- https://link-my.app/ai-index.json
+- https://link-my.app/openapi.json

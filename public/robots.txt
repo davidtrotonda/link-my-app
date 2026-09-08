@@ -5,5 +5,13 @@ Disallow: /login
 Disallow: /admin
 Disallow: /perfil
 
+# Agent and LLM guidance
+# https://link-my.app/llms.txt
+# https://link-my.app/llms-full.txt
+# https://link-my.app/agent-guide.md
+# https://link-my.app/ai-index.json
+# https://link-my.app/openapi.json
+# https://link-my.app/agents.md
+
 Sitemap: https://link-my.app/sitemap_index.xml
 Sitemap: https://link-my.app/sitemap.xml

@@ -8,6 +8,7 @@ import {
   Dumbbell,
   Sparkles,
   Building2,
+  Megaphone,
   ArrowRight,
   QrCode,
   Layers3,
@@ -15,7 +16,7 @@ import {
 import { SEO, LegalNavbar } from "./App.jsx";
 import { FinalFooter as LandingFinalFooter, animationStyles } from "./LandingVisuals.jsx";
 import { localizePath, normalizeLanguage } from "./lib/i18nRoutes.js";
-import { niches, useCaseHubRoutes, nichePath } from "./lib/useCases.js";
+import { visibleNiches, useCaseHubRoutes, nichePath } from "./lib/useCases.js";
 
 const brandName = "Link My App";
 const siteUrl = "https://link-my.app";
@@ -27,13 +28,14 @@ const iconByName = {
   Dumbbell,
   Sparkles,
   Building2,
+  Megaphone,
 };
 
 const hubMeta = {
   en: {
     title: "Use cases – app download links for every sector",
     description:
-      "See how every app sector uses a single smart link for App Store, Google Play and QR codes: ecommerce, SaaS, restaurants, fitness, creators and agencies.",
+      "See how app marketers use a single smart link for App Store, Google Play and QR codes: ads, ecommerce, SaaS, restaurants, fitness and agencies.",
     h1: "Smart links for every app sector",
     eyebrow: "Use cases",
     intro:
@@ -42,7 +44,7 @@ const hubMeta = {
   es: {
     title: "Casos de uso – enlaces de descarga para cada sector",
     description:
-      "Mira cómo cada sector usa un smart link único para App Store, Google Play y QR: ecommerce, SaaS, restaurantes, fitness, creadores y agencias.",
+      "Mira cómo se usa un smart link único para App Store, Google Play y QR: anuncios, ecommerce, SaaS, restaurantes, fitness y agencias.",
     h1: "Smart links para cualquier tipo de app",
     eyebrow: "Casos de uso",
     intro:
@@ -51,11 +53,83 @@ const hubMeta = {
   fr: {
     title: "Cas d'usage – liens de téléchargement par secteur",
     description:
-      "Découvre comment chaque secteur utilise un smart link unique pour App Store, Google Play et QR : ecommerce, SaaS, restauration, fitness, créateurs et agences.",
+      "Découvre comment utiliser un smart link unique pour App Store, Google Play et QR : publicités, ecommerce, SaaS, restauration, fitness et agences.",
     h1: "Smart links pour tout type d'app",
     eyebrow: "Cas d'usage",
     intro:
       "Choisis ton secteur et découvre comment utiliser un seul smart link et QR pour ton app : où le partager, où l'imprimer, comment mesurer les clics et quels canaux marchent le mieux.",
+  },
+  ja: {
+    title: "活用シーン - 業種別アプリダウンロードリンク",
+    description:
+      "広告、EC、SaaS、飲食店、フィットネス、代理店が、App Store、Google Play、QRコード向けに1つのスマートリンクを使う方法を紹介します。",
+    h1: "あらゆるアプリ業種に使えるスマートリンク",
+    eyebrow: "活用シーン",
+    intro:
+      "あなたの業種を選び、アプリ用スマートリンクとQRの使い方を確認しましょう。どこで共有し、どこに印刷し、クリックをどう測り、どのチャネルが効くかを整理できます。",
+  },
+  de: {
+    title: "Anwendungsfälle - App-Download-Links für jede Branche",
+    description:
+      "Sieh, wie Anzeigen, Ecommerce, SaaS, Restaurants, Fitness und Agenturen einen Smartlink für App Store, Google Play und QR-Codes nutzen.",
+    h1: "Smartlinks für jede Art von App",
+    eyebrow: "Anwendungsfälle",
+    intro:
+      "Wähle deine Branche und sieh, wie du einen einzigen App-Download-Link und QR-Code nutzt: wo du ihn teilst, wo du ihn druckst, wie du Klicks misst und welche Kanäle funktionieren.",
+  },
+  pt: {
+    title: "Casos de uso - links de download de apps por setor",
+    description:
+      "Vê como anúncios, ecommerce, SaaS, restaurantes, fitness e agências usam um smart link para App Store, Google Play e QR codes.",
+    h1: "Smart links para qualquer tipo de app",
+    eyebrow: "Casos de uso",
+    intro:
+      "Escolhe o teu setor e vê como usar um único link de download e QR code: onde partilhar, onde imprimir, como medir cliques e que canais funcionam melhor.",
+  },
+  it: {
+    title: "Casi d'uso - link di download app per settore",
+    description:
+      "Scopri come annunci, ecommerce, SaaS, ristoranti, fitness e agenzie usano uno smart link per App Store, Google Play e QR code.",
+    h1: "Smart link per ogni tipo di app",
+    eyebrow: "Casi d'uso",
+    intro:
+      "Scegli il tuo settore e scopri come usare un unico link di download e QR code: dove condividerlo, dove stamparlo, come misurare i clic e quali canali funzionano meglio.",
+  },
+  ko: {
+    title: "활용 사례 - 업종별 앱 다운로드 링크",
+    description:
+      "광고, 이커머스, SaaS, 레스토랑, 피트니스, 에이전시가 App Store, Google Play, QR 코드에 하나의 스마트 링크를 사용하는 방법을 소개합니다.",
+    h1: "모든 앱 업종을 위한 스마트 링크",
+    eyebrow: "활용 사례",
+    intro:
+      "업종을 선택하고 하나의 앱 다운로드 링크와 QR 코드를 어디에 공유하고, 어디에 인쇄하고, 클릭을 어떻게 측정할지 확인하세요.",
+  },
+  nl: {
+    title: "Toepassingen - app-downloadlinks per sector",
+    description:
+      "Bekijk hoe advertenties, e-commerce, SaaS, restaurants, fitness en agencies een smartlink gebruiken voor App Store, Google Play en QR-codes.",
+    h1: "Smartlinks voor elk type app",
+    eyebrow: "Toepassingen",
+    intro:
+      "Kies je sector en zie hoe je een app-downloadlink en QR-code gebruikt: waar je hem deelt, waar je hem drukt, hoe je klikken meet en welke kanalen het beste werken.",
+  },
+  ar: {
+    title: "حالات الاستخدام - روابط تنزيل التطبيقات حسب القطاع",
+    description:
+      "اكتشف كيف تستخدم الإعلانات والتجارة الإلكترونية وSaaS والمطاعم واللياقة والوكالات رابطا ذكيا لـ App Store وGoogle Play ورموز QR.",
+    h1: "روابط ذكية لكل نوع من التطبيقات",
+    eyebrow: "حالات الاستخدام",
+    intro:
+      "اختر قطاعك وشاهد كيف تستخدم رابط تنزيل واحدا ورمز QR: أين تشاركه، أين تطبعه، كيف تقيس النقرات، وأي القنوات تعمل بشكل أفضل.",
+  },
+  hi: {
+    title: "Use cases - हर sector के लिए app download links",
+    description:
+      "देखें ads, ecommerce, SaaS, restaurants, fitness और agencies App Store, Google Play और QR codes के लिए एक smart link कैसे इस्तेमाल करते हैं.",
+    h1: "हर app sector के लिए smart links",
+    eyebrow: "Use cases",
+    intro:
+      "अपना sector चुनें और देखें app के लिए एक smart link और QR कैसे इस्तेमाल करें: कहां share करना है, कहां print करना है, clicks कैसे measure करने हैं और कौन से channels बेहतर काम करते हैं.",
   },
 };
 
@@ -98,7 +172,7 @@ export default function UseCasesHub() {
         },
         {
           "@type": "ItemList",
-          itemListElement: niches.map((n, idx) => {
+          itemListElement: visibleNiches.map((n, idx) => {
             const c = n[language] || n.en;
             const url = `${siteUrl}${language === "en" ? "" : `/${language}`}${hubPath}/${c.slug}`;
             return {
@@ -142,7 +216,7 @@ export default function UseCasesHub() {
       {/* NICHES GRID */}
       <section className="relative mx-auto w-full max-w-[1240px] px-5 pb-24 md:px-8">
         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {niches.map((n) => {
+          {visibleNiches.map((n) => {
             const c = n[language] || n.en;
             const Ic = iconByName[n.icon] || Store;
             return (

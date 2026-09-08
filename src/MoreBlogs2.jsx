@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 const authorData = {
   name: "David Trotonda",
   role: "CEO de SkeilApps",
-  img: "https://skeilapps.com/wp-content/uploads/2025/12/IMG_20251213_151012-4.webp",
+  img: "/partner-logos/skeilapps-logo.png",
 };
 
 /* ============================================================================

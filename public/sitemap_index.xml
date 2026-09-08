@@ -2,18 +2,50 @@
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <sitemap>
     <loc>https://link-my.app/sitemap-en.xml</loc>
-    <lastmod>2026-05-27</lastmod>
+    <lastmod>2026-08-31</lastmod>
   </sitemap>
   <sitemap>
     <loc>https://link-my.app/sitemap-es.xml</loc>
-    <lastmod>2026-05-27</lastmod>
+    <lastmod>2026-08-31</lastmod>
   </sitemap>
   <sitemap>
     <loc>https://link-my.app/sitemap-fr.xml</loc>
-    <lastmod>2026-05-27</lastmod>
+    <lastmod>2026-08-31</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://link-my.app/sitemap-ja.xml</loc>
+    <lastmod>2026-08-31</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://link-my.app/sitemap-de.xml</loc>
+    <lastmod>2026-08-31</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://link-my.app/sitemap-pt.xml</loc>
+    <lastmod>2026-08-31</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://link-my.app/sitemap-it.xml</loc>
+    <lastmod>2026-08-31</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://link-my.app/sitemap-ko.xml</loc>
+    <lastmod>2026-08-31</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://link-my.app/sitemap-nl.xml</loc>
+    <lastmod>2026-08-31</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://link-my.app/sitemap-ar.xml</loc>
+    <lastmod>2026-08-31</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://link-my.app/sitemap-hi.xml</loc>
+    <lastmod>2026-08-31</lastmod>
   </sitemap>
   <sitemap>
     <loc>https://link-my.app/sitemap-blog.xml</loc>
-    <lastmod>2026-05-27</lastmod>
+    <lastmod>2026-08-31</lastmod>
   </sitemap>
 </sitemapindex>
