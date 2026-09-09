@@ -31,6 +31,12 @@ jobs:
         run: npm ci --no-audit --no-fund
 
       - name: Build web application
+        env:
+          VITE_FIREBASE_API_KEY: ci-placeholder
+          VITE_FIREBASE_AUTH_DOMAIN: ci-project.example.invalid
+          VITE_FIREBASE_PROJECT_ID: ci-project
+          VITE_FIREBASE_APP_ID: 1:000000000000:web:ci-placeholder
+          VITE_FIREBASE_DATABASE_URL: https://ci-project-default-rtdb.example.invalid
         run: npm run build
 
       - name: Validate generated SEO
