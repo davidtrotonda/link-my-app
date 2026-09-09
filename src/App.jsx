@@ -189,7 +189,7 @@ const adminEmails = Array.from(
       .filter(Boolean)
   )
 );
-const feedbackEndpoint = import.meta.env.VITE_FEEDBACK_ENDPOINT || "";
+const feedbackEndpoint = import.meta.env.VITE_FEEDBACK_ENDPOINT || "/api/feedback";
 const defaultSeoDescription =
   "Un solo enlace detecta iPhone, Android u ordenador y lleva cada clic a Google Play, App Store o tu web.";
 const defaultSeoKeywords =
@@ -5658,18 +5658,18 @@ function FeedbackPanel() {
       setStatus({ type: "error", message: t("messages.feedbackRequired") });
       return;
     }
-    if (!feedbackEndpoint) {
-      setStatus({ type: "error", message: t("messages.feedbackError") });
-      return;
-    }
-
     setStatus(null);
     setLoading(true);
     try {
+      const token = await user?.getIdToken();
+      if (!token) throw new Error("feedback-auth-required");
       const response = await fetch(feedbackEndpoint, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ feedback: feedback.trim(), email: user?.email || "Anónimo" }),
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ feedback: feedback.trim() }),
       });
       if (!response.ok) throw new Error("feedback-request-failed");
       setFeedback("");

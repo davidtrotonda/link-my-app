@@ -11,7 +11,20 @@ const SLUG_PATTERN = /^[a-z0-9][a-z0-9-]{0,79}$/;
 const OWNER_ID_PATTERN = /^[A-Za-z0-9_-]{1,180}$/;
 const MAX_JSON_BODY_BYTES = 8_192;
 const DEFAULT_EDGE_CACHE_TTL_SECONDS = 60;
-const DEFAULT_MISSING_TTL_SECONDS = 60;
+
+const RUNTIME_APP_SHELL_PATHS = new Set([
+  "/login", "/dashboard",
+  "/es/iniciar-sesion", "/es/panel",
+  "/fr/connexion", "/fr/tableau-de-bord",
+  "/ja/login", "/ja/dashboard",
+  "/de/anmelden", "/de/dashboard",
+  "/pt/entrar", "/pt/painel",
+  "/it/accedi", "/it/pannello",
+  "/ko/login", "/ko/dashboard",
+  "/nl/inloggen", "/nl/dashboard",
+  "/ar/login", "/ar/dashboard",
+  "/hi/login", "/hi/dashboard",
+]);
 
 type Destination = "ios" | "android" | "fallback";
 type ClickSource = "qr" | "written";
@@ -115,12 +128,6 @@ function edgeCacheRequestForSlug(slug: string): Request {
   return new Request(`https://link-cache.invalid/v1/${encodeURIComponent(slug)}`);
 }
 
-function cacheTtlForValue(env: Env, value: LinkCacheValue): number {
-  return "missing" in value
-    ? positiveInteger(env.EDGE_MISSING_TTL_SECONDS, DEFAULT_MISSING_TTL_SECONDS)
-    : positiveInteger(env.EDGE_CACHE_TTL_SECONDS, DEFAULT_EDGE_CACHE_TTL_SECONDS);
-}
-
 async function readEdgeCachedLink(
   cache: Cache,
   slug: string,
@@ -146,14 +153,17 @@ async function writeEdgeCachedLink(
   cache: Cache,
   env: Env,
   slug: string,
-  value: LinkCacheValue,
+  value: PublicLink,
 ): Promise<void> {
   try {
     await cache.put(
       edgeCacheRequestForSlug(slug),
       new Response(JSON.stringify(value), {
         headers: {
-          "Cache-Control": `public, max-age=${cacheTtlForValue(env, value)}`,
+          "Cache-Control": `public, max-age=${positiveInteger(
+            env.EDGE_CACHE_TTL_SECONDS,
+            DEFAULT_EDGE_CACHE_TTL_SECONDS,
+          )}`,
           "Content-Type": "application/json; charset=utf-8",
         },
       }),
@@ -240,8 +250,11 @@ export async function findCachedLink(
   cache: Cache = caches.default,
 ): Promise<PublicLink | null> {
   const edgeCached = await readEdgeCachedLink(cache, slug);
-  if (edgeCached && "missing" in edgeCached) return null;
-  if (isPublicLink(edgeCached)) return edgeCached;
+  if (edgeCached && "missing" in edgeCached) {
+    ctx.waitUntil(deleteEdgeCachedLink(cache, slug));
+  } else if (isPublicLink(edgeCached)) {
+    return edgeCached;
+  }
 
   const key = cacheKeyForSlug(slug);
   const cached = await env.LINKS_KV.get<LinkCacheValue>(key, {
@@ -250,17 +263,14 @@ export async function findCachedLink(
   });
 
   if (cached && "missing" in cached) {
-    ctx.waitUntil(writeEdgeCachedLink(cache, env, slug, { missing: true }));
-    return null;
-  }
-  if (isPublicLink(cached)) {
+    ctx.waitUntil(env.LINKS_KV.delete(key));
+  } else if (isPublicLink(cached)) {
     ctx.waitUntil(writeEdgeCachedLink(cache, env, slug, cached));
     return cached;
   }
 
   const link = await findActiveLink(env, slug);
-  const value: LinkCacheValue = link || { missing: true };
-  ctx.waitUntil(writeEdgeCachedLink(cache, env, slug, value));
+  if (link) ctx.waitUntil(writeEdgeCachedLink(cache, env, slug, link));
   return link;
 }
 
@@ -805,9 +815,36 @@ export function isFirebaseHostingProxyPath(pathname: string): boolean {
     pathname.startsWith("/__/auth/") ||
     pathname === "/__/firebase" ||
     pathname.startsWith("/__/firebase/") ||
+    pathname === "/api/feedback" ||
     pathname.startsWith("/api/stripe/") ||
     pathname.startsWith("/api/admin/")
   );
+}
+
+export function isRuntimeAppShellPath(pathname: string): boolean {
+  const normalizedPath = pathname === "/" ? pathname : pathname.replace(/\/+$/, "");
+  return RUNTIME_APP_SHELL_PATHS.has(normalizedPath);
+}
+
+async function appShellResponse(
+  request: Request,
+  env: Env,
+  status = 200,
+): Promise<Response> {
+  const requestUrl = new URL(request.url);
+  const appShellUrl = new URL("/", requestUrl);
+  const appShell = await env.ASSETS.fetch(new Request(appShellUrl, request));
+  if (status === 200 || appShell.status >= 400) return appShell;
+
+  const headers = new Headers(appShell.headers);
+  headers.delete("Content-Length");
+  headers.set("Cache-Control", "private, no-store, max-age=0");
+  headers.set("X-Robots-Tag", "noindex, nofollow");
+  return new Response(request.method === "HEAD" ? null : appShell.body, {
+    status,
+    statusText: status === 404 ? "Not Found" : appShell.statusText,
+    headers,
+  });
 }
 
 async function handleRequest(
@@ -888,8 +925,11 @@ async function handleRequest(
     return assetResponse;
   }
 
-  const appShellUrl = new URL("/", requestUrl);
-  return env.ASSETS.fetch(new Request(appShellUrl, request));
+  return appShellResponse(
+    request,
+    env,
+    isRuntimeAppShellPath(requestUrl.pathname) ? 200 : 404,
+  );
 }
 
 export default {
