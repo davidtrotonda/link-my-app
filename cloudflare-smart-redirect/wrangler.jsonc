@@ -32,7 +32,6 @@
     "FIREBASE_DATABASE_URL": "https://skeilink-default-rtdb.europe-west1.firebasedatabase.app",
     "FIREBASE_HOSTING_ORIGIN": "https://skeilink.web.app",
     "EDGE_CACHE_TTL_SECONDS": "60",
-    "EDGE_MISSING_TTL_SECONDS": "60",
     "REDIRECT_INTERSTITIAL_DELAY_MS": "1100",
     "LEGACY_CLICK_FALLBACK": "true"
   },

@@ -12,13 +12,14 @@ const services = [
   "verifypayment",
   "prepareuseraccount",
   "consumepreparedaccount",
+  "submitfeedback",
 ];
-const configPath = path.join(
-  os.homedir(),
-  ".config",
-  "configstore",
-  "firebase-tools.json"
-);
+const configPaths = [
+  process.env.APPDATA && path.join(process.env.APPDATA, "configstore", "firebase-tools.json"),
+  process.env.XDG_CONFIG_HOME &&
+    path.join(process.env.XDG_CONFIG_HOME, "configstore", "firebase-tools.json"),
+  path.join(os.homedir(), ".config", "configstore", "firebase-tools.json"),
+].filter(Boolean);
 
 if (!projectId) {
   throw new Error(
@@ -27,6 +28,10 @@ if (!projectId) {
 }
 
 function getFirebaseAccessToken() {
+  const configPath = configPaths.find((candidate) => fs.existsSync(candidate));
+  if (!configPath) {
+    throw new Error("No se ha encontrado la sesión de Firebase CLI. Ejecuta firebase login.");
+  }
   const config = JSON.parse(fs.readFileSync(configPath, "utf8"));
   const token = config.tokens?.access_token || config.user?.tokens?.access_token;
 

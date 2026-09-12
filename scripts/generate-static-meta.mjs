@@ -670,6 +670,49 @@ for (const entry of entries) {
   }
 }
 
+function aliasHtml(entry, language) {
+  const aliasEntry = {
+    ...entry,
+    id: `${entry.id}-legacy-alias`,
+    getMeta: (lang) => ({
+      ...entry.getMeta(lang),
+      robots: "noindex,follow",
+    }),
+  };
+  return htmlFor(aliasEntry, language);
+}
+
+const entryById = new Map(entries.map((entry) => [entry.id, entry]));
+const legacyAliases = [
+  { path: "/en", entryId: "home", language: "en" },
+  { path: "/precio", entryId: "pricing", language: "es" },
+  { path: "/tarifs", entryId: "pricing", language: "fr" },
+  { path: "/que-hacemos", entryId: "what-we-do", language: "es" },
+  { path: "/que-faisons-nous", entryId: "what-we-do", language: "fr" },
+  { path: "/privacidad", entryId: "legal-privacy", language: "es" },
+  { path: "/terminos", entryId: "legal-terms", language: "es" },
+  { path: "/confidentialite", entryId: "legal-privacy", language: "fr" },
+  { path: "/conditions", entryId: "legal-terms", language: "fr" },
+  { path: "/en/blog", entryId: "blog", language: "en" },
+  ...supportedLanguages.map((language) => ({
+    path: language === "en" ? "/como-funciona" : `/${language}/como-funciona`,
+    entryId: "what-we-do",
+    language,
+  })),
+  ...blogEntries.map((entry) => ({
+    path: `/en/blog/${entry.slug}`,
+    entryId: entry.id,
+    language: "en",
+  })),
+];
+
+for (const alias of legacyAliases) {
+  const entry = entryById.get(alias.entryId);
+  if (!entry) throw new Error(`Missing static entry for legacy alias ${alias.path}`);
+  writeRouteHtml(alias.path, aliasHtml(entry, alias.language));
+  written += 1;
+}
+
 // Vite's SSR loader can leave a file-watcher handle open on macOS/iCloud
 // workspaces even after server.close(). All generated files are written sync.
 for (const handle of process._getActiveHandles()) {
