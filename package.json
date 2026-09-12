@@ -34,6 +34,7 @@
     "deploy:cloudflare": "npm run build && npm run seo:check && npm run cloudflare:check && wrangler deploy --config cloudflare-smart-redirect/wrangler.jsonc && npm run cloudflare:migrate",
     "deploy:hosting": "npm run deploy:cloudflare",
     "deploy:firebase-hosting": "npm run build && firebase deploy --only hosting",
+    "deploy:functions:core": "node scripts/deploy-core-functions.mjs",
     "deploy:hosting:unattended": "node scripts/deploy-hosting-unattended.mjs",
     "deploy:functions": "FUNCTIONS_DISCOVERY_TIMEOUT=60 firebase deploy --only functions",
     "deploy:run-public": "node scripts/disable-run-invoker-iam.mjs",

@@ -4,9 +4,31 @@ const logger = require("firebase-functions/logger");
 const admin = require("firebase-admin");
 const Stripe = require("stripe");
 
-const stripeSecretKey = defineSecret("STRIPE_SECRET_KEY");
-const stripeWebhookSecret = defineSecret("STRIPE_WEBHOOK_SECRET");
-const stripeWebhookLegacySecret = defineSecret("STRIPE_WEBHOOK_SECRET_LEGACY");
+const firebaseDeployTargets = new Set(
+  (process.env.FIREBASE_DEPLOY_TARGETS || "")
+    .split(",")
+    .map((entry) => entry.trim())
+    .filter(Boolean)
+);
+const stripeFunctionNames = new Set([
+  "createCheckoutSession",
+  "createPortalSession",
+  "stripeWebhook",
+  "verifyPayment",
+]);
+const includesStripeDeployment =
+  firebaseDeployTargets.size === 0 ||
+  [...firebaseDeployTargets].some((target) => stripeFunctionNames.has(target));
+const deploymentSecret = (name) =>
+  includesStripeDeployment
+    ? defineSecret(name)
+    : { value: () => process.env[name] || "" };
+const stripeSecretBindings = (...secrets) =>
+  includesStripeDeployment ? secrets : [];
+
+const stripeSecretKey = deploymentSecret("STRIPE_SECRET_KEY");
+const stripeWebhookSecret = deploymentSecret("STRIPE_WEBHOOK_SECRET");
+const stripeWebhookLegacySecret = deploymentSecret("STRIPE_WEBHOOK_SECRET_LEGACY");
 const configuredInvokers =
   process.env.FUNCTIONS_INVOKER?.split(",").map((entry) => entry.trim()).filter(Boolean) ||
   [];
@@ -531,7 +553,7 @@ exports.createCheckoutSession = onRequest(
     region: "europe-west1",
     cors: allowedOrigins,
     invoker: functionInvoker,
-    secrets: [stripeSecretKey],
+    secrets: stripeSecretBindings(stripeSecretKey),
   },
   async (req, res) => {
     res.set("Cache-Control", "no-store");
@@ -613,7 +635,7 @@ exports.createPortalSession = onRequest(
     region: "europe-west1",
     cors: allowedOrigins,
     invoker: functionInvoker,
-    secrets: [stripeSecretKey],
+    secrets: stripeSecretBindings(stripeSecretKey),
   },
   async (req, res) => {
     res.set("Cache-Control", "no-store");
@@ -660,7 +682,11 @@ exports.stripeWebhook = onRequest(
   {
     region: "europe-west1",
     invoker: functionInvoker,
-    secrets: [stripeSecretKey, stripeWebhookSecret, stripeWebhookLegacySecret],
+    secrets: stripeSecretBindings(
+      stripeSecretKey,
+      stripeWebhookSecret,
+      stripeWebhookLegacySecret
+    ),
   },
   async (req, res) => {
     if (req.method !== "POST") {
@@ -753,7 +779,7 @@ exports.verifyPayment = onRequest(
     region: "europe-west1",
     cors: allowedOrigins,
     invoker: functionInvoker,
-    secrets: [stripeSecretKey],
+    secrets: stripeSecretBindings(stripeSecretKey),
   },
   async (req, res) => {
     if (req.method !== "POST") {
