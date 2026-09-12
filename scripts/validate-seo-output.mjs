@@ -58,11 +58,22 @@ const missingMetadata = indexable.filter((row) => !row.title || !row.description
 const thinPages = indexable.filter((row) => row.visibleCharacters < 300);
 const duplicateTitles = duplicateGroups(indexable, "title");
 const duplicateDescriptions = duplicateGroups(indexable, "description");
+const requiredLegacyAliases = [
+  "como-funciona.html",
+  "es/como-funciona.html",
+  "precio.html",
+  "que-hacemos.html",
+  "en.html",
+  "en/blog.html",
+];
+const generatedFiles = new Set(rows.map((row) => row.file.replaceAll("\\", "/")));
+const missingLegacyAliases = requiredLegacyAliases.filter((file) => !generatedFiles.has(file));
 
 if (missingMetadata.length) errors.push(`${missingMetadata.length} páginas sin metadatos completos`);
 if (thinPages.length) errors.push(`${thinPages.length} páginas con menos de 300 caracteres visibles`);
 if (duplicateTitles.length) errors.push(`${duplicateTitles.length} grupos de títulos duplicados`);
 if (duplicateDescriptions.length) errors.push(`${duplicateDescriptions.length} grupos de descripciones duplicadas`);
+if (missingLegacyAliases.length) errors.push(`${missingLegacyAliases.length} alias válidos sin HTML estático`);
 
 console.log(JSON.stringify({
   htmlPages: rows.length,
@@ -72,6 +83,7 @@ console.log(JSON.stringify({
   thinPages: thinPages.length,
   duplicateTitleGroups: duplicateTitles.length,
   duplicateDescriptionGroups: duplicateDescriptions.length,
+  missingLegacyAliases,
 }, null, 2));
 
 if (errors.length) {
