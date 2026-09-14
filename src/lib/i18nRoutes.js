@@ -1,13 +1,11 @@
 import {
-  getHowToBySlug,
+  getHowToIdBySlug,
+  getNicheIdBySlug,
   howToHubRoutes,
   howToPath,
-} from "./howTos.js";
-import {
-  getNicheBySlug,
   nichePath,
   useCaseHubRoutes,
-} from "./useCases.js";
+} from "./contentRoutes.js";
 
 export const defaultLanguage = "en";
 export const supportedLanguages = ["en", "es", "fr", "ja", "de", "pt", "it", "ko", "nl", "ar", "hi"];
@@ -373,8 +371,8 @@ function dynamicContentRoute(pathname = "/") {
     if (cleanPath.startsWith(`${useCaseHub}/`)) {
       const slug = cleanPath.slice(useCaseHub.length + 1);
       if (slug && !slug.includes("/")) {
-        const niche = getNicheBySlug(slug, language);
-        if (niche) return { type: "use-case", id: niche.id };
+        const nicheId = getNicheIdBySlug(slug, language);
+        if (nicheId) return { type: "use-case", id: nicheId };
       }
     }
 
@@ -382,8 +380,8 @@ function dynamicContentRoute(pathname = "/") {
     if (cleanPath.startsWith(`${howToHub}/`)) {
       const slug = cleanPath.slice(howToHub.length + 1);
       if (slug && !slug.includes("/")) {
-        const howTo = getHowToBySlug(slug, language);
-        if (howTo) return { type: "how-to", id: howTo.id };
+        const howToId = getHowToIdBySlug(slug, language);
+        if (howToId) return { type: "how-to", id: howToId };
       }
     }
   }

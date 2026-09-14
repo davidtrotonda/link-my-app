@@ -10,28 +10,9 @@ import { dutchHowTos } from "./nlContent.js";
 import { arabicHowTos } from "./arContent.js";
 import { hindiHowTos } from "./hiContent.js";
 import { portugueseHowTos } from "./ptContent.js";
+import { howToHubRoutes, howToPath } from "./contentRoutes.js";
 
-export const howToHubRoutes = {
-  en: "/how-to",
-  es: "/como",
-  fr: "/comment",
-  ja: "/how-to",
-  de: "/anleitungen",
-  pt: "/guias",
-  it: "/guide",
-  ko: "/how-to",
-  nl: "/gidsen",
-  ar: "/how-to",
-  hi: "/how-to",
-};
-
-export function howToPath(howToId, language = "en") {
-  const howto = howTos.find((h) => h.id === howToId);
-  if (!howto) return howToHubRoutes[language] || howToHubRoutes.en;
-  const hub = howToHubRoutes[language] || howToHubRoutes.en;
-  const slug = howto[language]?.slug || howto.en.slug;
-  return `${hub}/${slug}`;
-}
+export { howToHubRoutes, howToPath };
 
 export function getHowToBySlug(slug, language = "en") {
   return howTos.find((h) => (h[language]?.slug || h.en.slug) === slug);
