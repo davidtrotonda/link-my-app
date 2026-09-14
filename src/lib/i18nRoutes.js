@@ -1,3 +1,14 @@
+import {
+  getHowToBySlug,
+  howToHubRoutes,
+  howToPath,
+} from "./howTos.js";
+import {
+  getNicheBySlug,
+  nichePath,
+  useCaseHubRoutes,
+} from "./useCases.js";
+
 export const defaultLanguage = "en";
 export const supportedLanguages = ["en", "es", "fr", "ja", "de", "pt", "it", "ko", "nl", "ar", "hi"];
 
@@ -354,9 +365,44 @@ export function toCanonicalPath(pathname = "/") {
   return cleanPath;
 }
 
+function dynamicContentRoute(pathname = "/") {
+  const cleanPath = stripLanguagePrefix(pathname || "/").replace(/\/$/, "") || "/";
+
+  for (const language of supportedLanguages) {
+    const useCaseHub = useCaseHubRoutes[language] || useCaseHubRoutes.en;
+    if (cleanPath.startsWith(`${useCaseHub}/`)) {
+      const slug = cleanPath.slice(useCaseHub.length + 1);
+      if (slug && !slug.includes("/")) {
+        const niche = getNicheBySlug(slug, language);
+        if (niche) return { type: "use-case", id: niche.id };
+      }
+    }
+
+    const howToHub = howToHubRoutes[language] || howToHubRoutes.en;
+    if (cleanPath.startsWith(`${howToHub}/`)) {
+      const slug = cleanPath.slice(howToHub.length + 1);
+      if (slug && !slug.includes("/")) {
+        const howTo = getHowToBySlug(slug, language);
+        if (howTo) return { type: "how-to", id: howTo.id };
+      }
+    }
+  }
+
+  return null;
+}
+
+function localizedDynamicContentPath(pathname, language) {
+  const route = dynamicContentRoute(pathname);
+  if (!route) return "";
+  return route.type === "use-case"
+    ? nichePath(route.id, language)
+    : howToPath(route.id, language);
+}
+
 export function isLocalizableRoute(pathname = "/") {
   const cleanPath = stripLanguagePrefix(pathname || "/").replace(/\/$/, "") || "/";
   if (cleanPath === "/" || legacyCanonicalRoutes[cleanPath]) return true;
+  if (dynamicContentRoute(cleanPath)) return true;
   return cleanPath.startsWith("/blog/");
 }
 
@@ -373,7 +419,10 @@ export function localizePath(path = "/", language = defaultLanguage) {
   const cleanPath = stripLanguagePrefix(pathname || "/");
   const canonicalPath = toCanonicalPath(cleanPath);
   const localizedRoute = routeTranslations[languageCode]?.[canonicalPath];
-  const translatedPath = localizedRoute || canonicalPath;
+  const translatedPath =
+    localizedDynamicContentPath(cleanPath, languageCode) ||
+    localizedRoute ||
+    canonicalPath;
   const localizedPath =
     languageCode === defaultLanguage
       ? translatedPath
