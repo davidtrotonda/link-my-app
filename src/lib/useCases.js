@@ -11,28 +11,9 @@ import { dutchUseCases } from "./nlContent.js";
 import { arabicUseCases } from "./arContent.js";
 import { hindiUseCases } from "./hiContent.js";
 import { portugueseUseCases } from "./ptContent.js";
+import { nichePath, useCaseHubRoutes } from "./contentRoutes.js";
 
-export const useCaseHubRoutes = {
-  en: "/use-cases",
-  es: "/casos-de-uso",
-  fr: "/cas-d-usage",
-  ja: "/use-cases",
-  de: "/anwendungsfaelle",
-  pt: "/casos-de-uso",
-  it: "/casi-uso",
-  ko: "/use-cases",
-  nl: "/toepassingen",
-  ar: "/use-cases",
-  hi: "/use-cases",
-};
-
-export function nichePath(nicheId, language = "en") {
-  const niche = niches.find((n) => n.id === nicheId);
-  if (!niche) return useCaseHubRoutes[language] || useCaseHubRoutes.en;
-  const hub = useCaseHubRoutes[language] || useCaseHubRoutes.en;
-  const slug = niche[language]?.slug || niche.en.slug;
-  return `${hub}/${slug}`;
-}
+export { nichePath, useCaseHubRoutes };
 
 export const niches = [
   /* ============================================================

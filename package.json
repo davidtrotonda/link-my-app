@@ -24,7 +24,7 @@
     "test:worker": "node --test cloudflare-smart-redirect/test/*.test.js",
     "cloudflare:dev": "wrangler dev --config cloudflare-smart-redirect/wrangler.jsonc",
     "cloudflare:dry-run": "npm run build && npm run cloudflare:check && wrangler deploy --dry-run --config cloudflare-smart-redirect/wrangler.jsonc",
-    "seo:check": "node scripts/validate-seo-output.mjs",
+    "seo:check": "node --test src/lib/i18nRoutes.test.js vercel-frontdoor/vercel-config.test.js && node scripts/validate-seo-output.mjs",
     "images:check": "node scripts/validate-dist-images.mjs",
     "indexnow:submit": "node scripts/submit-indexnow.mjs",
     "cloudflare:migrate": "wrangler d1 migrations apply ANALYTICS_DB --remote --config cloudflare-smart-redirect/wrangler.jsonc",

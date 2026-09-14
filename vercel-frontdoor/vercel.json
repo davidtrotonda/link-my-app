@@ -1,6 +1,19 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.link-my.app"
+        }
+      ],
+      "destination": "https://link-my.app/:path*",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/",
