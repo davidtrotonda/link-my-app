@@ -6,6 +6,7 @@ import {
   findCachedLink,
   isFirebaseHostingProxyPath,
   isLikelyBot,
+  isRuntimeAppShellPath,
   normalizeDestination,
   redirectInterstitialHtml,
   slugFromPath,
@@ -52,8 +53,17 @@ test("reenvía únicamente las rutas reservadas de Firebase Hosting", () => {
   assert.equal(isFirebaseHostingProxyPath("/__/firebase/init.js"), true);
   assert.equal(isFirebaseHostingProxyPath("/api/stripe/create-checkout-session"), true);
   assert.equal(isFirebaseHostingProxyPath("/api/admin/users"), true);
+  assert.equal(isFirebaseHostingProxyPath("/api/feedback"), true);
   assert.equal(isFirebaseHostingProxyPath("/__/otra-ruta"), false);
   assert.equal(isFirebaseHostingProxyPath("/mi-smart-link"), false);
+});
+
+test("solo login y panel usan el app shell con estado 200", () => {
+  assert.equal(isRuntimeAppShellPath("/login"), true);
+  assert.equal(isRuntimeAppShellPath("/es/panel"), true);
+  assert.equal(isRuntimeAppShellPath("/fr/connexion/"), true);
+  assert.equal(isRuntimeAppShellPath("/es/ruta-que-no-existe"), false);
+  assert.equal(isRuntimeAppShellPath("/es/blog/articulo-inexistente"), false);
 });
 
 test("la pantalla de redirección muestra marca, logo y destino alternativo", () => {
@@ -122,7 +132,7 @@ test("la Cache API evita una lectura de KV cuando ya tiene el enlace", async () 
   assert.equal(kvReads, 0);
 });
 
-test("los enlaces inexistentes solo se guardan en Cache API", async () => {
+test("los enlaces inexistentes no se guardan en caché", async () => {
   const originalFetch = globalThis.fetch;
   const pendingTasks = [];
   let kvWrites = 0;
@@ -130,7 +140,6 @@ test("los enlaces inexistentes solo se guardan en Cache API", async () => {
   const env = {
     FIREBASE_DATABASE_URL: "https://database.example/",
     EDGE_CACHE_TTL_SECONDS: "60",
-    EDGE_MISSING_TTL_SECONDS: "60",
     LINKS_KV: {
       async get() {
         return null;
@@ -144,9 +153,8 @@ test("los enlaces inexistentes solo se guardan en Cache API", async () => {
     async match() {
       return undefined;
     },
-    async put(_request, response) {
+    async put() {
       edgeWrites += 1;
-      assert.deepEqual(await response.json(), { missing: true });
     },
   };
   const ctx = {
@@ -162,6 +170,53 @@ test("los enlaces inexistentes solo se guardan en Cache API", async () => {
 
     assert.equal(link, null);
     assert.equal(kvWrites, 0);
+    assert.equal(edgeWrites, 0);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("ignora una ausencia antigua de caché al reactivar un enlace", async () => {
+  const originalFetch = globalThis.fetch;
+  const pendingTasks = [];
+  let edgeDeletes = 0;
+  let edgeWrites = 0;
+  const env = {
+    FIREBASE_DATABASE_URL: "https://database.example/",
+    EDGE_CACHE_TTL_SECONDS: "60",
+    LINKS_KV: {
+      async get() {
+        return null;
+      },
+      async delete() {},
+    },
+  };
+  const cache = {
+    async match() {
+      return Response.json({ missing: true });
+    },
+    async delete() {
+      edgeDeletes += 1;
+      return true;
+    },
+    async put(_request, response) {
+      edgeWrites += 1;
+      assert.deepEqual(await response.json(), publicLink);
+    },
+  };
+  const ctx = {
+    waitUntil(promise) {
+      pendingTasks.push(promise);
+    },
+  };
+
+  try {
+    globalThis.fetch = async () => Response.json({ [publicLink.linkId]: publicLink });
+    const link = await findCachedLink(env, ctx, publicLink.slug, cache);
+    await Promise.all(pendingTasks);
+
+    assert.deepEqual(link, publicLink);
+    assert.equal(edgeDeletes, 1);
     assert.equal(edgeWrites, 1);
   } finally {
     globalThis.fetch = originalFetch;

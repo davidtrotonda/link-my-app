@@ -29,11 +29,8 @@ const allowedOrigins = [
   /^http:\/\/127\.0\.0\.1:\d+$/,
 ].filter(Boolean);
 
-admin.initializeApp({
-  databaseURL:
-    process.env.FIREBASE_DATABASE_URL ||
-    "https://your-project-default-rtdb.europe-west1.firebasedatabase.app",
-});
+const firebaseDatabaseUrl = process.env.FIREBASE_DATABASE_URL;
+admin.initializeApp(firebaseDatabaseUrl ? { databaseURL: firebaseDatabaseUrl } : undefined);
 
 function getStripe() {
   return new Stripe(stripeSecretKey.value());
@@ -472,11 +469,60 @@ exports.consumePreparedAccount = onRequest(
       });
     } catch (error) {
       logger.error("consumePreparedAccount failed", error);
+      const missingToken = error.message === "missing-token";
       const message =
-        error.message === "missing-token"
+        missingToken
           ? "Inicia sesión para aplicar la cuenta preparada."
           : error.message || "No se pudo aplicar la cuenta preparada.";
-      res.status(error.status || 400).json({ error: message });
+      res.status(error.status || (missingToken ? 401 : 400)).json({ error: message });
+    }
+  }
+);
+
+exports.submitFeedback = onRequest(
+  {
+    region: "europe-west1",
+    cors: allowedOrigins,
+    invoker: functionInvoker,
+  },
+  async (req, res) => {
+    res.set("Cache-Control", "no-store");
+
+    if (req.method !== "POST") {
+      res.status(405).json({ error: "Método no permitido." });
+      return;
+    }
+
+    try {
+      const decodedToken = await getUserFromRequest(req);
+      const feedback = cleanString(req.body?.feedback);
+      if (!feedback) {
+        res.status(400).json({ error: "Escribe primero tu sugerencia." });
+        return;
+      }
+      if (feedback.length > 2000) {
+        res.status(400).json({ error: "La sugerencia es demasiado larga." });
+        return;
+      }
+
+      const feedbackRef = admin.database().ref("feedback").push();
+      await feedbackRef.set({
+        uid: decodedToken.uid,
+        email: normalizeEmail(decodedToken.email || ""),
+        feedback,
+        status: "new",
+        createdAt: admin.database.ServerValue.TIMESTAMP,
+      });
+
+      res.status(200).json({ success: true, id: feedbackRef.key });
+    } catch (error) {
+      logger.error("submitFeedback failed", error);
+      const missingToken = error.message === "missing-token";
+      res.status(missingToken ? 401 : 500).json({
+        error: missingToken
+          ? "Inicia sesión para enviar una sugerencia."
+          : "No se ha podido guardar la sugerencia.",
+      });
     }
   }
 );

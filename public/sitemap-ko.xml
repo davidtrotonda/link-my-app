@@ -3,7 +3,7 @@
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://link-my.app/ko</loc>
-    <lastmod>2026-08-31</lastmod>
+    <lastmod>2026-09-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/" />
@@ -21,7 +21,7 @@
   </url>
   <url>
     <loc>https://link-my.app/ko/open-source</loc>
-    <lastmod>2026-08-31</lastmod>
+    <lastmod>2026-09-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/open-source-smart-link" />
@@ -39,7 +39,7 @@
   </url>
   <url>
     <loc>https://link-my.app/ko/app-download-link</loc>
-    <lastmod>2026-08-31</lastmod>
+    <lastmod>2026-09-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/what-we-do" />
@@ -57,7 +57,7 @@
   </url>
   <url>
     <loc>https://link-my.app/ko/free</loc>
-    <lastmod>2026-08-31</lastmod>
+    <lastmod>2026-09-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/pricing" />
@@ -75,7 +75,7 @@
   </url>
   <url>
     <loc>https://link-my.app/ko/app-qr-code</loc>
-    <lastmod>2026-08-31</lastmod>
+    <lastmod>2026-09-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/qr-code-for-apps" />
@@ -93,7 +93,7 @@
   </url>
   <url>
     <loc>https://link-my.app/ko/use-cases</loc>
-    <lastmod>2026-08-31</lastmod>
+    <lastmod>2026-09-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/use-cases" />
@@ -111,7 +111,7 @@
   </url>
   <url>
     <loc>https://link-my.app/ko/success-stories/tourixy</loc>
-    <lastmod>2026-08-31</lastmod>
+    <lastmod>2026-09-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/success-stories/tourixy" />
@@ -129,7 +129,7 @@
   </url>
   <url>
     <loc>https://link-my.app/ko/how-to</loc>
-    <lastmod>2026-08-31</lastmod>
+    <lastmod>2026-09-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/how-to" />
@@ -147,7 +147,7 @@
   </url>
   <url>
     <loc>https://link-my.app/ko/faq</loc>
-    <lastmod>2026-08-31</lastmod>
+    <lastmod>2026-09-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/faqs" />
@@ -165,7 +165,7 @@
   </url>
   <url>
     <loc>https://link-my.app/ko/blog</loc>
-    <lastmod>2026-08-31</lastmod>
+    <lastmod>2026-09-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/blog" />
@@ -183,7 +183,7 @@
   </url>
   <url>
     <loc>https://link-my.app/ko/privacy</loc>
-    <lastmod>2026-08-31</lastmod>
+    <lastmod>2026-09-23</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.35</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/privacy" />
@@ -201,7 +201,7 @@
   </url>
   <url>
     <loc>https://link-my.app/ko/cookies</loc>
-    <lastmod>2026-08-31</lastmod>
+    <lastmod>2026-09-23</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.35</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/cookies" />
@@ -219,7 +219,7 @@
   </url>
   <url>
     <loc>https://link-my.app/ko/terms</loc>
-    <lastmod>2026-08-31</lastmod>
+    <lastmod>2026-09-23</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.35</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/terms" />
@@ -237,7 +237,7 @@
   </url>
   <url>
     <loc>https://link-my.app/ko/use-cases/app-install-ads</loc>
-    <lastmod>2026-08-31</lastmod>
+    <lastmod>2026-09-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.76</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/use-cases/app-install-ads" />
@@ -255,7 +255,7 @@
   </url>
   <url>
     <loc>https://link-my.app/ko/use-cases/ecommerce-app-download-link</loc>
-    <lastmod>2026-08-31</lastmod>
+    <lastmod>2026-09-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.76</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/use-cases/ecommerce-apps" />
@@ -273,7 +273,7 @@
   </url>
   <url>
     <loc>https://link-my.app/ko/use-cases/saas-app-download-link</loc>
-    <lastmod>2026-08-31</lastmod>
+    <lastmod>2026-09-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.76</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/use-cases/saas-apps" />
@@ -291,7 +291,7 @@
   </url>
   <url>
     <loc>https://link-my.app/ko/use-cases/restaurant-app-qr-code</loc>
-    <lastmod>2026-08-31</lastmod>
+    <lastmod>2026-09-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.76</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/use-cases/restaurant-apps" />
@@ -309,7 +309,7 @@
   </url>
   <url>
     <loc>https://link-my.app/ko/use-cases/fitness-app-download-link</loc>
-    <lastmod>2026-08-31</lastmod>
+    <lastmod>2026-09-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.76</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/use-cases/fitness-apps" />
@@ -327,7 +327,7 @@
   </url>
   <url>
     <loc>https://link-my.app/ko/use-cases/creator-app-download-link</loc>
-    <lastmod>2026-08-31</lastmod>
+    <lastmod>2026-09-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.76</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/use-cases/creator-apps" />
@@ -345,7 +345,7 @@
   </url>
   <url>
     <loc>https://link-my.app/ko/use-cases/for-agencies</loc>
-    <lastmod>2026-08-31</lastmod>
+    <lastmod>2026-09-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.82</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/use-cases/for-agencies" />
@@ -363,7 +363,7 @@
   </url>
   <url>
     <loc>https://link-my.app/ko/how-to/share-app-instagram</loc>
-    <lastmod>2026-08-31</lastmod>
+    <lastmod>2026-09-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.72</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/how-to/share-your-app-on-instagram" />
@@ -381,7 +381,7 @@
   </url>
   <url>
     <loc>https://link-my.app/ko/how-to/app-download-link-whatsapp</loc>
-    <lastmod>2026-08-31</lastmod>
+    <lastmod>2026-09-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.72</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/how-to/app-download-link-whatsapp" />
@@ -399,7 +399,7 @@
   </url>
   <url>
     <loc>https://link-my.app/ko/how-to/app-store-google-play-redirect</loc>
-    <lastmod>2026-08-31</lastmod>
+    <lastmod>2026-09-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.72</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/how-to/redirect-users-app-store-google-play" />
@@ -417,7 +417,7 @@
   </url>
   <url>
     <loc>https://link-my.app/ko/how-to/app-download-button-website</loc>
-    <lastmod>2026-08-31</lastmod>
+    <lastmod>2026-09-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.72</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/how-to/app-download-button-website" />
@@ -435,7 +435,7 @@
   </url>
   <url>
     <loc>https://link-my.app/ko/how-to/qr-code-app-download</loc>
-    <lastmod>2026-08-31</lastmod>
+    <lastmod>2026-09-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.72</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://link-my.app/how-to/use-qr-physical-campaigns" />
