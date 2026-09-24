@@ -2108,9 +2108,9 @@ function SeoContentSection() {
         <div className="mt-6 flex justify-center">
           <div className="inline-flex items-center rounded-full border border-sky-100 bg-white p-1.5 pr-2 shadow-[0_14px_38px_rgba(14,116,144,0.10)]">
             <img
-              src="/tourixy-favicon.png"
+              src="/tourixy-logo-2026.png"
               alt=""
-              className="h-10 w-10 rounded-full shadow-sm"
+              className="h-10 w-10 rounded-full object-cover shadow-sm"
             />
             <Link
               to={localizePath("/success-story/tourixy", language)}
