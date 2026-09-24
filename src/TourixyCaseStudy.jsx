@@ -567,7 +567,7 @@ export default function TourixyCaseStudy() {
         title={content.title}
         description={content.description}
         path={pagePath}
-        image={`${siteUrl}/tourixy-logo-2026.png`}
+        image={`${siteUrl}/tourixy-logo-2026-tight.png`}
         schema={schema}
       />
       <LegalNavbar />
@@ -580,7 +580,7 @@ export default function TourixyCaseStudy() {
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-white px-3 py-2 text-[11px] font-black uppercase tracking-[0.2em] text-sky-800 shadow-sm">
               <img
-                src="/tourixy-logo-2026.png"
+                src="/tourixy-logo-2026-tight.png"
                 alt=""
                 className="h-7 w-7 rounded-full object-cover"
               />
@@ -612,7 +612,7 @@ export default function TourixyCaseStudy() {
             <div className="rounded-[38px] border border-black/8 bg-white p-5 shadow-[0_35px_100px_rgba(14,116,144,0.16)] md:p-7">
               <div className="flex items-center gap-3 border-b border-black/8 pb-5">
                 <img
-                  src="/tourixy-logo-2026.png"
+                  src="/tourixy-logo-2026-tight.png"
                   alt="Tourixy"
                   className="h-14 w-14 rounded-full object-cover shadow-[0_10px_24px_rgba(14,116,144,0.2)]"
                 />
