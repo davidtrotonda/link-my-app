@@ -8,9 +8,11 @@ import {
   isLikelyBot,
   isRuntimeAppShellPath,
   normalizeDestination,
+  redirectCopy,
   redirectInterstitialHtml,
   slugFromPath,
 } from "../src/index.ts";
+import { supportedLanguages } from "../../src/lib/i18nRoutes.js";
 
 const publicLink = {
   linkId: "link-1",
@@ -66,6 +68,71 @@ test("solo login y panel usan el app shell con estado 200", () => {
   assert.equal(isRuntimeAppShellPath("/es/blog/articulo-inexistente"), false);
 });
 
+test("la redirección usa los once idiomas de la web", () => {
+  const titles = {
+    en: "Redirecting…",
+    es: "Redirigiendo…",
+    fr: "Redirection en cours…",
+    ja: "リダイレクトしています…",
+    de: "Du wirst weitergeleitet…",
+    pt: "A redirecionar…",
+    it: "Reindirizzamento in corso…",
+    ko: "이동 중…",
+    nl: "Je wordt doorgestuurd…",
+    ar: "جارٍ إعادة التوجيه…",
+    hi: "रीडायरेक्ट किया जा रहा है…",
+  };
+
+  assert.deepEqual(Object.keys(titles).sort(), [...supportedLanguages].sort());
+  for (const language of supportedLanguages) {
+    const request = new Request("https://link-my.app/example", {
+      headers: { "Accept-Language": `${language}-XX,${language};q=0.9,en;q=0.8` },
+    });
+    const copy = redirectCopy(request);
+    const html = redirectInterstitialHtml({
+      target: "https://example.com/app",
+      copy,
+      delayMs: 1100,
+      nonce: "testnonce",
+    });
+
+    assert.equal(copy.language, language);
+    assert.equal(copy.title, titles[language]);
+    assert.match(html, new RegExp(`<html lang="${language}"`));
+    assert.ok(html.includes(copy.fallback));
+    assert.ok(html.includes(copy.openDestination));
+    assert.ok(html.includes(copy.poweredBy));
+  }
+});
+
+test("elige el primer idioma compatible con mayor preferencia y omite q=0", () => {
+  const copyFor = (header) => redirectCopy(new Request("https://link-my.app/example", {
+    headers: { "Accept-Language": header },
+  }));
+
+  assert.equal(copyFor("ca-ES,es;q=0.9,fr;q=0.8").language, "es");
+  assert.equal(copyFor("fr;q=0.5,it-IT;q=0.9").language, "it");
+  assert.equal(copyFor("fr;q=0,ja;q=0.8").language, "ja");
+  assert.equal(copyFor("constructor,en;q=0.5").language, "en");
+  assert.equal(copyFor("ca-ES").language, "en");
+  assert.equal(copyFor("").language, "en");
+});
+
+test("la pantalla árabe indica dirección de lectura RTL", () => {
+  const copy = redirectCopy(new Request("https://link-my.app/example", {
+    headers: { "Accept-Language": "ar-SA,ar;q=0.9" },
+  }));
+  const html = redirectInterstitialHtml({
+    target: "https://example.com/app",
+    copy,
+    delayMs: 1100,
+    nonce: "testnonce",
+  });
+
+  assert.match(html, /<html lang="ar" dir="rtl">/);
+  assert.match(html, /بدعم من Link My App/);
+});
+
 test("la pantalla de redirección muestra marca, logo y destino alternativo", () => {
   const html = redirectInterstitialHtml({
     target: "https://apps.apple.com/es/app/example?id=123&ct=test",
@@ -75,13 +142,14 @@ test("la pantalla de redirección muestra marca, logo y destino alternativo", ()
       fallback: "Si no se abre automáticamente,",
       openDestination: "pulsa aquí",
       advertisement: "Publicidad",
+      poweredBy: "Con tecnología de Link My App",
     },
     delayMs: 1100,
     nonce: "testnonce",
   });
 
   assert.match(html, /Redirigiendo…/);
-  assert.match(html, /Powered by Link My App/);
+  assert.match(html, /Con tecnología de Link My App/);
   assert.match(html, /logo-link-my-app\.avif/);
   assert.match(html, /id="redirect-ad-slot"/);
   assert.match(html, /window\.location\.replace/);
@@ -98,6 +166,7 @@ test("la pantalla simple no muestra el nombre de la app ni texto adicional", () 
       fallback: "If it does not open automatically,",
       openDestination: "tap here",
       advertisement: "Advertisement",
+      poweredBy: "Powered by Link My App",
     },
     delayMs: 1100,
     nonce: "testnonce",

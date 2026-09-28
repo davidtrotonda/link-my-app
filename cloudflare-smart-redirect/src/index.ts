@@ -43,12 +43,18 @@ type PublicLink = {
 type MissingLink = { missing: true };
 type LinkCacheValue = PublicLink | MissingLink;
 
+const REDIRECT_LANGUAGES = [
+  "en", "es", "fr", "ja", "de", "pt", "it", "ko", "nl", "ar", "hi",
+] as const;
+type RedirectLanguage = (typeof REDIRECT_LANGUAGES)[number];
+
 type RedirectCopy = {
-  language: "en" | "es";
+  language: RedirectLanguage;
   title: string;
   fallback: string;
   openDestination: string;
   advertisement: string;
+  poweredBy: string;
 };
 
 type SyncRequestBody = {
@@ -669,30 +675,108 @@ function inlineScriptString(value: string): string {
     .replace(/\u2029/g, "\\u2029");
 }
 
-function redirectCopy(request: Request): RedirectCopy {
-  const primaryLanguage = (request.headers.get("accept-language") || "")
-    .split(",", 1)[0]
-    ?.split("-", 1)[0]
-    ?.trim()
-    .toLowerCase();
-
-  if (primaryLanguage === "es") {
-    return {
-      language: "es",
-      title: "Redirigiendo…",
-      fallback: "Si no se abre automáticamente,",
-      openDestination: "pulsa aquí",
-      advertisement: "Publicidad",
-    };
-  }
-
-  return {
-    language: "en",
+const REDIRECT_COPIES: Record<RedirectLanguage, Omit<RedirectCopy, "language">> = {
+  en: {
     title: "Redirecting…",
     fallback: "If it does not open automatically,",
     openDestination: "tap here",
     advertisement: "Advertisement",
-  };
+    poweredBy: "Powered by Link My App",
+  },
+  es: {
+    title: "Redirigiendo…",
+    fallback: "Si no se abre automáticamente,",
+    openDestination: "pulsa aquí",
+    advertisement: "Publicidad",
+    poweredBy: "Con tecnología de Link My App",
+  },
+  fr: {
+    title: "Redirection en cours…",
+    fallback: "Si la page ne s’ouvre pas automatiquement,",
+    openDestination: "appuyez ici",
+    advertisement: "Publicité",
+    poweredBy: "Propulsé par Link My App",
+  },
+  ja: {
+    title: "リダイレクトしています…",
+    fallback: "自動的に開かない場合は、",
+    openDestination: "ここをタップしてください",
+    advertisement: "広告",
+    poweredBy: "Link My App を使用",
+  },
+  de: {
+    title: "Du wirst weitergeleitet…",
+    fallback: "Falls sich die Seite nicht automatisch öffnet,",
+    openDestination: "tippe hier",
+    advertisement: "Werbung",
+    poweredBy: "Bereitgestellt von Link My App",
+  },
+  pt: {
+    title: "A redirecionar…",
+    fallback: "Se não abrir automaticamente,",
+    openDestination: "toca aqui",
+    advertisement: "Publicidade",
+    poweredBy: "Com tecnologia Link My App",
+  },
+  it: {
+    title: "Reindirizzamento in corso…",
+    fallback: "Se non si apre automaticamente,",
+    openDestination: "tocca qui",
+    advertisement: "Pubblicità",
+    poweredBy: "Con tecnologia Link My App",
+  },
+  ko: {
+    title: "이동 중…",
+    fallback: "자동으로 열리지 않으면,",
+    openDestination: "여기를 탭하세요",
+    advertisement: "광고",
+    poweredBy: "Link My App 제공",
+  },
+  nl: {
+    title: "Je wordt doorgestuurd…",
+    fallback: "Als de pagina niet automatisch opent,",
+    openDestination: "tik hier",
+    advertisement: "Advertentie",
+    poweredBy: "Mogelijk gemaakt door Link My App",
+  },
+  ar: {
+    title: "جارٍ إعادة التوجيه…",
+    fallback: "إذا لم تُفتح الصفحة تلقائيًا،",
+    openDestination: "اضغط هنا",
+    advertisement: "إعلان",
+    poweredBy: "بدعم من Link My App",
+  },
+  hi: {
+    title: "रीडायरेक्ट किया जा रहा है…",
+    fallback: "अगर यह अपने आप नहीं खुलता है,",
+    openDestination: "यहाँ टैप करें",
+    advertisement: "विज्ञापन",
+    poweredBy: "Link My App द्वारा संचालित",
+  },
+};
+
+export function redirectCopy(request: Request): RedirectCopy {
+  let selectedLanguage: RedirectLanguage = "en";
+  let highestQuality = 0;
+
+  for (const preference of (request.headers.get("accept-language") || "").split(",")) {
+    const [tag, ...parameters] = preference.trim().split(";");
+    const languageCode = tag?.split("-", 1)[0]?.toLowerCase() || "";
+    if (!Object.hasOwn(REDIRECT_COPIES, languageCode)) continue;
+    const language = languageCode as RedirectLanguage;
+
+    const qualityParameter = parameters.find((parameter) => /^\s*q\s*=/i.test(parameter));
+    const quality = qualityParameter
+      ? Number(qualityParameter.split("=", 2)[1]?.trim())
+      : 1;
+    if (!Number.isFinite(quality) || quality <= 0 || quality > 1) continue;
+    if (quality > highestQuality) {
+      selectedLanguage = language;
+      highestQuality = quality;
+    }
+  }
+
+  return { language: selectedLanguage, ...REDIRECT_COPIES[selectedLanguage] };
 }
 
 type RedirectInterstitialOptions = {
@@ -711,9 +795,11 @@ export function redirectInterstitialHtml({
   const safeTarget = escapeHtml(target);
   const safeNonce = escapeHtml(nonce);
   const fallbackDelaySeconds = Math.ceil((delayMs + 2_500) / 1_000);
+  const directionAttribute = copy.language === "ar" ? ' dir="rtl"' : "";
+  const sentenceEnd = copy.language === "ja" ? "。" : copy.language === "hi" ? "।" : ".";
 
   return `<!doctype html>
-<html lang="${copy.language}">
+<html lang="${copy.language}"${directionAttribute}>
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -745,12 +831,12 @@ export function redirectInterstitialHtml({
       <section class="card">
         <h1>${escapeHtml(copy.title)}</h1>
         <div class="progress" aria-hidden="true"></div>
-        <p class="fallback">${escapeHtml(copy.fallback)} <a href="${safeTarget}" rel="nofollow noreferrer">${escapeHtml(copy.openDestination)}</a>.</p>
+        <p class="fallback">${escapeHtml(copy.fallback)} <a href="${safeTarget}" rel="nofollow noreferrer">${escapeHtml(copy.openDestination)}</a>${sentenceEnd}</p>
         <aside id="redirect-ad-slot" class="ad-slot" data-ad-placement="smart-link-interstitial" aria-label="${escapeHtml(copy.advertisement)}" hidden></aside>
       </section>
       <div class="powered">
         <img src="/logo-link-my-app.avif" width="22" height="22" alt="">
-        <span>Powered by Link My App</span>
+        <span>${escapeHtml(copy.poweredBy)}</span>
       </div>
     </main>
     <script nonce="${safeNonce}">
