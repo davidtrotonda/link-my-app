@@ -6,6 +6,11 @@ Link My App lets app owners create one short URL that detects the visitor device
 
 Created by [David Trotonda](https://github.com/davidtrotonda).
 
+## Tools for launching an app
+
+- Preview and copy HTML for separate App Store and Google Play buttons or one smart link button. [Download button generator](https://link-my.app/how-to/app-download-button-website?utm_source=github&utm_medium=referral&utm_campaign=app_launch_tools) · [Español](https://link-my.app/es/como/boton-descarga-app-web?utm_source=github&utm_medium=referral&utm_campaign=app_launch_tools)
+- Scan or open the same QR to try the iPhone, Android and desktop destinations. [App download QR demo](https://link-my.app/qr-code-for-apps?utm_source=github&utm_medium=referral&utm_campaign=app_launch_tools) · [Español](https://link-my.app/es/codigo-qr-app?utm_source=github&utm_medium=referral&utm_campaign=app_launch_tools)
+
 ## What it does
 
 - Smart redirects from `/r/:slug` based on user agent.
