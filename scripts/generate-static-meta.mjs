@@ -15,7 +15,7 @@ import {
 } from "../src/lib/i18nRoutes.js";
 import { niches, nichePath, useCaseHubRoutes } from "../src/lib/useCases.js";
 import { howTos, howToHubRoutes, howToPath } from "../src/lib/howTos.js";
-import { englishDownloadLinks, websiteButtonGuideId } from "../src/lib/downloadResourceLinks.js";
+import { englishDownloadLinks } from "../src/lib/downloadResourceLinks.js";
 import { getDateForSlugISO } from "../src/lib/blogDates.js";
 import {
   legalPagesAr,
@@ -335,9 +335,9 @@ function englishResourceLinks(entry) {
     }))];
   }
   if (entry.id.startsWith("how-to-")) {
-    return entry.id === `how-to-${websiteButtonGuideId}`
-      ? [generator, qr]
-      : [generator, qr, websiteButton];
+    return entry.id === "how-to-redirect-by-device"
+      ? [generator, qr, websiteButton]
+      : [generator, qr];
   }
   if (entry.slug === "alternativa-gratis-onelink-to") return [generator];
   return [];

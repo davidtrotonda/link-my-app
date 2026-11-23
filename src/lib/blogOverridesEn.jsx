@@ -76,23 +76,35 @@ export const englishBlogOverrides = {
     content: (
       <div className="text-[#111827] text-[15px] sm:text-[16px] leading-[1.7] space-y-6">
         <p>
-          Link My App and OneLink.to both let you share one download link for iPhone and Android. Both have a free plan with QR codes and device statistics. The main differences are how many links you can create and which customization and analytics features come with the free plan.
+          Link My App is a free OneLink.to alternative for sharing an app download link. Both tools can open the App Store on iPhone, Google Play on Android, and a website you choose on a computer. Each free plan includes QR codes and click data by device.
         </p>
 
         <h2 className="text-[22px] font-bold mt-12 mb-4 tracking-tight scroll-mt-32">What each free plan includes</h2>
         <p>
-          <strong>Link My App</strong> lists unlimited smart links, downloadable QR codes, editable link names, and click statistics by device and campaign. You can set an App Store destination, a Google Play destination, and a fallback page for other devices. See the <Link to={localizePath("/pricing", "en")} className="underline underline-offset-2">Link My App plan</Link> for the included features.
+          <strong>Link My App</strong> includes unlimited smart links, downloadable QR codes, custom URL slugs, and click statistics by device and campaign in its <Link to={localizePath("/pricing", "en")} className="underline underline-offset-2">free plan</Link>. You can create separate links for your website, social bio, and printed QR to compare clicks by placement.
         </p>
         <p>
-          <strong>OneLink.to Free</strong> includes three links, QR styling, device statistics, and 90 days of daily statistics. Its <a href="https://www.onelink.to/pricing" className="underline underline-offset-2">official plan comparison</a> lists custom link names on Professional and custom domains on Team Plus and Enterprise.
+          <strong>OneLink.to Free</strong> includes three active links, QR styling, device statistics, and 90 days of daily statistics. After the first three months, the first 1,000 clicks or scans each month redirect without a OneLink.to page in between. Visitors above that threshold see a forwarding page and can still reach the destination. See the <a href="https://www.onelink.to/what-happens-after-1000-clicks-free-plan" className="underline underline-offset-2">OneLink.to explanation of the threshold</a>.
         </p>
 
-        <h2 className="text-[22px] font-bold mt-12 mb-4 tracking-tight scroll-mt-32">Choose based on where the link should open</h2>
+        <h2 className="text-[22px] font-bold mt-12 mb-4 tracking-tight scroll-mt-32">When an upgraded OneLink.to plan makes sense</h2>
+        <ul className="list-disc space-y-2 pl-6">
+          <li>Professional has 10 links and adds custom slugs, separate Windows and Mac destinations, and more detailed click reports.</li>
+          <li>Team has 200 links and adds UTM campaign reporting, parameter forwarding, and deferred deep linking on Android.</li>
+          <li>Team Plus has 500 links and adds one custom domain, Open in App, and the statistics API.</li>
+          <li>Enterprise has unlimited links and includes three custom domains.</li>
+          <li>The Non-Profit plan offers custom slugs and two years of daily statistics for eligible organizations.</li>
+        </ul>
         <p>
-          If you want separate download links for your website, social bio, and printed QR, Link My App lets you create a link for each placement and compare the clicks. To open a specific screen inside an already installed app, review <a href="https://www.onelink.to/features/open-in-app" className="underline underline-offset-2">OneLink.to's Open in App feature</a> on Team Plus and Enterprise. It requires a custom domain and configuration in your app. Both tools can send visitors to the store, while opening an in-app screen is a separate feature.
+          Check the <a href="https://www.onelink.to/pricing" className="underline underline-offset-2">official OneLink.to plan comparison</a> for current prices and limits. If you need to open a particular screen in an installed app, <a href="https://www.onelink.to/features/open-in-app" className="underline underline-offset-2">Open in App</a> requires a custom domain and a change to the app. Plan details were checked on November 23, 2026.
+        </p>
+
+        <h2 className="text-[22px] font-bold mt-12 mb-4 tracking-tight scroll-mt-32">Test the same download setup in both tools</h2>
+        <p>
+          Use the same App Store and Google Play listings and the same desktop fallback in each tool. For OneLink.to, follow its <a href="https://www.onelink.to/guides/create-your-first-onelink" className="underline underline-offset-2">first-link guide</a>. In Link My App, enter your URLs in the form and sign in to create the smart link.
         </p>
         <p>
-          Plan details checked on November 23, 2026. Click statistics show how people used your link or QR code. You can check completed downloads in your app store reporting.
+          Open the saved link and scan its QR code on iPhone and Android. Try the link on a computer to check the fallback. Look for those visits in the click reports and check completed downloads in your app store reporting.
         </p>
 
         <div className="bg-gray-50 border border-gray-200 rounded-2xl p-6 sm:p-8 mt-10 text-center">

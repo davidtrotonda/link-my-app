@@ -120,7 +120,7 @@ export const blogSeoPosts = [
       en: {
         title: "Free OneLink.to Alternative for App Store & Google Play",
         description:
-          "Compare Link My App and OneLink.to for app download links, QR codes, and click stats. See what each free plan offers for App Store and Google Play.",
+          "Compare the free plans from Link My App and OneLink.to for App Store and Google Play. Check link limits, QR codes, custom slugs, and click analytics.",
       },
       fr: {
         title: "La meilleure alternative a onelink.to, gratuite et moderne",

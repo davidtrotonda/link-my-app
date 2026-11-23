@@ -17,7 +17,7 @@ import { FinalFooter as LandingFinalFooter, animationStyles } from "./LandingVis
 import { localizePath, normalizeLanguage } from "./lib/i18nRoutes.js";
 import { howTos, howToHubRoutes, howToPath, getHowToBySlug } from "./lib/howTos.js";
 import { getNicheById, nichePath } from "./lib/useCases.js";
-import { englishDownloadLinks, websiteButtonGuideId } from "./lib/downloadResourceLinks.js";
+import { englishDownloadLinks } from "./lib/downloadResourceLinks.js";
 
 const brandName = "Link My App";
 const siteUrl = "https://link-my.app";
@@ -94,11 +94,10 @@ export default function HowToPage() {
     [howto],
   );
 
-  const otherGuides = howTos.filter((guide) => guide.id !== howto.id);
-  const websiteButtonGuide = otherGuides.find((guide) => guide.id === websiteButtonGuideId);
-  const featuredGuides = language === "en" && websiteButtonGuide
-    ? [websiteButtonGuide, ...otherGuides.filter((guide) => guide !== websiteButtonGuide)].slice(0, 3)
-    : otherGuides.slice(0, 3);
+  const otherGuides = useMemo(
+    () => howTos.filter((h) => h.id !== howto.id).slice(0, 3),
+    [howto.id],
+  );
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-white text-black">
@@ -255,7 +254,7 @@ export default function HowToPage() {
           {t("howTo.otherGuidesTitle", "Sigue aprendiendo a usar tu smart link")}
         </h2>
         <div className="mt-8 grid gap-4 md:grid-cols-3">
-          {featuredGuides.map((g) => {
+          {otherGuides.map((g) => {
             const c = g[language] || g.en;
             const Ic = iconByName[g.icon] || Instagram;
             return (
