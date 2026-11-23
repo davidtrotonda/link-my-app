@@ -1,5 +1,6 @@
 export const analyticsConsentKey = "link-my-app.cookie-consent";
 const measurementId = import.meta.env?.VITE_FIREBASE_MEASUREMENT_ID;
+const landingFormPages = ["/", "/es"];
 let analyticsStarted = false;
 
 export function readAnalyticsPreference() {
@@ -42,11 +43,16 @@ export function startAnalytics() {
 }
 
 export function canTrackLandingForm(page) {
-  return (page === "/" || page === "/es") && startAnalytics();
+  return landingFormPages.includes(page) && startAnalytics();
+}
+
+export function trackAnalyticsEvent(eventName, parameters) {
+  if (!startAnalytics()) return false;
+  window.gtag("event", eventName, parameters);
+  return true;
 }
 
 export function trackLandingFormEvent(eventName, page) {
-  if (!canTrackLandingForm(page)) return false;
-  window.gtag("event", eventName, { landing_form_page: page });
-  return true;
+  if (!landingFormPages.includes(page)) return false;
+  return trackAnalyticsEvent(eventName, { landing_form_page: page });
 }

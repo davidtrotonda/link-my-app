@@ -571,6 +571,27 @@
     "ctaSubtitle": "Envía usuarios con un link a App Store, Google Play o web y mide cada clic.",
     "ctaButton": "Crear cuenta gratis"
   },
+  "websiteButtonGenerator": {
+    "title": "Generador de botones de descarga",
+    "difference": "Cada botón de tienda abre su ficha y un botón con smart link usa ese enlace para elegir el destino según el dispositivo.",
+    "createSmartLink": "Crear un smart link",
+    "modeLabel": "Tipo de botón",
+    "modes": { "stores": "Botones de tiendas", "smart": "Un botón con smart link" },
+    "fields": { "ios": "URL de App Store", "android": "URL de Google Play", "smart": "Smart link existente" },
+    "buttons": { "ios": "Descargar en App Store", "android": "Descargar en Google Play", "smart": "Descargar la app" },
+    "errors": {
+      "ios": "Introduce la URL de la ficha de una app en App Store.",
+      "android": "Introduce la URL de la ficha de Google Play con el ID de la app.",
+      "smart": "Introduce un enlace HTTP o HTTPS válido."
+    },
+    "example": "Cargar el ejemplo de Tourixy",
+    "preview": "Vista previa del botón",
+    "emptyPreview": "Introduce una URL para ver el botón.",
+    "html": "HTML para pegar en tu web",
+    "copy": "Copiar HTML",
+    "copied": "HTML copiado.",
+    "copyManually": "El HTML está seleccionado. Usa la opción de copiar de tu dispositivo."
+  },
   "howTo": {
     "hubBreadcrumb": "Guías",
     "readGuide": "Leer guía",
