@@ -1,3 +1,4 @@
+import assert from "node:assert/strict";
 import fs from "node:fs";
 import process from "node:process";
 import {
@@ -136,7 +137,28 @@ try {
     throw new Error("Un enlace desactivado sigue visible en la capa pública.");
   }
 
-  console.log("Reglas verificadas: redirección pública, privacidad, URLs y desactivación.");
+  const firstLinkEvent = `firstSmartLinkEvents/${ownerId}`;
+  await assertFails(set(ref(strangerDb, firstLinkEvent), true));
+  const attempts = await Promise.allSettled(
+    ["first-attempt", "competing-attempt"].map((id) => update(ref(ownerDb), {
+      [firstLinkEvent]: true,
+      [`links/${id}`]: { ...activeLink, slug: id },
+      [`publicLinks/${id}`]: { ...publicLink, slug: id },
+    })),
+  );
+  assert.equal(attempts.filter((attempt) => attempt.status === "fulfilled").length, 1);
+  const losingLink = attempts[0].status === "rejected" ? "first-attempt" : "competing-attempt";
+  const losingWrite = await get(query(ref(anonymousDb, "publicLinks"), orderByChild("slug"), equalTo(losingLink)));
+  assert.equal(losingWrite.exists(), false, "A rejected event claim must not save a link");
+  await assertFails(get(ref(ownerDb, firstLinkEvent)));
+  await assertFails(set(ref(ownerDb, firstLinkEvent), true));
+  await assertFails(set(ref(ownerDb, firstLinkEvent), null));
+  await testEnv.withSecurityRulesDisabled((context) =>
+    set(ref(context.database(), `users/${ownerId}`), null),
+  );
+  await assertSucceeds(set(ref(ownerDb, firstLinkEvent), null));
+
+  console.log("Reglas verificadas: redirección pública, privacidad, URLs, desactivación y evento de primer enlace.");
 } finally {
   await testEnv.cleanup();
 }

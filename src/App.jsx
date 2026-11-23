@@ -32,6 +32,7 @@ import {
   serverTimestamp,
   equalTo,
   get,
+  limitToFirst,
   limitToLast,
   onValue,
   orderByChild,
@@ -131,6 +132,13 @@ import {
 } from "./lib/i18nRoutes.js";
 import { visibleUseCaseTeasers as useCaseNiches, teaserNichePath as nichePath } from "./lib/useCaseTeasers.js";
 import { getOpenSourceContent, openSourceLinks } from "./lib/openSourceContent.js";
+import {
+  analyticsConsentKey,
+  canTrackLandingForm,
+  readAnalyticsPreference,
+  startAnalytics,
+  trackLandingFormEvent,
+} from "./lib/landingAnalytics.js";
 import { socialGlyphs } from "./components/SocialIcons.jsx";
 
 const BlogIndex = React.lazy(() =>
@@ -174,6 +182,7 @@ function normalizeLinkDestinationUrls(form) {
 }
 
 const linkDraftStorageKey = "link-my-app.pendingLinkDraft";
+const landingAttributionWindowMs = 30 * 60 * 1000;
 const brandName = "Link My App";
 const siteUrl = "https://link-my.app";
 const brandLogoUrl = `${siteUrl}/favicon-512.png`;
@@ -869,38 +878,68 @@ async function getWithLegacyFallback(primaryLocation, legacyLocation) {
   }
 }
 
-async function writePrivateAndPublicLink(linkRef, link) {
+function isDatabasePermissionDenied(error) {
+  return String(error?.code).toLowerCase().replace("_", "-") === "permission-denied";
+}
+
+async function writePrivateAndPublicLink(linkRef, link, claimFirstLinkEvent = false) {
   const linkId = linkRef.key;
   if (!linkId) throw new Error("No se pudo crear el identificador del link.");
 
-  await update(ref(db), {
+  const updates = {
     [`links/${linkId}`]: link,
     [`publicLinks/${linkId}`]: link.active ? publicLinkData(link) : null,
-  });
+  };
+  let firstLinkEventClaimed = false;
+  if (claimFirstLinkEvent) {
+    try {
+      await update(ref(db), {
+        ...updates,
+        [`firstSmartLinkEvents/${link.ownerId}`]: true,
+      });
+      firstLinkEventClaimed = true;
+    } catch (error) {
+      // The write-once marker may already belong to another submission.
+      if (!isDatabasePermissionDenied(error)) throw error;
+    }
+  }
+  if (!firstLinkEventClaimed) await update(ref(db), updates);
   await syncLinkAtEdge(auth?.currentUser, linkId);
+  return firstLinkEventClaimed;
 }
 
 function hasLinkDraftData(draft) {
   return Object.values(sanitizeLinkDraft(draft)).some((value) => value.trim());
 }
 
-function readLinkDraft() {
-  if (typeof window === "undefined") return emptyLinkForm;
-
+function readStoredLinkDraft() {
   try {
-    const rawDraft = window.localStorage.getItem(linkDraftStorageKey);
-    return rawDraft ? sanitizeLinkDraft(JSON.parse(rawDraft)) : emptyLinkForm;
+    return JSON.parse(window.localStorage.getItem(linkDraftStorageKey));
   } catch {
-    return emptyLinkForm;
+    return null;
   }
 }
 
-function saveLinkDraft(draft) {
+function readLinkDraft() {
+  return sanitizeLinkDraft(readStoredLinkDraft());
+}
+
+function readLinkDraftAnalyticsPage(storedDraft = readStoredLinkDraft()) {
+  const attribution = storedDraft?.attribution;
+  return attribution?.expiresAt > Date.now() && canTrackLandingForm(attribution.page)
+    ? attribution.page
+    : undefined;
+}
+
+function saveLinkDraft(draft, analyticsPage) {
   if (typeof window === "undefined") return;
 
   const nextDraft = sanitizeLinkDraft(draft);
   if (!hasLinkDraftData(nextDraft)) return;
-  window.localStorage.setItem(linkDraftStorageKey, JSON.stringify(nextDraft));
+  const attribution = canTrackLandingForm(analyticsPage)
+    ? { page: analyticsPage, expiresAt: Date.now() + landingAttributionWindowMs }
+    : undefined;
+  window.localStorage.setItem(linkDraftStorageKey, JSON.stringify({ ...nextDraft, attribution }));
 }
 
 function clearLinkDraft() {
@@ -1088,7 +1127,14 @@ async function createSmartLink(form, user, options = {}) {
     throw createLinkError("link/destinations-invalid");
   }
 
-  const slug = await findAvailableSlug(requestedSlug);
+  const { analyticsPage } = options;
+  const [slug, existingLinks] = await Promise.all([
+    findAvailableSlug(requestedSlug),
+    canTrackLandingForm(analyticsPage)
+      ? get(query(ref(db, "links"), orderByChild("ownerId"), equalTo(user.uid), limitToFirst(1)))
+          .catch(() => null)
+      : null,
+  ]);
 
   const linkRef = push(ref(db, "links"));
   const payload = {
@@ -1109,17 +1155,23 @@ async function createSmartLink(form, user, options = {}) {
   if (options.channel) {
     payload.channel = options.channel;
   }
-  await writePrivateAndPublicLink(linkRef, payload);
+  const claimFirstLinkEvent = existingLinks?.exists() === false && canTrackLandingForm(analyticsPage);
+  if (await writePrivateAndPublicLink(linkRef, payload, claimFirstLinkEvent)) {
+    trackLandingFormEvent("first_smart_link_created", analyticsPage);
+  }
 
   return slug;
 }
 
 async function createPendingSmartLink(user) {
-  const draft = readLinkDraft();
+  const storedDraft = readStoredLinkDraft();
+  const draft = sanitizeLinkDraft(storedDraft);
   if (!hasLinkDraftData(draft)) return null;
 
   try {
-    const slug = await createSmartLink(draft, user);
+    const slug = await createSmartLink(draft, user, {
+      analyticsPage: readLinkDraftAnalyticsPage(storedDraft),
+    });
     clearLinkDraft();
     return slug;
   } catch (error) {
@@ -1444,6 +1496,7 @@ function LinkCreateForm({
   onDisabledSubmit,
   hasExistingLinks = false,
   isPro = false,
+  analyticsPage,
 }) {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
@@ -1454,6 +1507,8 @@ function LinkCreateForm({
   const [error, setError] = useState("");
   const [selectedChannel, setSelectedChannel] = useState(null);
   const submitButtonRef = React.useRef(null);
+  const formStarted = useRef(false);
+  const submitting = useRef(false);
 
   const baseSlug =
     slugFromInput(form.customUrl || form.title) ||
@@ -1462,8 +1517,15 @@ function LinkCreateForm({
   const previewUrl = publicLinkForSlug(publicBaseUrl, effectiveSlug);
 
   function updateField(field, value) {
+    if (value.trim()) trackFormStart();
     setError("");
     setForm((current) => ({ ...current, [field]: value }));
+  }
+
+  function trackFormStart() {
+    if (!formStarted.current) {
+      formStarted.current = trackLandingFormEvent("smart_link_form_start", analyticsPage);
+    }
   }
 
   function handleChannelClick(channel) {
@@ -1485,6 +1547,7 @@ function LinkCreateForm({
 
   async function handleSubmit(event) {
     event.preventDefault();
+    if (submitting.current) return;
     setError("");
 
     if (!form.title.trim()) {
@@ -1526,9 +1589,11 @@ function LinkCreateForm({
     }
 
     setForm(normalizedForm);
+    trackFormStart();
 
     if (!user) {
-      saveLinkDraft(normalizedForm);
+      saveLinkDraft(normalizedForm, analyticsPage);
+      trackLandingFormEvent("smart_link_auth_start", analyticsPage);
       navigate(localizePath("/login?linkDraft=1", i18n.language));
       return;
     }
@@ -1538,6 +1603,7 @@ function LinkCreateForm({
       return;
     }
 
+    submitting.current = true;
     setSaving(true);
     try {
       // If a channel is selected we force the slug suffix by passing the
@@ -1548,6 +1614,7 @@ function LinkCreateForm({
         : normalizedForm;
       const slug = await createSmartLink(formForSubmit, user, {
         channel: selectedChannel?.id,
+        analyticsPage: analyticsPage || (draftReady ? readLinkDraftAnalyticsPage() : undefined),
       });
       clearLinkDraft();
       setForm(emptyLinkForm);
@@ -1557,6 +1624,7 @@ function LinkCreateForm({
     } catch (nextError) {
       setError(formatLinkError(nextError, t));
     } finally {
+      submitting.current = false;
       setSaving(false);
     }
   }
@@ -1798,6 +1866,8 @@ function LandingPage() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const language = normalizeLanguage(i18n.language);
+  const hasNewFormCopy = ["en", "es", "ja", "de"].includes(language);
   const [openFaq, setOpenFaq] = useState(-1);
   const faqSchema = useMemo(
     () => ({
@@ -1924,9 +1994,17 @@ function LandingPage() {
                 </div>
               </div>
 
+              {hasNewFormCopy && (
+                <div className="mb-5 space-y-2 text-sm leading-6 text-black/65">
+                  <p>{t("landing.formRouting")}</p>
+                  {!user && <p>{t("landing.formSignInNote")}</p>}
+                </div>
+              )}
+
               <LinkCreateForm
                 onCreated={() => navigate(localizePath("/dashboard", i18n.language))}
                 buttonLabel={user ? t("landing.formButton") : t("landing.formLoginButton")}
+                analyticsPage={hasNewFormCopy ? localizePath("/", language) : undefined}
               />
             </div>
           </div>
@@ -2875,8 +2953,9 @@ function LoginPage() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
 
-
-  if (user) return <Navigate to={localizePath("/dashboard", i18n.language)} replace />;
+  if (user && !loadingProvider) {
+    return <Navigate to={localizePath("/dashboard", i18n.language)} replace />;
+  }
 
   async function handleProvider(providerType) {
     if (!firebaseReady || !auth) return;
@@ -4121,6 +4200,9 @@ function AccountDetailsModal({ user, profile, onDeleted, onClose }) {
       await update(ref(db), {
         [`users/${user.uid}`]: null,
         [`publicProfiles/${user.uid}`]: null,
+      });
+      await remove(ref(db, `firstSmartLinkEvents/${user.uid}`)).catch((error) => {
+        if (!isDatabasePermissionDenied(error)) throw error;
       });
       await deleteUser(auth.currentUser);
       onDeleted?.();
@@ -6745,19 +6827,17 @@ function NotFoundPage() {
   );
 }
 
-const cookieConsentKey = "link-my-app.cookie-consent";
-
 function CookieConsentBanner() {
   const { t } = useTranslation();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const storedConsent = window.localStorage.getItem(cookieConsentKey);
-    setVisible(!storedConsent);
+    setVisible(!readAnalyticsPreference());
   }, []);
 
   function saveConsent(value) {
-    window.localStorage.setItem(cookieConsentKey, value);
+    window.localStorage.setItem(analyticsConsentKey, value);
+    if (value === "accepted") startAnalytics();
     setVisible(false);
   }
 

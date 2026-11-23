@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import App from "./App.jsx";
 import ScrollToTop from "./components/ScrollToTop.jsx";
+import { startAnalytics } from "./lib/landingAnalytics.js";
 import "./index.css";
 import "./i18n";
 
@@ -28,6 +29,8 @@ class ErrorBoundary extends React.Component {
     return this.props.children;
   }
 }
+
+startAnalytics();
 
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>

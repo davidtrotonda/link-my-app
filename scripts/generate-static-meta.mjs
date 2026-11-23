@@ -31,6 +31,7 @@ import {
 } from "../src/lib/legalPages.js";
 import { blogSeoPosts, getBlogSeoMeta } from "../src/lib/blogSeoMeta.js";
 import { getOpenSourceContent } from "../src/lib/openSourceContent.js";
+import qrDemo from "../src/lib/qrDemo.json" with { type: "json" };
 const { loadStaticSeoData } = await import("./load-blog-static-data.mjs");
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -324,6 +325,17 @@ function collectReadableText(value, output = []) {
   return output;
 }
 
+function staticQrDemo(language) {
+  const { qr } = readLocale(language);
+  const createPath = localizePath("/#crear", language);
+  return `<section aria-labelledby="static-qr-demo-title">
+        <h2 id="static-qr-demo-title">${escapeHtml(qr.demoTitle)}</h2>
+        <img src="${qrDemo.imagePath}" width="320" height="320" style="max-width:100%;height:auto" alt="${escapeHtml(qr.demoImageAlt)}" />
+        <p>${escapeHtml(qr.demoIos)} · ${escapeHtml(qr.demoAndroid)} · ${escapeHtml(qr.demoDesktop)}</p>
+        <p><a href="${qrDemo.path}">${escapeHtml(qr.demoOpen)}</a> · <a href="${createPath}">${escapeHtml(qr.ctaPrimary)}</a></p>
+      </section>`;
+}
+
 function staticContentBlock({ entry, language, title, description, robots }) {
   const collected = collectReadableText(entry.getContent?.(language));
   const paragraphs = [...new Set([description, ...collected])];
@@ -337,6 +349,9 @@ function staticContentBlock({ entry, language, title, description, robots }) {
   const useCasesPath = localizePath("/use-cases", language);
   const howToPathname = localizePath("/how-to", language);
   const blogPath = localizePath("/blog", language);
+  const demo = entry.id === "qr-codes" && (language === "en" || language === "es")
+    ? staticQrDemo(language)
+    : "";
 
   return `<style id="app-loading-shell-styles">
       #app-loading-shell{position:fixed;inset:0;z-index:2147483647;display:grid;place-items:center;min-height:100vh;background-color:#fff;background-image:linear-gradient(rgba(17,24,39,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(17,24,39,.035) 1px,transparent 1px);background-size:44px 44px;font-family:Arial,sans-serif;color:#050505}
@@ -360,6 +375,7 @@ function staticContentBlock({ entry, language, title, description, robots }) {
     <main id="seo-static-content" style="max-width:1120px;margin:0 auto;padding:96px 24px 64px;font-family:Arial,sans-serif;line-height:1.65;color:#111827">
       <h1 style="max-width:900px;font-size:clamp(2rem,5vw,4rem);line-height:1.05">${escapeHtml(title)}</h1>
       ${selectedParagraphs.map((paragraph) => `<p style="max-width:850px">${escapeHtml(paragraph)}</p>`).join("\n      ")}
+      ${demo}
       ${robots?.startsWith("noindex") ? "" : `<nav aria-label="Public pages" style="display:flex;flex-wrap:wrap;gap:16px;margin-top:32px"><a href="${homePath}">Link My App</a><a href="${useCasesPath}">Use cases</a><a href="${howToPathname}">Guides</a><a href="${blogPath}">Blog</a></nav>`}
     </main>`;
 }

@@ -20,6 +20,8 @@ import { SEO, LegalNavbar } from "./App.jsx";
 import { FinalFooter as LandingFinalFooter, animationStyles } from "./LandingVisuals.jsx";
 import { localizePath, normalizeLanguage } from "./lib/i18nRoutes.js";
 import { niches as useCaseNiches, nichePath } from "./lib/useCases.js";
+import { trackAnalyticsEvent } from "./lib/landingAnalytics.js";
+import qrDemo from "./lib/qrDemo.json";
 
 const brandName = "Link My App";
 const siteUrl = "https://link-my.app";
@@ -131,10 +133,40 @@ function QrScanAnimation() {
 /* ---------------------------------------------------------------------------
    Página completa de QR
 --------------------------------------------------------------------------- */
+function QrDemo({ language, t }) {
+  return (
+    <aside aria-labelledby="qr-demo-title" className="mx-auto w-full max-w-[440px] rounded-[32px] border border-black/10 bg-[#fafaf8] p-6 text-center shadow-[0_18px_45px_rgba(0,0,0,0.07)]">
+      <h2 id="qr-demo-title" className="text-xl font-black tracking-tight">{t("qr.demoTitle")}</h2>
+      <p className="mt-2 text-sm leading-6 text-black/65">{t("qr.demoHint")}</p>
+      <img
+        src={qrDemo.imagePath}
+        width="320"
+        height="320"
+        alt={t("qr.demoImageAlt")}
+        className="mx-auto my-4 h-auto w-48 rounded-xl bg-white sm:w-56"
+      />
+      <ul className="mx-auto mb-5 grid w-fit gap-1 text-left text-sm leading-6 text-black/75">
+        <li>{t("qr.demoIos")}</li>
+        <li>{t("qr.demoAndroid")}</li>
+        <li>{t("qr.demoDesktop")}</li>
+      </ul>
+      <a
+        href={qrDemo.path}
+        onClick={() => trackAnalyticsEvent("qr_demo_opened", { guide_language: language })}
+        className="inline-flex min-h-11 items-center justify-center rounded-full border border-black/20 bg-white px-5 py-2 text-sm font-bold underline underline-offset-4 hover:border-black"
+      >
+        {t("qr.demoOpen")}
+      </a>
+    </aside>
+  );
+}
+
 export default function QrLandingPage() {
   const { t, i18n } = useTranslation();
   const language = normalizeLanguage(i18n.language);
   const [openFaq, setOpenFaq] = useState(-1);
+  const showDemo = language === "en" || language === "es";
+  const createPath = localizePath(showDemo ? "/#crear" : "/login", language);
 
   const pageTitle = t(
     "qr.metaTitle",
@@ -403,36 +435,40 @@ export default function QrLandingPage() {
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Link
-                to={localizePath("/login", language)}
+                to={createPath}
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-black px-6 py-3 text-sm font-black tracking-[-0.01em] text-white shadow-[0_18px_40px_rgba(0,0,0,0.18)] transition hover:-translate-y-0.5 hover:shadow-[0_22px_45px_rgba(0,0,0,0.24)]"
               >
                 {t("qr.ctaPrimary", "Crear mi QR gratis")} <QrCode size={16} />
               </Link>
-              <Link
-                to={localizePath("/login", language)}
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-black/12 bg-white px-6 py-3 text-sm font-black tracking-[-0.01em] text-black transition hover:-translate-y-0.5 hover:border-black/25"
-              >
-                {t("qr.ctaSecondary", "Crear cuenta gratis")}
-              </Link>
+              {!showDemo && (
+                <Link
+                  to={localizePath("/login", language)}
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-black/12 bg-white px-6 py-3 text-sm font-black tracking-[-0.01em] text-black transition hover:-translate-y-0.5 hover:border-black/25"
+                >
+                  {t("qr.ctaSecondary", "Crear cuenta gratis")}
+                </Link>
+              )}
             </div>
 
-            <ul className="mt-7 grid gap-2.5 text-sm font-medium text-black/65">
-              {[
-                t("qr.heroBullet1", "QR gratis y sin fecha de caducidad"),
-                t("qr.heroBullet2", "Funciona para iPhone, Android y ordenador"),
-                t("qr.heroBullet3", "Estadísticas separadas para escaneos QR"),
-              ].map((line) => (
-                <li key={line} className="flex items-center gap-2">
-                  <span className="grid h-5 w-5 place-items-center rounded-full bg-emerald-100 text-emerald-700">
-                    <Check size={12} strokeWidth={3} />
-                  </span>
-                  {line}
-                </li>
-              ))}
-            </ul>
+            {!showDemo && (
+              <ul className="mt-7 grid gap-2.5 text-sm font-medium text-black/65">
+                {[
+                  t("qr.heroBullet1", "QR gratis y sin fecha de caducidad"),
+                  t("qr.heroBullet2", "Funciona para iPhone, Android y ordenador"),
+                  t("qr.heroBullet3", "Estadísticas separadas para escaneos QR"),
+                ].map((line) => (
+                  <li key={line} className="flex items-center gap-2">
+                    <span className="grid h-5 w-5 place-items-center rounded-full bg-emerald-100 text-emerald-700">
+                      <Check size={12} strokeWidth={3} />
+                    </span>
+                    {line}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
 
-          <QrScanAnimation />
+          {showDemo ? <QrDemo language={language} t={t} /> : <QrScanAnimation />}
         </div>
       </section>
 
@@ -626,7 +662,7 @@ export default function QrLandingPage() {
               </p>
             </div>
             <Link
-              to={localizePath("/login", language)}
+              to={createPath}
               className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-black tracking-[-0.01em] text-black transition hover:-translate-y-0.5 hover:shadow-[0_22px_45px_rgba(255,255,255,0.16)]"
             >
               {t("qr.finalCtaButton", "Generar mi QR")} <QrCode size={16} />

@@ -1,0 +1,7 @@
+{
+  "path": "/demo/qr",
+  "imagePath": "/qr-demo.png",
+  "iosUrl": "https://apps.apple.com/app/id6807142283",
+  "androidUrl": "https://play.google.com/store/apps/details?id=com.tourixy.app",
+  "fallbackUrl": "https://tourixy.com/"
+}
