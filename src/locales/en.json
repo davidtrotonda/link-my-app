@@ -571,6 +571,27 @@
     "ctaSubtitle": "Send users with one link to App Store, Google Play or web and measure every click.",
     "ctaButton": "Create free account"
   },
+  "websiteButtonGenerator": {
+    "title": "App download button generator",
+    "difference": "Store buttons each open a specific listing, while one button with a smart link uses that link’s device routing.",
+    "createSmartLink": "Create a smart link",
+    "modeLabel": "Button type",
+    "modes": { "stores": "Store buttons", "smart": "One smart link button" },
+    "fields": { "ios": "App Store URL", "android": "Google Play URL", "smart": "Existing smart link" },
+    "buttons": { "ios": "Download on the App Store", "android": "Get it on Google Play", "smart": "Download the app" },
+    "errors": {
+      "ios": "Enter a URL that points to an app listing on the App Store.",
+      "android": "Enter a Google Play app listing URL with its app ID.",
+      "smart": "Enter a valid HTTP or HTTPS link."
+    },
+    "example": "Load the Tourixy example",
+    "preview": "Button preview",
+    "emptyPreview": "Enter a URL to preview your button.",
+    "html": "HTML to paste into your website",
+    "copy": "Copy HTML",
+    "copied": "HTML copied.",
+    "copyManually": "The HTML is selected. Use your device’s copy command."
+  },
   "howTo": {
     "hubBreadcrumb": "Guides",
     "readGuide": "Read guide",
