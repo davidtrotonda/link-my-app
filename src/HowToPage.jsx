@@ -143,6 +143,14 @@ export default function HowToPage() {
         <p className="mt-6 max-w-3xl text-base font-medium leading-8 text-black/60 md:text-lg">
           {content.intro}
         </p>
+        {content.creationLink && (
+          <Link
+            to={localizePath(content.creationLink.to, language)}
+            className="mt-4 inline-block font-bold underline underline-offset-4 hover:text-black/65"
+          >
+            {content.creationLink.label}
+          </Link>
+        )}
       </section>
 
       {showButtonGenerator && <WebsiteButtonGenerator key={language} language={language} />}

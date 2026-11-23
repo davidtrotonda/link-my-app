@@ -241,8 +241,9 @@ export const howTos = [
       metaDescription: "Step-by-step guide to redirect your users automatically to App Store on iPhone, Google Play on Android and a fallback URL on desktop.",
       h1: "How to redirect users to App Store or Google Play by device",
       eyebrow: "Device redirect",
-      intro: "If your app is on iOS and Android, one URL must serve three audiences: iPhone, Android and desktop. Here's the setup that does it automatically and counts each visitor by device.",
-      problem: "Sending all traffic to a single store URL means losing half your users. A smart link reads the user agent and decides the destination on the fly.",
+      intro: "Use one smart link to open the App Store on iPhone, Google Play on Android, and a page you choose on desktop. Add those three destinations, save the link, and open the same URL on each device before sharing it.",
+      problem: "A link to a single app store sends everyone to the same listing. A smart link uses the visitor’s device to choose which destination to open.",
+      creationLink: { to: "/#crear", label: "Open the form to add your destinations" },
       totalTime: "PT4M",
       steps: [
         {
@@ -251,15 +252,15 @@ export const howTos = [
         },
         {
           name: "Create the smart link",
-          text: "In your Link My App dashboard, create a new smart link and paste all three URLs. Save.",
+          text: "Paste the two store URLs and your desktop fallback into the Link My App form. Sign in to save the link, then copy it from your dashboard.",
         },
         {
           name: "Confirm the device detection",
           text: "Open the smart link from an iPhone, an Android and a desktop. You should be redirected to the right destination each time.",
         },
         {
-          name: "Replace all your old store links",
-          text: "Anywhere you had two URLs (email signature, bio, ads, QR), replace them with the smart link. Less friction, more conversions.",
+          name: "Share the tested link",
+          text: "Once you’ve verified the destinations, use the same link in your email signature, bio, ads or QR code.",
         },
         {
           name: "Check the dashboard",
