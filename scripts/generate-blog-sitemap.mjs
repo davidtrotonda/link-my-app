@@ -30,32 +30,24 @@ const availableBlogSlugsByLanguage = Object.fromEntries(
   ]),
 );
 
-const now = new Date();
-const todayISO = now.toISOString().slice(0, 10);
-const year = now.getUTCFullYear();
-const month = String(now.getUTCMonth() + 1).padStart(2, "0");
-const monthKey = `${year}-${now.getUTCMonth()}`;
-const todayDay = now.getUTCDate();
-const maxDay = Math.min(28, Math.max(1, todayDay));
-
-function hashString(str) {
-  let hash = 0;
-  for (let i = 0; i < str.length; i += 1) {
-    hash = (hash << 5) - hash + str.charCodeAt(i);
-    hash |= 0;
-  }
-  return Math.abs(hash);
-}
-
-function dayForSlug(slug) {
-  const seed = hashString(`${slug}::${monthKey}`);
-  return (seed % maxDay) + 1;
-}
-
-function isoForSlug(slug) {
-  const day = String(dayForSlug(slug)).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
+// Update the affected canonical paths when significant page changes go live.
+const lastModifiedByPath = {
+  "/": "2026-11-23",
+  "/es": "2026-11-23",
+  "/de": "2026-11-23",
+  "/ja": "2026-11-23",
+  "/qr-code-for-apps": "2026-11-23",
+  "/es/codigo-qr-app": "2026-11-23",
+  "/how-to": "2026-11-23",
+  "/how-to/share-your-app-on-instagram": "2026-11-23",
+  "/how-to/app-download-link-whatsapp": "2026-11-23",
+  "/how-to/redirect-users-app-store-google-play": "2026-11-23",
+  "/how-to/app-download-button-website": "2026-11-23",
+  "/how-to/use-qr-physical-campaigns": "2026-11-23",
+  "/es/como/boton-descarga-app-web": "2026-11-23",
+  "/blog/alternativa-gratis-onelink-to": "2026-11-23",
+  "/es/blog/codigo-qr-app-descarga": "2026-11-23",
+};
 
 function languagePrefix(language) {
   return language === defaultLanguage ? "" : `/${language}`;
@@ -92,10 +84,11 @@ function xmlAlternates(entry) {
 }
 
 function xmlUrl(entry, language) {
-  const loc = withSiteUrl(entry.getPath(language));
+  const path = entry.getPath(language);
+  const loc = withSiteUrl(path);
+  const lastmod = lastModifiedByPath[path];
   return `  <url>
-    <loc>${escapeXml(loc)}</loc>
-    <lastmod>${entry.lastmod}</lastmod>
+    <loc>${escapeXml(loc)}</loc>${lastmod ? `\n    <lastmod>${lastmod}</lastmod>` : ""}
     <changefreq>${entry.changefreq}</changefreq>
     <priority>${entry.priority}</priority>
 ${xmlAlternates(entry)}
@@ -131,13 +124,11 @@ const staticPageEntries = [
   { id: "terms", path: "/terms", changefreq: "yearly", priority: "0.35" },
 ].map((entry) => ({
   ...entry,
-  lastmod: todayISO,
   getPath: (language) => localizePath(entry.path, language),
 }));
 
 const useCaseEntries = niches.map((niche) => ({
   id: `use-case-${niche.id}`,
-  lastmod: todayISO,
   changefreq: "monthly",
   priority: niche.id === "agencies" ? "0.82" : "0.76",
   getPath: (language) => localizedDynamicPath((lang) => nichePath(niche.id, lang), language),
@@ -145,7 +136,6 @@ const useCaseEntries = niches.map((niche) => ({
 
 const howToEntries = howTos.map((howTo) => ({
   id: `how-to-${howTo.id}`,
-  lastmod: todayISO,
   changefreq: "monthly",
   priority: "0.72",
   getPath: (language) => localizedDynamicPath((lang) => howToPath(howTo.id, lang), language),
@@ -155,7 +145,6 @@ const pageEntries = [...staticPageEntries, ...useCaseEntries, ...howToEntries];
 
 const blogEntries = blogSeoPosts.map((post) => ({
   id: `blog-${post.slug}`,
-  lastmod: post.publishedAt || isoForSlug(post.slug),
   changefreq: "monthly",
   priority: "0.62",
   getPath: (language) => localizePath(`/blog/${post.slug}`, language),
@@ -163,20 +152,9 @@ const blogEntries = blogSeoPosts.map((post) => ({
     availableBlogSlugsByLanguage[language]?.has(post.slug)),
 }));
 
-const sitemapIndexUrls = [
-  { loc: `${siteUrl}/sitemap-en.xml`, lastmod: todayISO },
-  { loc: `${siteUrl}/sitemap-es.xml`, lastmod: todayISO },
-  { loc: `${siteUrl}/sitemap-fr.xml`, lastmod: todayISO },
-  { loc: `${siteUrl}/sitemap-ja.xml`, lastmod: todayISO },
-  { loc: `${siteUrl}/sitemap-de.xml`, lastmod: todayISO },
-  { loc: `${siteUrl}/sitemap-pt.xml`, lastmod: todayISO },
-  { loc: `${siteUrl}/sitemap-it.xml`, lastmod: todayISO },
-  { loc: `${siteUrl}/sitemap-ko.xml`, lastmod: todayISO },
-  { loc: `${siteUrl}/sitemap-nl.xml`, lastmod: todayISO },
-  { loc: `${siteUrl}/sitemap-ar.xml`, lastmod: todayISO },
-  { loc: `${siteUrl}/sitemap-hi.xml`, lastmod: todayISO },
-  { loc: `${siteUrl}/sitemap-blog.xml`, lastmod: todayISO },
-];
+const sitemapIndexUrls = [...supportedLanguages, "blog"].map(
+  (name) => `${siteUrl}/sitemap-${name}.xml`,
+);
 
 function buildLanguageSitemap(language) {
   return xmlUrlset(pageEntries.map((entry) => xmlUrl(entry, language)));
@@ -192,9 +170,8 @@ function buildBlogSitemap() {
 function buildSitemapIndex() {
   const items = sitemapIndexUrls
     .map(
-      (entry) => `  <sitemap>
-    <loc>${escapeXml(entry.loc)}</loc>
-    <lastmod>${entry.lastmod}</lastmod>
+      (url) => `  <sitemap>
+    <loc>${escapeXml(url)}</loc>
   </sitemap>`,
     )
     .join("\n");
