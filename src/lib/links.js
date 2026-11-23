@@ -59,14 +59,15 @@ function escapeHtml(value) {
     .replace(/'/g, "&#039;");
 }
 
-export function buildWebsiteLinkHtml(url, anchorText) {
+export function buildWebsiteLinkHtml(url, anchorText, { style } = {}) {
   const parsedUrl = new URL(url);
 
   if (!["http:", "https:"].includes(parsedUrl.protocol)) {
     throw new Error("Website links must use HTTP or HTTPS.");
   }
 
-  return `<a href="${escapeHtml(parsedUrl.toString())}">${escapeHtml(anchorText)}</a>`;
+  const styleAttribute = style ? ` style="${escapeHtml(style)}"` : "";
+  return `<a href="${escapeHtml(parsedUrl.toString())}"${styleAttribute}>${escapeHtml(anchorText)}</a>`;
 }
 
 export function profileLinkForUser(baseUrl, uid) {

@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import WebsiteButtonGenerator from "./components/WebsiteButtonGenerator.jsx";
 import {
   Instagram,
   MessageCircle,
@@ -37,6 +38,7 @@ export default function HowToPage() {
   const howto = getHowToBySlug(howToSlug, language) || howTos[0];
   const content = howto[language] || howto.en;
   const Icon = iconByName[howto.icon] || Instagram;
+  const showButtonGenerator = howto.id === "download-button-website" && ["en", "es"].includes(language);
 
   const seoPath = `${howToHubRoutes.en}/${howto.en.slug}`;
   const canonical = `${siteUrl}${language === "en" ? seoPath : `/${language}${howToHubRoutes[language] || howToHubRoutes.en}/${content.slug}`}`;
@@ -142,6 +144,8 @@ export default function HowToPage() {
           {content.intro}
         </p>
       </section>
+
+      {showButtonGenerator && <WebsiteButtonGenerator key={language} language={language} />}
 
       {/* PROBLEM */}
       {content.problem && (

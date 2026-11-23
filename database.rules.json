@@ -25,6 +25,11 @@
         ".validate": "!newData.exists() || (newData.hasChildren(['ownerId', 'title', 'slug', 'iosUrl', 'androidUrl', 'fallbackUrl', 'active', 'createdAt', 'updatedAt']) && newData.child('ownerId').isString() && newData.child('title').isString() && newData.child('slug').isString() && newData.child('iosUrl').isString() && (newData.child('iosUrl').val().beginsWith('https://') || newData.child('iosUrl').val().beginsWith('http://')) && newData.child('androidUrl').isString() && (newData.child('androidUrl').val().beginsWith('https://') || newData.child('androidUrl').val().beginsWith('http://')) && newData.child('fallbackUrl').isString() && (newData.child('fallbackUrl').val().beginsWith('https://') || newData.child('fallbackUrl').val().beginsWith('http://')) && newData.child('active').isBoolean())"
       }
     },
+    "firstSmartLinkEvents": {
+      "$uid": {
+        ".write": "auth != null && auth.uid === $uid && ((!data.exists() && newData.val() === true) || (!newData.exists() && !root.child('users').child($uid).exists()))"
+      }
+    },
     "publicLinks": {
       ".indexOn": ["slug", "ownerId"],
       ".read": "(query.orderByChild == 'slug' && query.equalTo != null) || (query.orderByChild == 'ownerId' && query.equalTo != null) || (auth != null && ((auth.token.email === 'info@skeilapps.com') || (auth.token.email === 'davidtroton@gmail.com') || root.child('admins').child(auth.uid).val() === true))",
