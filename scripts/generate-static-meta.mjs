@@ -15,6 +15,7 @@ import {
 } from "../src/lib/i18nRoutes.js";
 import { niches, nichePath, useCaseHubRoutes } from "../src/lib/useCases.js";
 import { howTos, howToHubRoutes, howToPath } from "../src/lib/howTos.js";
+import { englishDownloadLinks, websiteButtonGuideId } from "../src/lib/downloadResourceLinks.js";
 import { getDateForSlugISO } from "../src/lib/blogDates.js";
 import {
   legalPagesAr,
@@ -324,6 +325,24 @@ function collectReadableText(value, output = []) {
   return output;
 }
 
+function englishResourceLinks(entry) {
+  const { generator, qr, websiteButton } = englishDownloadLinks;
+  if (entry.id === "home") return [generator, qr, websiteButton];
+  if (entry.id === "how-to") {
+    return [generator, qr, ...howTos.map((guide) => ({
+      href: localizePath(howToPath(guide.id, "en"), "en"),
+      label: guide.en.label,
+    }))];
+  }
+  if (entry.id.startsWith("how-to-")) {
+    return entry.id === `how-to-${websiteButtonGuideId}`
+      ? [generator, qr]
+      : [generator, qr, websiteButton];
+  }
+  if (entry.slug === "alternativa-gratis-onelink-to") return [generator];
+  return [];
+}
+
 function staticContentBlock({ entry, language, title, description, robots }) {
   const collected = collectReadableText(entry.getContent?.(language));
   const paragraphs = [...new Set([description, ...collected])];
@@ -337,6 +356,11 @@ function staticContentBlock({ entry, language, title, description, robots }) {
   const useCasesPath = localizePath("/use-cases", language);
   const howToPathname = localizePath("/how-to", language);
   const blogPath = localizePath("/blog", language);
+  const resourceLinks = language === "en"
+    ? englishResourceLinks(entry).map(({ href, label }) =>
+        `<a href="${escapeHtml(href)}">${escapeHtml(label)}</a>`,
+      ).join("")
+    : "";
 
   return `<style id="app-loading-shell-styles">
       #app-loading-shell{position:fixed;inset:0;z-index:2147483647;display:grid;place-items:center;min-height:100vh;background-color:#fff;background-image:linear-gradient(rgba(17,24,39,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(17,24,39,.035) 1px,transparent 1px);background-size:44px 44px;font-family:Arial,sans-serif;color:#050505}
@@ -360,7 +384,7 @@ function staticContentBlock({ entry, language, title, description, robots }) {
     <main id="seo-static-content" style="max-width:1120px;margin:0 auto;padding:96px 24px 64px;font-family:Arial,sans-serif;line-height:1.65;color:#111827">
       <h1 style="max-width:900px;font-size:clamp(2rem,5vw,4rem);line-height:1.05">${escapeHtml(title)}</h1>
       ${selectedParagraphs.map((paragraph) => `<p style="max-width:850px">${escapeHtml(paragraph)}</p>`).join("\n      ")}
-      ${robots?.startsWith("noindex") ? "" : `<nav aria-label="Public pages" style="display:flex;flex-wrap:wrap;gap:16px;margin-top:32px"><a href="${homePath}">Link My App</a><a href="${useCasesPath}">Use cases</a><a href="${howToPathname}">Guides</a><a href="${blogPath}">Blog</a></nav>`}
+      ${robots?.startsWith("noindex") ? "" : `<nav aria-label="Public pages" style="display:flex;flex-wrap:wrap;gap:16px;margin-top:32px"><a href="${homePath}">Link My App</a><a href="${useCasesPath}">Use cases</a><a href="${howToPathname}">Guides</a><a href="${blogPath}">Blog</a>${resourceLinks}</nav>`}
     </main>`;
 }
 

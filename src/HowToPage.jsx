@@ -17,6 +17,7 @@ import { FinalFooter as LandingFinalFooter, animationStyles } from "./LandingVis
 import { localizePath, normalizeLanguage } from "./lib/i18nRoutes.js";
 import { howTos, howToHubRoutes, howToPath, getHowToBySlug } from "./lib/howTos.js";
 import { getNicheById, nichePath } from "./lib/useCases.js";
+import { englishDownloadLinks, websiteButtonGuideId } from "./lib/downloadResourceLinks.js";
 
 const brandName = "Link My App";
 const siteUrl = "https://link-my.app";
@@ -93,10 +94,11 @@ export default function HowToPage() {
     [howto],
   );
 
-  const otherGuides = useMemo(
-    () => howTos.filter((h) => h.id !== howto.id).slice(0, 3),
-    [howto.id],
-  );
+  const otherGuides = howTos.filter((guide) => guide.id !== howto.id);
+  const websiteButtonGuide = otherGuides.find((guide) => guide.id === websiteButtonGuideId);
+  const featuredGuides = language === "en" && websiteButtonGuide
+    ? [websiteButtonGuide, ...otherGuides.filter((guide) => guide !== websiteButtonGuide)].slice(0, 3)
+    : otherGuides.slice(0, 3);
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-white text-black">
@@ -196,7 +198,7 @@ export default function HowToPage() {
           </ol>
           <div className="mt-10 flex flex-wrap items-center gap-3">
             <Link
-              to={localizePath("/login", language)}
+              to={language === "en" ? englishDownloadLinks.generator.href : localizePath("/login", language)}
               className="inline-flex items-center justify-center gap-2 rounded-full bg-black px-6 py-3 text-sm font-black tracking-[-0.01em] text-white shadow-[0_18px_40px_rgba(0,0,0,0.18)] transition hover:-translate-y-0.5"
             >
               {t("howTo.ctaPrimary", "Crear mi smart link gratis")} <ArrowRight size={16} />
@@ -253,7 +255,7 @@ export default function HowToPage() {
           {t("howTo.otherGuidesTitle", "Sigue aprendiendo a usar tu smart link")}
         </h2>
         <div className="mt-8 grid gap-4 md:grid-cols-3">
-          {otherGuides.map((g) => {
+          {featuredGuides.map((g) => {
             const c = g[language] || g.en;
             const Ic = iconByName[g.icon] || Instagram;
             return (
