@@ -3,6 +3,17 @@
   "framework": null,
   "redirects": [
     {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.link-my.app"
+        }
+      ],
+      "destination": "https://link-my.app/",
+      "permanent": true
+    },
+    {
       "source": "/:path*",
       "has": [
         {
