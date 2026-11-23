@@ -1675,6 +1675,7 @@ export function getLocalizedBlogStaticData(language) {
       slug: post.slug,
       title: post.title,
       description: post.excerpt || post.title,
+      introductionLink: post.introductionLink,
       category: post.category || "",
       publishedAt: post.publishedAt,
       content: [...new Set(contentParts)].join("\n"),

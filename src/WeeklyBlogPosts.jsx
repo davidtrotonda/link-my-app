@@ -348,6 +348,16 @@ function WeeklyArticleContent({ article, language }) {
     <div className="space-y-8">
       <div>
         {locale.introduction.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+        {locale.introductionLink && (
+          <p>
+            <Link
+              to={localizePath(locale.introductionLink.to, language)}
+              className="font-bold text-gray-950 underline decoration-gray-300 underline-offset-4 hover:decoration-gray-950"
+            >
+              {locale.introductionLink.label}
+            </Link>
+          </p>
+        )}
       </div>
 
       {locale.sections.map((section) => (
@@ -371,7 +381,7 @@ function WeeklyArticleContent({ article, language }) {
         <h3 className="mt-0 text-xl font-black text-gray-950">{locale.cta.title}</h3>
         <p>{locale.cta.text}</p>
         <Link
-          to={localizePath("/", language)}
+          to={localizePath(locale.cta.to || "/", language)}
           className="inline-block rounded-full bg-black px-8 py-3.5 font-bold text-white shadow-lg transition-transform hover:-translate-y-1 hover:bg-gray-900"
         >
           {locale.cta.label}
@@ -393,6 +403,7 @@ export function getWeeklyBlogPosts(language = "es") {
       title: locale.title,
       category: locale.category,
       excerpt: locale.excerpt,
+      introductionLink: locale.introductionLink,
       readTime: locale.readTime,
       publishedAt: article.publishedAt,
       keywords: [

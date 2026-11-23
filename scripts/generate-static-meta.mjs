@@ -356,6 +356,7 @@ function staticQrDemo(language) {
 }
 
 function staticContentBlock({ entry, language, title, description, robots }) {
+  const introductionLink = entry.getIntroductionLink?.(language);
   const collected = collectReadableText(entry.getContent?.(language));
   const paragraphs = [...new Set([description, ...collected])];
   let characterCount = 0;
@@ -398,6 +399,7 @@ function staticContentBlock({ entry, language, title, description, robots }) {
     <noscript><style>#app-loading-shell{display:none!important}#seo-static-content{position:static!important;width:auto!important;height:auto!important;padding:96px 24px 64px!important;margin:0 auto!important;overflow:visible!important;clip:auto!important;white-space:normal!important}</style></noscript>
     <main id="seo-static-content" style="max-width:1120px;margin:0 auto;padding:96px 24px 64px;font-family:Arial,sans-serif;line-height:1.65;color:#111827">
       <h1 style="max-width:900px;font-size:clamp(2rem,5vw,4rem);line-height:1.05">${escapeHtml(title)}</h1>
+      ${introductionLink ? `<p><a href="${escapeHtml(localizePath(introductionLink.to, language))}">${escapeHtml(introductionLink.label)}</a></p>` : ""}
       ${selectedParagraphs.map((paragraph) => `<p style="max-width:850px">${escapeHtml(paragraph)}</p>`).join("\n      ")}
       ${demo}
       ${robots?.startsWith("noindex") ? "" : `<nav aria-label="Public pages" style="display:flex;flex-wrap:wrap;gap:16px;margin-top:32px"><a href="${homePath}">Link My App</a><a href="${useCasesPath}">Use cases</a><a href="${howToPathname}">Guides</a><a href="${blogPath}">Blog</a>${resourceLinks}</nav>`}
@@ -698,6 +700,7 @@ const blogEntries = blogSeoPosts.map((post) => ({
     };
   },
   getContent: (language) => blogStaticByLanguage[language]?.get(post.slug)?.content || "",
+  getIntroductionLink: (language) => blogStaticByLanguage[language]?.get(post.slug)?.introductionLink,
 }));
 
 const entries = [...staticEntries, ...legalEntries, ...useCaseEntries, ...howToEntries, ...blogEntries];

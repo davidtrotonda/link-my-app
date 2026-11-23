@@ -1,14 +1,52 @@
 export const weeklyBlogQrAppLocales = {
   es: {
-    title: "Codigo QR app: como llevar usuarios a App Store y Google Play",
-    excerpt: "Aprende a crear un codigo QR para tu app que detecte el dispositivo, envie a cada usuario a la tienda correcta y mida clics sin prometer atribucion que no puedes demostrar.",
+    title: "Cómo crear un código QR para descargar tu app en iPhone y Android",
+    excerpt: "Crea un solo código QR para App Store y Google Play. Sigue un ejemplo con enlaces reales y comprueba qué abre en iPhone, Android y ordenador.",
     category: "QR para apps",
     readTime: "9 min",
     introduction: [
-      "Un codigo QR app sirve para que una persona escanee desde un cartel, packaging, evento, escaparate o folleto y llegue directamente al destino correcto para instalar tu aplicacion. La clave no es generar cualquier QR, sino conectarlo a un enlace inteligente que detecte iOS, Android o escritorio, mantenga una pagina de respaldo y separe los clics por campaña. Asi evitas pedir al usuario que elija tienda manualmente y tambien evitas mezclar datos de canales diferentes.",
-      "El error habitual es tratar el QR como una imagen fija. Para una app, el QR debe ser una puerta controlada: un unico codigo impreso, una URL que puedas actualizar, reglas claras por dispositivo y medicion honesta. Si cambias la ficha, lanzas una promocion o necesitas separar una feria de una campaña de creadores, no deberias reimprimir todo. Deberias ajustar el destino del enlace y conservar la lectura por fuente.",
+      "Para crear un solo código QR para tu app, añade las fichas de App Store y Google Play a un enlace inteligente y elige una web para ordenador. Guarda el enlace y descarga su QR desde el panel. Ese QR abre la URL del enlace, que envía a cada persona al destino de su dispositivo.",
+      "Antes de imprimirlo, escanéalo con un iPhone y un Android. Después abre el enlace en un ordenador para comprobar la página alternativa.",
     ],
+    introductionLink: {
+      label: "Abrir el generador de códigos QR para apps",
+      to: "/qr-codes",
+    },
     sections: [
+      {
+        heading: "Ejemplo con tres destinos reales",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "Tourixy tiene una ficha en cada tienda y una web en español. Para configurar tu propio QR, sustituye estos tres enlaces por los de tu app y pégalos en los campos correspondientes.",
+          },
+          {
+            type: "link",
+            text: "En iPhone, el enlace debe abrir ",
+            label: "Tourixy en App Store",
+            to: "https://apps.apple.com/app/id6807142283",
+            after: ".",
+          },
+          {
+            type: "link",
+            text: "En Android, debe abrir ",
+            label: "Tourixy en Google Play",
+            to: "https://play.google.com/store/apps/details?id=com.tourixy.app",
+            after: ".",
+          },
+          {
+            type: "link",
+            text: "En ordenador, elige como página alternativa ",
+            label: "la web de Tourixy en español",
+            to: "https://tourixy.com/es",
+            after: ".",
+          },
+          {
+            type: "paragraph",
+            text: "Introduce tus destinos en el formulario e inicia sesión para guardar el enlace. Descarga el QR asociado y confirma que las fichas que abre son las de tu app. En ordenador, prueba la URL del enlace inteligente para verificar el destino alternativo.",
+          },
+        ],
+      },
       {
         heading: "Que problema resuelve un codigo QR app",
         blocks: [
@@ -208,9 +246,10 @@ export const weeklyBlogQrAppLocales = {
       },
     ],
     cta: {
-      title: "Crea un QR que envie a cada usuario a la tienda correcta",
-      text: "Genera un enlace para tu app, conectalo a tu QR y separa clics por campaña, canal o colaborador sin reimprimir cada cambio.",
-      label: "Crear mi enlace de app"
+      title: "Crea un QR que envíe a cada usuario a la tienda correcta",
+      text: "Añade los destinos de tu app al formulario, guarda el enlace y descarga su código QR.",
+      label: "Ir al formulario para crear mi enlace",
+      to: "/#crear",
     },
   },
   en: {
