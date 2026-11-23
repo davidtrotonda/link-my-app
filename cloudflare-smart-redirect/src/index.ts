@@ -1,3 +1,5 @@
+import qrDemo from "../../src/lib/qrDemo.json" with { type: "json" };
+
 const STATIC_SINGLE_SEGMENTS = new Set([
   "es", "fr", "ja", "de", "pt", "it", "ko", "nl", "ar", "hi", "en",
   "login", "dashboard", "privacy", "cookies", "terms", "faqs", "pricing",
@@ -280,7 +282,7 @@ export async function findCachedLink(
   return link;
 }
 
-function destinationUrl(link: PublicLink, destination: Destination): string {
+function destinationUrl(link: Pick<PublicLink, "iosUrl" | "androidUrl" | "fallbackUrl">, destination: Destination): string {
   if (destination === "ios") return link.iosUrl;
   if (destination === "android") return link.androidUrl;
   return link.fallbackUrl;
@@ -939,6 +941,11 @@ async function handleRequest(
   ctx: ExecutionContext,
 ): Promise<Response> {
   const requestUrl = new URL(request.url);
+
+  if (requestUrl.pathname === qrDemo.path && (request.method === "GET" || request.method === "HEAD")) {
+    const destination = detectDestination(request.headers.get("user-agent") || "");
+    return redirectResponse(destinationUrl(qrDemo, destination));
+  }
 
   if (request.method === "OPTIONS" && requestUrl.pathname.startsWith("/api/")) {
     const headers = apiHeaders(request, env);

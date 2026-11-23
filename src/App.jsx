@@ -1867,7 +1867,7 @@ function LandingPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const language = normalizeLanguage(i18n.language);
-  const hasNewFormCopy = language === "en" || language === "es";
+  const hasNewFormCopy = ["en", "es", "ja", "de"].includes(language);
   const [openFaq, setOpenFaq] = useState(-1);
   const faqSchema = useMemo(
     () => ({

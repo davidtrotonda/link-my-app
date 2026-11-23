@@ -1,6 +1,6 @@
 export const analyticsConsentKey = "link-my-app.cookie-consent";
 const measurementId = import.meta.env?.VITE_FIREBASE_MEASUREMENT_ID;
-const landingFormPages = ["/", "/es"];
+const landingFormPages = ["/", "/es", "/ja", "/de"];
 let analyticsStarted = false;
 
 export function readAnalyticsPreference() {

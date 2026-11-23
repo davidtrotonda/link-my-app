@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import {
+import worker, {
   detectDestination,
   findCachedLink,
   isFirebaseHostingProxyPath,
@@ -29,6 +29,28 @@ test("detecta el destino sin distinguir mayúsculas", () => {
   assert.equal(detectDestination("Mozilla/5.0 (iPhone)"), "ios");
   assert.equal(detectDestination("Mozilla/5.0 (Linux; Android 15)"), "android");
   assert.equal(detectDestination("Mozilla/5.0 (Macintosh)"), "fallback");
+});
+
+test("la demo de QR redirige a Tourixy en iPhone, Android y ordenador", async () => {
+  const targets = [
+    ["Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)", "https://apps.apple.com/app/id6807142283"],
+    ["Mozilla/5.0 (Linux; Android 15; Pixel 9)", "https://play.google.com/store/apps/details?id=com.tourixy.app"],
+    ["Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)", "https://tourixy.com/"],
+  ];
+  const context = { waitUntil: () => assert.fail("The demo must not record a user-link click") };
+  for (const [userAgent, target] of targets) {
+    for (const method of ["GET", "HEAD"]) {
+      const request = new Request("https://link-my.app/demo/qr?src=qr", {
+        method,
+        headers: { "User-Agent": userAgent },
+      });
+      const response = await worker.fetch(request, {}, context);
+      assert.equal(response.status, 302);
+      assert.equal(response.headers.get("Location"), target);
+      assert.match(response.headers.get("Cache-Control"), /no-store/);
+      assert.match(response.headers.get("X-Robots-Tag"), /noindex/);
+    }
+  }
 });
 
 test("extrae slugs explícitos y antiguos", () => {
