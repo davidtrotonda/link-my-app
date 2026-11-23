@@ -130,6 +130,7 @@ import {
   supportedLanguages,
   switchLanguagePath,
 } from "./lib/i18nRoutes.js";
+import { englishDownloadLinks } from "./lib/downloadResourceLinks.js";
 import { visibleUseCaseTeasers as useCaseNiches, teaserNichePath as nichePath } from "./lib/useCaseTeasers.js";
 import { getOpenSourceContent, openSourceLinks } from "./lib/openSourceContent.js";
 import {
@@ -1980,7 +1981,7 @@ function LandingPage() {
 
           <div
             id="crear"
-            className="mx-auto w-full max-w-[920px] rounded-[34px] border border-black/10 bg-white/82 p-4 shadow-[0_28px_90px_rgba(0,0,0,0.08)] backdrop-blur-2xl md:p-5 xl:mx-0 xl:max-w-[540px] 2xl:max-w-[560px]"
+            className="mx-auto w-full max-w-[920px] scroll-mt-28 rounded-[34px] border border-black/10 bg-white/82 p-4 shadow-[0_28px_90px_rgba(0,0,0,0.08)] backdrop-blur-2xl md:p-5 xl:mx-0 xl:max-w-[540px] 2xl:max-w-[560px]"
           >
             <div className="rounded-[28px] border border-black/5 bg-white p-5 shadow-sm md:p-7">
               <div className="mb-6 flex items-start justify-between gap-4">
@@ -2029,6 +2030,10 @@ function SeoContentSection() {
       icon: Smartphone,
       title: "Un link de descarga para iPhone, Android y ordenador",
       text: "Evita poner dos botones o explicar al usuario qué tienda debe abrir. Con un enlace inteligente, cada clic llega al destino adecuado: App Store, Google Play o una página alternativa.",
+      ...(language === "en" && {
+        to: englishDownloadLinks.websiteButton.href,
+        cta: englishDownloadLinks.websiteButton.label,
+      }),
     },
     {
       icon: QrCode,

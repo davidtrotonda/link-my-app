@@ -15,6 +15,7 @@ import {
 } from "../src/lib/i18nRoutes.js";
 import { niches, nichePath, useCaseHubRoutes } from "../src/lib/useCases.js";
 import { howTos, howToHubRoutes, howToPath } from "../src/lib/howTos.js";
+import { englishDownloadLinks } from "../src/lib/downloadResourceLinks.js";
 import { getDateForSlugISO } from "../src/lib/blogDates.js";
 import {
   legalPagesAr,
@@ -325,6 +326,24 @@ function collectReadableText(value, output = []) {
   return output;
 }
 
+function englishResourceLinks(entry) {
+  const { generator, qr, websiteButton } = englishDownloadLinks;
+  if (entry.id === "home") return [generator, qr, websiteButton];
+  if (entry.id === "how-to") {
+    return [generator, qr, ...howTos.map((guide) => ({
+      href: localizePath(howToPath(guide.id, "en"), "en"),
+      label: guide.en.label,
+    }))];
+  }
+  if (entry.id.startsWith("how-to-")) {
+    return entry.id === "how-to-redirect-by-device"
+      ? [generator, qr, websiteButton]
+      : [generator, qr];
+  }
+  if (entry.slug === "alternativa-gratis-onelink-to") return [generator];
+  return [];
+}
+
 function staticQrDemo(language) {
   const { qr } = readLocale(language);
   const createPath = localizePath("/#crear", language);
@@ -349,6 +368,11 @@ function staticContentBlock({ entry, language, title, description, robots }) {
   const useCasesPath = localizePath("/use-cases", language);
   const howToPathname = localizePath("/how-to", language);
   const blogPath = localizePath("/blog", language);
+  const resourceLinks = language === "en"
+    ? englishResourceLinks(entry).map(({ href, label }) =>
+        `<a href="${escapeHtml(href)}">${escapeHtml(label)}</a>`,
+      ).join("")
+    : "";
   const demo = entry.id === "qr-codes" && (language === "en" || language === "es")
     ? staticQrDemo(language)
     : "";
@@ -376,7 +400,7 @@ function staticContentBlock({ entry, language, title, description, robots }) {
       <h1 style="max-width:900px;font-size:clamp(2rem,5vw,4rem);line-height:1.05">${escapeHtml(title)}</h1>
       ${selectedParagraphs.map((paragraph) => `<p style="max-width:850px">${escapeHtml(paragraph)}</p>`).join("\n      ")}
       ${demo}
-      ${robots?.startsWith("noindex") ? "" : `<nav aria-label="Public pages" style="display:flex;flex-wrap:wrap;gap:16px;margin-top:32px"><a href="${homePath}">Link My App</a><a href="${useCasesPath}">Use cases</a><a href="${howToPathname}">Guides</a><a href="${blogPath}">Blog</a></nav>`}
+      ${robots?.startsWith("noindex") ? "" : `<nav aria-label="Public pages" style="display:flex;flex-wrap:wrap;gap:16px;margin-top:32px"><a href="${homePath}">Link My App</a><a href="${useCasesPath}">Use cases</a><a href="${howToPathname}">Guides</a><a href="${blogPath}">Blog</a>${resourceLinks}</nav>`}
     </main>`;
 }
 

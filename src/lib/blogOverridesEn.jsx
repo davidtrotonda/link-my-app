@@ -1,12 +1,16 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { localizePath } from "./i18nRoutes.js";
+import { getBlogSeoMeta } from "./blogSeoMeta.js";
+import { englishDownloadLinks } from "./downloadResourceLinks.js";
 
 const authorData = {
   name: "David Trotonda",
   role: "CEO de SkeilApps",
   img: "https://skeilapps.com/wp-content/uploads/2025/12/IMG_20251213_151012-4.webp"
 };
+
+const oneLinkComparison = getBlogSeoMeta("alternativa-gratis-onelink-to", "en");
 
 export const englishBlogOverrides = {
   "error-perder-ventas-instagram": {
@@ -66,42 +70,48 @@ export const englishBlogOverrides = {
     )
   },
   "alternativa-gratis-onelink-to": {
-    title: "The best onelink.to alternative, free and modern",
-    excerpt: "See why older one-link tools feel slow and how to create a faster, cleaner smart link for your app.",
+    title: oneLinkComparison.title,
+    excerpt: oneLinkComparison.description,
     category: "ALTERNATIVES",
     content: (
       <div className="text-[#111827] text-[15px] sm:text-[16px] leading-[1.7] space-y-6">
         <p>
-          If you are looking to create a smart link that sends iPhone users to the App Store and Android users to Google Play, chances are you ended up using the "onelink.to" service.
+          Link My App is a free OneLink.to alternative for sharing an app download link. Both tools can open the App Store on iPhone, Google Play on Android, and a website you choose on a computer. Each free plan includes QR codes and click data by device.
+        </p>
+
+        <h2 className="text-[22px] font-bold mt-12 mb-4 tracking-tight scroll-mt-32">What each free plan includes</h2>
+        <p>
+          <strong>Link My App</strong> includes unlimited smart links, downloadable QR codes, custom URL slugs, and click statistics by device and campaign in its <Link to={localizePath("/pricing", "en")} className="underline underline-offset-2">free plan</Link>. You can create separate links for your website, social bio, and printed QR to compare clicks by placement.
         </p>
         <p>
-          For many years, onelink.to has been a very popular tool for doing exactly this. However, its technology and design have remained stuck in the past, and its free version is extremely limited.
+          <strong>OneLink.to Free</strong> includes three active links, QR styling, device statistics, and 90 days of daily statistics. After the first three months, the first 1,000 clicks or scans each month redirect without a OneLink.to page in between. Visitors above that threshold see a forwarding page and can still reach the destination. See the <a href="https://www.onelink.to/what-happens-after-1000-clicks-free-plan" className="underline underline-offset-2">OneLink.to explanation of the threshold</a>.
         </p>
-        
-        <h2 className="text-[22px] font-bold mt-12 mb-4 tracking-tight scroll-mt-32">The limitations of onelink.to</h2>
+
+        <h2 className="text-[22px] font-bold mt-12 mb-4 tracking-tight scroll-mt-32">When an upgraded OneLink.to plan makes sense</h2>
+        <ul className="list-disc space-y-2 pl-6">
+          <li>Professional has 10 links and adds custom slugs, separate Windows and Mac destinations, and more detailed click reports.</li>
+          <li>Team has 200 links and adds UTM campaign reporting, parameter forwarding, and deferred deep linking on Android.</li>
+          <li>Team Plus has 500 links and adds one custom domain, Open in App, and the statistics API.</li>
+          <li>Enterprise has unlimited links and includes three custom domains.</li>
+          <li>The Non-Profit plan offers custom slugs and two years of daily statistics for eligible organizations.</li>
+        </ul>
         <p>
-          The main problem with onelink.to is friction. Its system often shows an intermediate screen or takes a couple of seconds to process the redirection (Client-Side redirection), causing a noticeable drop in the conversion funnel. That waiting time is gold when you pay for clicks.
+          Check the <a href="https://www.onelink.to/pricing" className="underline underline-offset-2">official OneLink.to plan comparison</a> for current prices and limits. If you need to open a particular screen in an installed app, <a href="https://www.onelink.to/features/open-in-app" className="underline underline-offset-2">Open in App</a> requires a custom domain and a change to the app. Plan details were checked on November 23, 2026.
+        </p>
+
+        <h2 className="text-[22px] font-bold mt-12 mb-4 tracking-tight scroll-mt-32">Test the same download setup in both tools</h2>
+        <p>
+          Use the same App Store and Google Play listings and the same desktop fallback in each tool. For OneLink.to, follow its <a href="https://www.onelink.to/guides/create-your-first-onelink" className="underline underline-offset-2">first-link guide</a>. In Link My App, enter your URLs in the form and sign in to create the smart link.
         </p>
         <p>
-          Furthermore, <strong>onelink.to inserts annoying ads on the redirection screen</strong>, hurting your users' experience unless you pay. Basic functions like customizing the link, changing the slug, or having a neat dashboard, are also locked behind outdated paywalls. Its user experience leaves much to be desired in 2026.
+          Open the saved link and scan its QR code on iPhone and Android. Try the link on a computer to check the fallback. Look for those visits in the click reports and check completed downloads in your app store reporting.
         </p>
-  
-        <h2 className="text-[22px] font-bold mt-12 mb-4 tracking-tight scroll-mt-32">Link My App: The agile, free and ad-free alternative</h2>
-        <p>
-          If you just need <strong>a smart link that directs iPhones to the App Store and Androids to Google Play</strong>, the best alternative is <strong>Link My App</strong>: a 100% free and ad-free solution.
-        </p>
-        <p>
-          We have eliminated all the technical complexity. You don't need to install any SDK in your application, you don't need to modify code, and you don't need to configure Apple certificates. It works 100% externally through Server-Side detection.
-        </p>
-        <p>
-          You just paste your iOS link, your Android link, and in a second you get an elegant "Smart Link" ready to use in your Instagram, TikTok or Facebook Ads campaigns. And best of all: the core basic routing function is and always will be free.
-        </p>
-  
+
         <div className="bg-gray-50 border border-gray-200 rounded-2xl p-6 sm:p-8 mt-10 text-center">
-          <h3 className="text-[20px] font-bold mb-3 text-black">Apply this today</h3>
-          <p className="text-gray-600 mb-6">Create a single smart link that detects your user's phone and sends them directly to their store, without touching a line of code.</p>
-          <Link to={localizePath("/", "en")} className="inline-block font-bold px-8 py-3.5 rounded-full transition-transform shadow-lg transform hover:-translate-y-1 bg-black text-white hover:bg-gray-900">
-            Create your link for free
+          <h2 className="text-[20px] font-bold mb-3 text-black">Create one link for both stores</h2>
+          <p className="text-gray-600 mb-6">Add your store URLs and choose where desktop visitors should go. Test your link on each device before sharing it.</p>
+          <Link to={englishDownloadLinks.generator.href} className="inline-block font-bold px-8 py-3.5 rounded-full transition-transform shadow-lg transform hover:-translate-y-1 bg-black text-white hover:bg-gray-900">
+            {englishDownloadLinks.generator.label}
           </Link>
         </div>
       </div>

@@ -118,9 +118,9 @@ export const blogSeoPosts = [
     category: "Alternativas",
     translations: {
       en: {
-        title: "The best onelink.to alternative, free and modern",
+        title: "Free OneLink.to Alternative for App Store & Google Play",
         description:
-          "See why older one-link tools feel slow and how to create a faster, cleaner smart link for your app.",
+          "Compare the free plans from Link My App and OneLink.to for App Store and Google Play. Check link limits, QR codes, custom slugs, and click analytics.",
       },
       fr: {
         title: "La meilleure alternative a onelink.to, gratuite et moderne",

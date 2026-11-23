@@ -18,6 +18,7 @@ import { FinalFooter as LandingFinalFooter, animationStyles } from "./LandingVis
 import { localizePath, normalizeLanguage } from "./lib/i18nRoutes.js";
 import { howTos, howToHubRoutes, howToPath, getHowToBySlug } from "./lib/howTos.js";
 import { getNicheById, nichePath } from "./lib/useCases.js";
+import { englishDownloadLinks } from "./lib/downloadResourceLinks.js";
 
 const brandName = "Link My App";
 const siteUrl = "https://link-my.app";
@@ -200,7 +201,7 @@ export default function HowToPage() {
           </ol>
           <div className="mt-10 flex flex-wrap items-center gap-3">
             <Link
-              to={localizePath("/login", language)}
+              to={language === "en" ? englishDownloadLinks.generator.href : localizePath("/login", language)}
               className="inline-flex items-center justify-center gap-2 rounded-full bg-black px-6 py-3 text-sm font-black tracking-[-0.01em] text-white shadow-[0_18px_40px_rgba(0,0,0,0.18)] transition hover:-translate-y-0.5"
             >
               {t("howTo.ctaPrimary", "Crear mi smart link gratis")} <ArrowRight size={16} />

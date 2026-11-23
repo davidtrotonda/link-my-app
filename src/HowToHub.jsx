@@ -14,6 +14,7 @@ import { SEO, LegalNavbar } from "./App.jsx";
 import { FinalFooter as LandingFinalFooter, animationStyles } from "./LandingVisuals.jsx";
 import { localizePath, normalizeLanguage } from "./lib/i18nRoutes.js";
 import { howTos, howToHubRoutes, howToPath } from "./lib/howTos.js";
+import { englishDownloadLinks } from "./lib/downloadResourceLinks.js";
 
 const brandName = "Link My App";
 const siteUrl = "https://link-my.app";
@@ -239,6 +240,11 @@ export default function HowToHub() {
             );
           })}
         </div>
+        {language === "en" && (
+          <Link to={englishDownloadLinks.qr.href} className="mt-6 inline-block font-bold underline underline-offset-4 hover:text-black/65">
+            {englishDownloadLinks.qr.label}
+          </Link>
+        )}
       </section>
 
       <LandingFinalFooter theme="light" />
