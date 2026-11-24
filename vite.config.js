@@ -88,6 +88,8 @@ export default defineConfig(({ command, mode }) => {
       rollupOptions: {
         output: {
           manualChunks,
+          // Give shared chunks fresh URLs so the CDN cannot reuse old cache headers.
+          chunkFileNames: "assets/chunks/[name]-[hash].js",
         },
       },
     },
