@@ -60,17 +60,7 @@ function manualChunks(id) {
     return "localized-content";
   }
 
-  if (
-    moduleId.includes("/src/lib/blogOverrides") ||
-    moduleId.endsWith("/src/MoreBlogs.jsx") ||
-    moduleId.endsWith("/src/MoreBlogs2.jsx") ||
-    moduleId.endsWith("/src/MoreBlogs3.jsx") ||
-    moduleId.endsWith("/src/TuBackBlogPost.jsx") ||
-    moduleId.endsWith("/src/TienRankBlogPost.jsx")
-  ) {
-    return "blog-content";
-  }
-
+  // Let Rollup keep the blog lazy and split its shared links from its articles.
   return undefined;
 }
 
