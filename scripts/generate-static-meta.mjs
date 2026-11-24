@@ -40,6 +40,7 @@ const repoRoot = join(__dirname, "..");
 const distDir = join(repoRoot, "dist");
 const localeDir = join(repoRoot, "src", "locales");
 const baseHtml = readFileSync(join(distDir, "index.html"), "utf8");
+const buildManifest = JSON.parse(readFileSync(join(distDir, ".vite", "manifest.json"), "utf8"));
 const { blog: blogStaticData, tourixy: tourixyStaticData } = await loadStaticSeoData();
 const blogStaticByLanguage = Object.fromEntries(
   Object.entries(blogStaticData).map(([language, posts]) => [
@@ -355,6 +356,65 @@ function staticQrDemo(language) {
       </section>`;
 }
 
+function isFastHome(entry, language) {
+  return entry.id === "home" && (language === "en" || language === "es");
+}
+
+function fastHomeHead(html) {
+  const localePreloads = ["en", "es"].map((language) => {
+    const { file } = buildManifest[`src/locales/${language}.json`];
+    return `<link rel="modulepreload" crossorigin href="/${file}">`;
+  }).join("\n    ");
+  return html
+    .replace(
+      /<link rel="stylesheet" crossorigin href="\/(assets\/[^"]+\.css)">/,
+      (_, file) => `<style id="home-app-css">${readFileSync(join(distDir, file), "utf8")}</style>`,
+    )
+    .replace("</head>", `    ${localePreloads}\n  </head>`);
+}
+
+function fastHomeContent(language, title, paragraphs, navigation) {
+  const { landing } = readLocale(language);
+  return `<style>
+      #app-loading-shell{padding:2rem;text-align:center;font:600 1rem system-ui;color:#111827}
+      #seo-static-content{display:none}
+      html[data-home-startup] #app-loading-shell{display:none}
+      html[data-home-startup] #seo-static-content{display:block}
+      .initial-home{margin:0 auto;max-width:1440px;min-height:100vh;padding:1.5rem clamp(1.25rem,4vw,3rem);font-family:system-ui,sans-serif;color:#050505}
+      .initial-home-brand{font-weight:800;font-size:1.15rem}
+      .initial-home-grid{display:grid;gap:2rem;margin-top:clamp(3rem,8vw,9rem);align-items:start}
+      .initial-home h1{font-size:clamp(2.5rem,6vw,5rem);font-weight:900;letter-spacing:-.05em;line-height:.98;margin:0}
+      .initial-home p{max-width:42rem;line-height:1.65;color:#374151}
+      .initial-home-card{padding:clamp(1.25rem,4vw,2rem);border:1px solid #e5e7eb;border-radius:1.75rem}
+      .initial-home h2{margin:0;font-size:1.5rem;font-weight:800}
+      .initial-home-cta{display:inline-block;margin-top:1rem;padding:.7rem 1.1rem;border-radius:.8rem;background:#050505;color:#fff;font-weight:700}
+      .initial-home nav{display:flex;flex-wrap:wrap;gap:1rem;margin:2rem 0}
+      .initial-home nav a{text-decoration:underline;text-underline-offset:.2em}
+      .initial-home-details{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+      @media(min-width:900px){.initial-home-grid{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}}
+    </style>
+    <script>if (location.pathname === "/" || /^\\/es\\/?$/.test(location.pathname)) document.documentElement.setAttribute("data-home-startup", "");</script>
+    <noscript><style>#app-loading-shell{display:none}#seo-static-content{display:block}.initial-home-details{position:static;width:auto;height:auto;overflow:visible;clip-path:none}</style></noscript>
+    <div id="app-loading-shell" role="status">Link My App</div>
+    <main id="seo-static-content" class="initial-home">
+      <a class="initial-home-brand" href="${localizePath("/", language)}">Link My App</a>
+      <div class="initial-home-grid">
+        <div>
+          <h1>${escapeHtml(title)}</h1>
+          <p>${escapeHtml(paragraphs[0])}</p>
+          <a class="initial-home-cta" href="#crear">${escapeHtml(landing.formButton)}</a>
+        </div>
+        <section id="crear" class="initial-home-card" aria-labelledby="initial-home-form">
+          <h2 id="initial-home-form">${escapeHtml(landing.formTitle)}</h2>
+          <p>${escapeHtml(landing.formRouting)}</p>
+          <p>${escapeHtml(landing.formSignInNote)}</p>
+        </section>
+      </div>
+      ${navigation}
+      <div class="initial-home-details">${paragraphs.slice(1).map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("\n")}</div>
+    </main>`;
+}
+
 function staticContentBlock({ entry, language, title, description, robots }) {
   const introductionLink = entry.getIntroductionLink?.(language);
   const collected = collectReadableText(entry.getContent?.(language));
@@ -374,6 +434,10 @@ function staticContentBlock({ entry, language, title, description, robots }) {
         `<a href="${escapeHtml(href)}">${escapeHtml(label)}</a>`,
       ).join("")
     : "";
+  const navigation = robots?.startsWith("noindex") ? "" : `<nav aria-label="Public pages" style="display:flex;flex-wrap:wrap;gap:16px;margin-top:32px"><a href="${homePath}">Link My App</a><a href="${useCasesPath}">Use cases</a><a href="${howToPathname}">Guides</a><a href="${blogPath}">Blog</a>${resourceLinks}</nav>`;
+  if (isFastHome(entry, language)) {
+    return fastHomeContent(language, title, selectedParagraphs, navigation);
+  }
   const demo = entry.id === "qr-codes" && (language === "en" || language === "es")
     ? staticQrDemo(language)
     : "";
@@ -402,7 +466,7 @@ function staticContentBlock({ entry, language, title, description, robots }) {
       ${introductionLink ? `<p><a href="${escapeHtml(localizePath(introductionLink.to, language))}">${escapeHtml(introductionLink.label)}</a></p>` : ""}
       ${selectedParagraphs.map((paragraph) => `<p style="max-width:850px">${escapeHtml(paragraph)}</p>`).join("\n      ")}
       ${demo}
-      ${robots?.startsWith("noindex") ? "" : `<nav aria-label="Public pages" style="display:flex;flex-wrap:wrap;gap:16px;margin-top:32px"><a href="${homePath}">Link My App</a><a href="${useCasesPath}">Use cases</a><a href="${howToPathname}">Guides</a><a href="${blogPath}">Blog</a>${resourceLinks}</nav>`}
+      ${navigation}
     </main>`;
 }
 
@@ -507,7 +571,8 @@ function stripBaseSchema(html) {
 function htmlFor(entry, language) {
   const { title, description, robots, pageKeywords } = entry.getMeta(language);
   const direction = language === "ar" ? "rtl" : "ltr";
-  const html = entry.id === "home" ? stripBaseSeo(baseHtml) : stripBaseSchema(stripBaseSeo(baseHtml));
+  const pageTemplate = isFastHome(entry, language) ? fastHomeHead(baseHtml) : baseHtml;
+  const html = entry.id === "home" ? stripBaseSeo(pageTemplate) : stripBaseSchema(stripBaseSeo(pageTemplate));
   const seo = [
     metaBlock({ entry, language, title, description, robots, pageKeywords }),
     entry.id === "home" || robots?.startsWith("noindex")

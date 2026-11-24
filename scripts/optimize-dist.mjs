@@ -16,6 +16,8 @@ for (const filename of excludedDrafts) {
   if (existsSync(target)) rmSync(target);
 }
 
+rmSync(join(distDir, ".vite", "manifest.json"), { force: true });
+
 const optimizedLogo = join(distDir, "logo-link-my-app.avif");
 if (!existsSync(optimizedLogo)) {
   throw new Error("Falta dist/logo-link-my-app.avif; no se desplegará el logo pesado.");

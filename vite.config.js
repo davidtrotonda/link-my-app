@@ -84,6 +84,7 @@ export default defineConfig(({ command, mode }) => {
   return {
     plugins: [react()],
     build: {
+      manifest: true,
       rollupOptions: {
         output: {
           manualChunks,
